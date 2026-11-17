@@ -58,7 +58,7 @@ class _AssistantGuestViewState extends ConsumerState<AssistantGuestView> {
               Semantics(
                 header: true,
                 child: Text(
-                  'Meet ${AppConfig.appName} AI',
+                  'Meet ${AppConfig.assistantName}',
                   textAlign: TextAlign.center,
                   style: t.headlineSmall!.copyWith(fontWeight: FontWeight.w700),
                 ),

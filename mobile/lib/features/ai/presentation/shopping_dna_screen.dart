@@ -415,7 +415,7 @@ class _HowItLearns extends StatelessWidget {
     const steps = [
       (Icons.touch_app_outlined, 'Signals', 'Views, wishlist saves, cart adds, purchases and chats are weighted (a purchase counts more than a view) and fade over time.'),
       (Icons.hub_outlined, 'Profile', 'Signals become affinities for categories, brands and a typical price band, plus traits like deal-seeking or brand loyalty.'),
-      (Icons.auto_awesome_outlined, 'Ranking', 'Every recommendation blends relevance, quality, popularity and your affinities, and shows the reasons behind it.'),
+      (Icons.leaderboard_outlined, 'Ranking', 'Every recommendation blends relevance, quality, popularity and your affinities, and shows the reasons behind it.'),
       (Icons.lock_outline_rounded, 'Privacy', 'Your profile is used only to personalize your own results. Clear your activity any time to reset it.'),
     ];
     return Column(
@@ -470,7 +470,7 @@ class _Empty extends StatelessWidget {
         EmptyState(
           iconWidget: const AiMark(size: 30),
           title: 'Your DNA is still forming',
-          message: 'Browse, save and chat a little. ${AppConfig.appName} AI learns your taste from what you do and builds your profile here.',
+          message: 'Browse, save and chat a little. ${AppConfig.assistantName} learns your taste from what you do and builds your profile here.',
           actionLabel: 'Start exploring',
           onAction: () => context.go(Routes.explore),
         ),

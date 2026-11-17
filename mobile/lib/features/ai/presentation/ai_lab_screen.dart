@@ -77,7 +77,7 @@ class _LabIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AiHeader(
-      title: 'Under the hood of ${AppConfig.appName} AI',
+      title: 'Under the hood of ${AppConfig.assistantName}',
       caption: 'Live model stats and a playground to test language understanding.',
     );
   }

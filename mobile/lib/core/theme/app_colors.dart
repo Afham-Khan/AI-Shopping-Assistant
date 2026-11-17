@@ -3,86 +3,106 @@ import 'package:material_ui/material_ui.dart';
 /// Raw Zelora color tokens. Widgets should read the theme-aware [AppPalette]
 /// (`context.colors`) rather than these constants.
 ///
-/// Identity: "editorial front, ledger precision". Deep tide-ink neutrals
-/// (dark, the default) or mint-tinted paper (light), ONE confident accent
-/// (Zelora mint), a warm coral for sale states and amber for ratings.
-/// No gradients anywhere — the gradient getters below are flat on purpose.
+/// Identity v2 — "airy royal": a soft lavender-blue page with a gentle wash
+/// of light from the top, pure white rounded cards with very soft shadows,
+/// ONE confident royal blue, dark navy ink, slate secondary text. Calm red
+/// for discounts, amber for rating stars. Light is the primary theme; dark is
+/// derived from the same hues (deep navy, lighter periwinkle accent).
 abstract final class AppColors {
-  // accent — Zelora mint
-  static const mint = Color(0xFF3DDBA6);
-  static const mintHover = Color(0xFF62E5BA);
-  static const mintDeep = Color(0xFF0A7F60);
-  static const mintDeepHover = Color(0xFF086B51);
+  // brand — Zelora royal blue (5.17:1 with white, 4.58:1 on the page wash)
+  static const blue = Color(0xFF2563EB);
+  static const blueHover = Color(0xFF1D4ED8);
+  static const blueSoft = Color(0xFFEDF2FE);
 
-  // dark — tide ink (teal-black, lower chroma than navy so photos stay true)
-  static const darkBackground = Color(0xFF081719);
-  static const darkSurface = Color(0xFF0D2023);
-  static const darkSurfaceVariant = Color(0xFF13292D);
-  static const darkSurfaceRaised = Color(0xFF1A3439);
-  static const darkBorder = Color(0xFF1E383D);
-  static const darkBorderStrong = Color(0xFF30535A);
-  static const darkText = Color(0xFFEAF2F0);
-  static const darkMuted = Color(0xFFA4BBB8);
-  static const darkFaint = Color(0xFF6F8A88);
+  /// Dark-theme accent: a lighter periwinkle that reads on navy (6.9:1 on
+  /// the dark surface) with navy ink on top.
+  static const blueLight = Color(0xFF7AA2FF);
+  static const blueLightHover = Color(0xFF94B4FF);
+  static const navy = Color(0xFF0F172A);
 
-  // light — paper with a breath of mint; cards are true white
-  static const lightBackground = Color(0xFFF4F7F4);
+  // light — lavender-blue page, white cards, navy ink
+  static const lightBackground = Color(0xFFEEF1FB);
+  static const lightBackgroundTop = Color(0xFFF3F5FD);
+  static const lightBackgroundBottom = Color(0xFFE6EAF8);
   static const lightSurface = Color(0xFFFFFFFF);
-  static const lightSurfaceVariant = Color(0xFFECF1ED);
-  static const lightSurfaceRaised = Color(0xFFE0E8E3);
-  static const lightBorder = Color(0xFFD9E3DD);
-  static const lightBorderStrong = Color(0xFFB5C8BE);
-  static const lightText = Color(0xFF10221D);
-  static const lightMuted = Color(0xFF465E56);
-  static const lightFaint = Color(0xFF72887F);
+  static const lightSurfaceVariant = Color(0xFFF4F6FC);
+  static const lightSurfaceRaised = Color(0xFFE9EDF8);
+  static const lightBorder = Color(0xFFE3E8F4);
+  static const lightBorderStrong = Color(0xFFC9D2E6);
+  static const lightText = navy;
+  static const lightMuted = Color(0xFF5B6478);
+  static const lightFaint = Color(0xFF6B7489);
 
-  // semantic (dark / light pairs live in AppPalette)
-  static const coral = Color(0xFFF4736C);
-  static const amber = Color(0xFFF0B352);
-  static const sky = Color(0xFF5AB6EE);
-  static const violet = Color(0xFFC4A0FA);
+  // dark — deep navy derived from the same hue family
+  static const darkBackground = Color(0xFF0B1020);
+  static const darkBackgroundTop = Color(0xFF10172C);
+  static const darkBackgroundBottom = Color(0xFF0A0E1C);
+  static const darkSurface = Color(0xFF141B2E);
+  static const darkSurfaceVariant = Color(0xFF1A2238);
+  static const darkSurfaceRaised = Color(0xFF222B44);
+  static const darkBorder = Color(0xFF252E47);
+  static const darkBorderStrong = Color(0xFF36415F);
+  static const darkText = Color(0xFFE8ECF6);
+  static const darkMuted = Color(0xFFA3ADC4);
+  static const darkFaint = Color(0xFF8790AB);
 
-  // legacy names kept so older call sites compile
-  static const emerald = mintDeep;
-  static const emeraldBright = mint;
-  static const ocean = Color(0xFF0F6FC0);
-  static const oceanBright = sky;
-  static const cyan = Color(0xFF3FBFC0);
-  static const aiStart = mint;
-  static const aiMid = mint;
-  static const aiEnd = mint;
-  static const ai = mint;
-  static const sale = coral;
-  static const success = Color(0xFF3BD48F);
-  static const warning = amber;
+  // semantic
+  static const red = Color(0xFFDC2626);
+  static const redLight = Color(0xFFFF7A7A);
+  static const amber = Color(0xFFF59E0B);
+  static const amberLight = Color(0xFFFBBF24);
+  static const green = Color(0xFF15803D);
+  static const sky = Color(0xFF0369A1);
+  static const violet = Color(0xFF7C3AED);
+
+  // legacy names kept so older call sites compile — all point at v2 values
+  // (there is no mint/teal anywhere any more)
+  static const mint = blue;
+  static const mintHover = blueHover;
+  static const mintDeep = blue;
+  static const mintDeepHover = blueHover;
+  static const coral = red;
+  static const emerald = green;
+  static const emeraldBright = Color(0xFF4ADE80);
+  static const ocean = sky;
+  static const oceanBright = Color(0xFF38BDF8);
+  static const cyan = Color(0xFF0891B2);
+  static const aiStart = blue;
+  static const aiMid = blue;
+  static const aiEnd = blue;
+  static const ai = blue;
+  static const sale = red;
+  static const success = green;
+  static const warning = Color(0xFFB45309);
   static const star = amber;
-  static const error = Color(0xFFCF3B33);
-  static const errorDark = coral;
+  static const error = red;
+  static const errorDark = redLight;
 
-  /// Flat on purpose: the design system has no visible gradients. Kept as a
+  /// Flat on purpose: the design system has no loud gradients. Kept as a
   /// [LinearGradient] only because older code asks for one.
-  static const aiGradient = LinearGradient(colors: [Color(0xFF1FB888), Color(0xFF1FB888)]);
-  static const brandGradient = LinearGradient(colors: [Color(0xFF1FB888), Color(0xFF1FB888)]);
+  static const aiGradient = LinearGradient(colors: [blue, blue]);
+  static const brandGradient = LinearGradient(colors: [blue, blue]);
 
-  // Department hues: mid-tones that read on both themes. Use them as a thin
-  // top border, a 6 px dot or a small icon tint — never as a loud fill.
+  // Department hues: calm mid-tones that read on both themes. Use them as a
+  // small icon tint, a 6 px dot or a soft 10 % tile behind an icon — never
+  // as a loud fill or for body text.
   static const _departmentAccents = <String, Color>{
-    'electronics': Color(0xFF4AA8E8),
-    'fashion': Color(0xFFE8719A),
-    'beauty-personal-care': Color(0xFFA98BF0),
-    'home-living': Color(0xFFE0A23C),
-    'groceries': Color(0xFF4CC38A),
-    'sports-outdoors': Color(0xFFEE8A4E),
-    'automotive': Color(0xFF3FBFC0),
+    'electronics': Color(0xFF3B82F6),
+    'fashion': Color(0xFFEC4899),
+    'beauty-personal-care': Color(0xFF8B5CF6),
+    'home-living': Color(0xFFF59E0B),
+    'groceries': Color(0xFF22A06B),
+    'sports-outdoors': Color(0xFFF97316),
+    'automotive': Color(0xFF0EA5E9),
   };
   static const _fallbackAccents = [
-    Color(0xFF4AA8E8),
-    Color(0xFF4CC38A),
-    Color(0xFFA98BF0),
-    Color(0xFFE8719A),
-    Color(0xFFEE8A4E),
-    Color(0xFF3FBFC0),
-    Color(0xFFE0A23C),
+    Color(0xFF3B82F6),
+    Color(0xFF22A06B),
+    Color(0xFF8B5CF6),
+    Color(0xFFEC4899),
+    Color(0xFFF97316),
+    Color(0xFF0EA5E9),
+    Color(0xFFF59E0B),
   ];
 
   /// Accent for a department slug; unknown slugs get a stable color from the palette.
@@ -97,6 +117,8 @@ abstract final class AppColors {
 class AppPalette extends ThemeExtension<AppPalette> {
   const AppPalette({
     required this.background,
+    required this.backgroundTop,
+    required this.backgroundBottom,
     required this.surface,
     required this.surfaceVariant,
     required this.surfaceRaised,
@@ -127,40 +149,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.shadow,
   });
 
-  static const dark = AppPalette(
-    background: AppColors.darkBackground,
-    surface: AppColors.darkSurface,
-    surfaceVariant: AppColors.darkSurfaceVariant,
-    surfaceRaised: AppColors.darkSurfaceRaised,
-    border: AppColors.darkBorder,
-    borderStrong: AppColors.darkBorderStrong,
-    text: AppColors.darkText,
-    muted: AppColors.darkMuted,
-    faint: AppColors.darkFaint,
-    primary: AppColors.mint,
-    primaryHover: AppColors.mintHover,
-    onPrimary: Color(0xFF04271B),
-    primarySoft: Color(0xFF123531),
-    secondary: AppColors.sky,
-    secondarySoft: Color(0xFF12303F),
-    error: AppColors.coral,
-    sale: AppColors.coral,
-    onSale: Color(0xFF2B0907),
-    saleSoft: Color(0xFF3A2224),
-    success: Color(0xFF3BD48F),
-    warning: AppColors.amber,
-    star: AppColors.amber,
-    purple: AppColors.violet,
-    ai: AppColors.mint,
-    aiSoft: Color(0xFF123531),
-    imageWell: Color(0xFFE7EDEA),
-    onImageWell: Color(0xFF10221D),
-    grid: Color(0xFF1B3439),
-    shadow: Color(0xB3000000),
-  );
-
   static const light = AppPalette(
     background: AppColors.lightBackground,
+    backgroundTop: AppColors.lightBackgroundTop,
+    backgroundBottom: AppColors.lightBackgroundBottom,
     surface: AppColors.lightSurface,
     surfaceVariant: AppColors.lightSurfaceVariant,
     surfaceRaised: AppColors.lightSurfaceRaised,
@@ -169,77 +161,119 @@ class AppPalette extends ThemeExtension<AppPalette> {
     text: AppColors.lightText,
     muted: AppColors.lightMuted,
     faint: AppColors.lightFaint,
-    primary: AppColors.mintDeep,
-    primaryHover: AppColors.mintDeepHover,
+    primary: AppColors.blue,
+    primaryHover: AppColors.blueHover,
     onPrimary: Color(0xFFFFFFFF),
-    primarySoft: Color(0xFFE1F2EC),
-    secondary: Color(0xFF0F6FC0),
-    secondarySoft: Color(0xFFE3EFF9),
-    error: Color(0xFFCF3B33),
-    sale: Color(0xFFC8372F),
+    primarySoft: AppColors.blueSoft,
+    secondary: AppColors.sky,
+    secondarySoft: Color(0xFFE0F2FE),
+    error: AppColors.red,
+    sale: AppColors.red,
     onSale: Color(0xFFFFFFFF),
-    saleSoft: Color(0xFFFBE9E7),
-    success: Color(0xFF0E8F5B),
-    warning: Color(0xFFA86A09),
-    star: Color(0xFFE09A14),
-    purple: Color(0xFF6F48D6),
-    ai: AppColors.mintDeep,
-    aiSoft: Color(0xFFE1F2EC),
-    imageWell: Color(0xFFEEF2EF),
-    onImageWell: Color(0xFF10221D),
-    grid: Color(0xFFD3DED7),
-    shadow: Color(0x2410231C),
+    saleSoft: Color(0xFFFDECEC),
+    success: AppColors.green,
+    warning: Color(0xFFB45309),
+    star: AppColors.amber,
+    purple: AppColors.violet,
+    ai: AppColors.blue,
+    aiSoft: AppColors.blueSoft,
+    imageWell: Color(0xFFF3F5FA),
+    onImageWell: AppColors.navy,
+    grid: Color(0xFFDDE3F1),
+    shadow: Color(0x661E2A5A),
   );
 
-  /// Page background.
-  final Color background;
+  static const dark = AppPalette(
+    background: AppColors.darkBackground,
+    backgroundTop: AppColors.darkBackgroundTop,
+    backgroundBottom: AppColors.darkBackgroundBottom,
+    surface: AppColors.darkSurface,
+    surfaceVariant: AppColors.darkSurfaceVariant,
+    surfaceRaised: AppColors.darkSurfaceRaised,
+    border: AppColors.darkBorder,
+    borderStrong: AppColors.darkBorderStrong,
+    text: AppColors.darkText,
+    muted: AppColors.darkMuted,
+    faint: AppColors.darkFaint,
+    primary: AppColors.blueLight,
+    primaryHover: AppColors.blueLightHover,
+    onPrimary: Color(0xFF0A1A3F),
+    primarySoft: Color(0xFF1C2850),
+    secondary: Color(0xFF38BDF8),
+    secondarySoft: Color(0xFF0E2A3D),
+    error: AppColors.redLight,
+    sale: AppColors.redLight,
+    onSale: Color(0xFF2A0707),
+    saleSoft: Color(0xFF3A1C24),
+    success: Color(0xFF4ADE80),
+    warning: AppColors.amberLight,
+    star: AppColors.amberLight,
+    purple: Color(0xFFB79CFF),
+    ai: AppColors.blueLight,
+    aiSoft: Color(0xFF1C2850),
+    // product photos are cut-outs and many products are black: the well
+    // stays light in dark mode too
+    imageWell: Color(0xFFEEF1F8),
+    onImageWell: AppColors.navy,
+    grid: Color(0xFF1F2740),
+    shadow: Color(0xB3000000),
+  );
 
-  /// Cards, sheets, inputs.
+  /// Flat page color (also the scrolled-under app bar fill). The page itself
+  /// paints a soft wash from [backgroundTop] to [backgroundBottom] — see
+  /// `AppBackground`.
+  final Color background;
+  final Color backgroundTop;
+  final Color backgroundBottom;
+
+  /// Cards, sheets, inputs, the bottom bar, circular icon buttons (white).
   final Color surface;
 
-  /// Quiet fills: hover rows, skeletons, inset panels (surface-2).
+  /// Quiet fills: pressed rows, skeletons, inset panels, unselected chips on cards.
   final Color surfaceVariant;
 
-  /// Chips on a surface, kbd chips, tooltips (surface-3).
+  /// Kbd chips, tooltips, slider/progress tracks.
   final Color surfaceRaised;
 
-  /// Hairline border. [borderStrong] on hover / emphasis.
+  /// Light grey-blue hairline. [borderStrong] on hover / emphasis.
   final Color border;
   final Color borderStrong;
 
-  /// Primary text, secondary text ([muted]) and captions/placeholders ([faint]).
+  /// Navy primary text, slate secondary text ([muted]) and captions/placeholders ([faint]).
   final Color text;
   final Color muted;
   final Color faint;
 
-  /// The one accent (Zelora mint): primary buttons, active states, eyebrows.
+  /// Royal blue: primary buttons, active nav, selected chips, links, prices you act on.
   final Color primary;
   final Color primaryHover;
   final Color onPrimary;
 
-  /// Opaque accent tint for selected chips, nav indicators, AI panels.
+  /// Very light blue tint for selected chips, the nav indicator, AI panels.
   final Color primarySoft;
 
-  /// Informational blue: links and info states only.
+  /// Informational sky blue: info states only.
   final Color secondary;
   final Color secondarySoft;
 
   final Color error;
 
-  /// Warm coral for discounts and "was" savings. Text on it uses [onSale].
+  /// Calm red for discounts and "was" savings. Text on it uses [onSale].
   final Color sale;
   final Color onSale;
   final Color saleSoft;
   final Color success;
   final Color warning;
+
+  /// Amber rating stars.
   final Color star;
   final Color purple;
 
-  /// AI surfaces use the same single accent (kept as separate names for intent).
+  /// AI surfaces use the brand blue (separate names for intent).
   final Color ai;
   final Color aiSoft;
 
-  /// The light "studio" tile behind product photos — light in BOTH themes,
+  /// The very light tile behind product photos — light in BOTH themes,
   /// because the catalog's cut-out photos include dark products.
   final Color imageWell;
 
@@ -249,24 +283,49 @@ class AppPalette extends ThemeExtension<AppPalette> {
   /// Dot / line color for `DotGridBackground`.
   final Color grid;
 
-  /// Shadow color, for floating elements only.
+  /// Translucent shadow hue for `Material.shadowColor` (navy in light, black
+  /// in dark). For box shadows use [shadowSm] / [shadowMd] / [shadowLg].
   final Color shadow;
+
+  bool get _isDark => background.computeLuminance() < 0.2;
 
   LinearGradient get aiGradient => LinearGradient(colors: [ai, ai]);
   LinearGradient get brandGradient => LinearGradient(colors: [primary, primary]);
 
-  /// Department hue (thin top borders, dots, small icon tints).
+  /// The page wash: light from the top, very soft.
+  LinearGradient get backgroundWash => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [backgroundTop, background, backgroundBottom],
+    stops: const [0, 0.42, 1],
+  );
+
+  /// Department hue (small icon tints, dots, soft tiles).
   Color departmentAccent(String? slug) => AppColors.departmentAccent(slug);
 
-  /// Soft drop shadow for hovered cards and menus.
-  List<BoxShadow> get shadowMd => [BoxShadow(color: shadow, blurRadius: 28, spreadRadius: -10, offset: const Offset(0, 10))];
+  /// Resting cards (product cards, AppCard, list groups): barely-there lift.
+  List<BoxShadow> get shadowSm => [
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.30 : 0.06), blurRadius: 18, offset: const Offset(0, 6)),
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.20 : 0.03), blurRadius: 3, offset: const Offset(0, 1)),
+  ];
 
-  /// Deep shadow for dialogs and popovers.
-  List<BoxShadow> get shadowLg => [BoxShadow(color: shadow, blurRadius: 64, spreadRadius: -24, offset: const Offset(0, 28))];
+  /// Hovered cards, menus, floating bars and circular icon buttons over photos.
+  List<BoxShadow> get shadowMd => [
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.45 : 0.10), blurRadius: 30, spreadRadius: -6, offset: const Offset(0, 12)),
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.25 : 0.04), blurRadius: 4, offset: const Offset(0, 1)),
+  ];
+
+  /// Dialogs, popovers and the desktop app frame.
+  List<BoxShadow> get shadowLg => [
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.55 : 0.14), blurRadius: 70, spreadRadius: -18, offset: const Offset(0, 30)),
+    BoxShadow(color: shadow.withValues(alpha: _isDark ? 0.30 : 0.05), blurRadius: 10, offset: const Offset(0, 2)),
+  ];
 
   @override
   AppPalette copyWith({
     Color? background,
+    Color? backgroundTop,
+    Color? backgroundBottom,
     Color? surface,
     Color? surfaceVariant,
     Color? surfaceRaised,
@@ -298,6 +357,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
   }) {
     return AppPalette(
       background: background ?? this.background,
+      backgroundTop: backgroundTop ?? this.backgroundTop,
+      backgroundBottom: backgroundBottom ?? this.backgroundBottom,
       surface: surface ?? this.surface,
       surfaceVariant: surfaceVariant ?? this.surfaceVariant,
       surfaceRaised: surfaceRaised ?? this.surfaceRaised,
@@ -335,6 +396,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color mix(Color a, Color b) => Color.lerp(a, b, t)!;
     return AppPalette(
       background: mix(background, other.background),
+      backgroundTop: mix(backgroundTop, other.backgroundTop),
+      backgroundBottom: mix(backgroundBottom, other.backgroundBottom),
       surface: mix(surface, other.surface),
       surfaceVariant: mix(surfaceVariant, other.surfaceVariant),
       surfaceRaised: mix(surfaceRaised, other.surfaceRaised),

@@ -15,18 +15,24 @@ import '../../catalog/data/models/catalog_models.dart';
 import '../../catalog/data/models/product_query.dart';
 import '../../catalog/providers/catalog_providers.dart';
 import '../../compare_tray/compare_tray_provider.dart';
+import '../../discover/presentation/widgets/discover_entry_card.dart';
 import '../../notifications/providers/notifications_providers.dart';
+import '../providers/room_providers.dart';
+import 'room/room_section.dart';
 import 'widgets/ask_bar.dart';
-import 'widgets/banner_carousel.dart';
 import 'widgets/home_sections.dart';
+import 'widgets/parallax_deals_rail.dart';
+import 'widgets/scroll_story.dart';
 
-/// AI-first home: greeting, "Ask Zelora" prompt, AI shortcuts, banners,
-/// departments, flash deals, personal picks and curated rails.
+/// Home, composed as a calm story: greeting and "Ask Zel", the interactive
+/// room (hero), one scroll-driven featured product, flash deals, personal
+/// picks, the Discover entry, then trending and Zel's tools.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   Future<void> _refresh(WidgetRef ref) async {
     ref.read(unreadNotificationsProvider.notifier).refresh();
+    ref.invalidate(roomZonesProvider);
     try {
       ref.invalidate(homeFeedProvider);
       await ref.read(homeFeedProvider.future);
@@ -48,14 +54,10 @@ class HomeScreen extends ConsumerWidget {
             const _HomeAppBar(),
             const _Box(child: _Greeting()),
             const _Box(top: AppSpacing.md, child: AskBar()),
-            _Box(
-              top: AppSpacing.md,
-              child: QuickActions(
-                onCompare: () => context.push(Routes.compareOf(ref.read(compareTrayProvider.notifier).ids)),
-              ),
-            ),
+            // the hero: works on its own data, so it shows even if the feed fails
+            const _Box(top: AppSpacing.xl, child: RoomSection()),
             ...switch (feed) {
-              AsyncValue(:final value?) => _content(context, value),
+              AsyncValue(:final value?) => _content(context, ref, value),
               AsyncValue(:final error?) => [
                 SliverToBoxAdapter(
                   child: Padding(
@@ -78,32 +80,28 @@ class HomeScreen extends ConsumerWidget {
   }
 
   List<Widget> _loading(BuildContext context) => [
-    const _Box(top: AppSpacing.xl, child: BannerCarouselSkeleton()),
-    const _Box(top: AppSpacing.xl, child: _HeaderSkeleton()),
-    const SliverToBoxAdapter(
-      child: Padding(padding: EdgeInsets.only(top: AppSpacing.sm), child: DepartmentTilesSkeleton()),
+    const _Box(
+      top: AppSpacing.xxl,
+      child: Skeleton(height: 240, borderRadius: AppRadii.sheetAll),
     ),
     const _Box(top: AppSpacing.xl, child: _HeaderSkeleton()),
     const _Rail(top: AppSpacing.sm, child: ProductRail.loading()),
   ];
 
-  List<Widget> _content(BuildContext context, HomeFeed feed) {
-    final wide = context.isWide;
+  /// The featured product for the scroll moment: best rated with a photo.
+  static ProductSummary? _featured(HomeFeed feed) {
+    for (final list in [feed.topRated, feed.trending, feed.flashDeals, feed.newArrivals]) {
+      for (final p in list) {
+        if (p.thumbnail != null) return p;
+      }
+    }
+    return null;
+  }
+
+  List<Widget> _content(BuildContext context, WidgetRef ref, HomeFeed feed) {
+    final featured = _featured(feed);
     return [
-      if (feed.banners.isNotEmpty) _Box(top: AppSpacing.xl, child: BannerCarousel(banners: feed.banners)),
-      if (feed.departments.isNotEmpty) ...[
-        _Box(
-          top: AppSpacing.xl,
-          child: SectionHeader(
-            title: 'Shop by department',
-            onSeeAll: () => context.go(Routes.explore),
-            actionLabel: 'All',
-          ),
-        ),
-        wide
-            ? _Box(top: AppSpacing.sm, child: DepartmentTiles(departments: feed.departments))
-            : _Rail(top: AppSpacing.xs, child: DepartmentTiles(departments: feed.departments)),
-      ],
+      if (featured != null) _Box(top: AppSpacing.xxl, child: ScrollStory(product: featured)),
       if (feed.flashDeals.isNotEmpty) ...[
         _Box(
           top: AppSpacing.xl,
@@ -114,13 +112,22 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
         ),
-        _Rail(top: AppSpacing.sm, child: ProductRail(products: feed.flashDeals)),
+        _Rail(top: AppSpacing.sm, child: ParallaxDealsRail(products: feed.flashDeals)),
       ],
       // AI recommendations (owned by the AI feature; renders its own header)
       const _Rail(top: AppSpacing.xl, child: ForYouRail()),
+      _Box(
+        top: AppSpacing.xl,
+        child: DiscoverEntryCard(products: feed.trending.isNotEmpty ? feed.trending : feed.topRated),
+      ),
       ..._rail(context, 'Trending now', 'What everyone is buying', feed.trending, ProductSort.popular),
-      ..._rail(context, 'Top rated', 'Loved by shoppers', feed.topRated, ProductSort.rating),
-      ..._rail(context, 'New arrivals', 'Fresh in the store', feed.newArrivals, ProductSort.newest),
+      const _Box(top: AppSpacing.xl, child: SectionHeader(title: 'More from Zel')),
+      _Box(
+        top: AppSpacing.sm,
+        child: QuickActions(
+          onCompare: () => context.push(Routes.compareOf(ref.read(compareTrayProvider.notifier).ids)),
+        ),
+      ),
     ];
   }
 
@@ -185,26 +192,25 @@ class _HomeAppBar extends ConsumerWidget {
     return SliverAppBar(
       floating: true,
       snap: true,
+      centerTitle: false,
       titleSpacing: context.pagePadding,
-      // the rail already shows the logo on wide screens
-      title: context.useBottomNav
-          ? const FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AppLogo(size: 30))
-          : null,
+      title: const FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AppLogo(size: 30)),
       actions: [
-        IconButton(
+        CircleIconButton(
+          icon: Icons.search_rounded,
           tooltip: 'Search',
           onPressed: () => context.push(Routes.search),
-          icon: const Icon(Icons.search_rounded),
         ),
-        IconButton(
+        CircleIconButton(
+          icon: Icons.notifications_none_rounded,
           tooltip: unread > 0 ? 'Notifications, $unread unread' : 'Notifications',
+          badgeCount: unread,
           onPressed: () {
             if (!requireAuth(context, ref, message: 'Sign in to see your notifications')) return;
             context.push(Routes.notifications);
           },
-          icon: AppBadge(count: unread, child: const Icon(Icons.notifications_none_rounded)),
         ),
-        SizedBox(width: context.pagePadding - AppSpacing.xxs),
+        SizedBox(width: context.pagePadding - AppSpacing.xs),
       ],
     );
   }

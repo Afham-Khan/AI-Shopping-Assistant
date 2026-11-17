@@ -4,13 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
 import '../../auth/providers/auth_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
+import '../data/models/price_history.dart';
 import '../data/models/product_detail.dart';
+import '../data/price_history_repository.dart';
 
 /// `GET /products/:idOrSlug` (the backend logs the view for signed-in users).
 final productDetailProvider = FutureProvider.autoDispose.family<ProductDetail, String>((ref, idOrSlug) {
   ref.watch(isAuthenticatedProvider);
   return ref.watch(catalogRepositoryProvider).product(idOrSlug);
 });
+
+/// Recorded price changes (last 90 days) for the mini chart on the product page.
+final priceHistoryProvider = FutureProvider.autoDispose.family<PriceHistory, int>(
+  (ref, productId) => ref.watch(priceHistoryRepositoryProvider).history(productId),
+);
 
 /// The 3 most helpful reviews + rating summary for the product page.
 final topReviewsProvider = FutureProvider.autoDispose.family<Paginated<Review>, int>(

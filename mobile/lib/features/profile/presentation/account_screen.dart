@@ -74,6 +74,12 @@ class AccountScreen extends ConsumerWidget {
       items: [
         _MenuItem(icon: Icons.receipt_long_outlined, label: 'My orders', onTap: () => context.push(Routes.orders)),
         _MenuItem(icon: Icons.favorite_border_rounded, label: 'Wishlist', onTap: () => context.push(Routes.wishlist)),
+        _MenuItem(
+          icon: Icons.notifications_active_outlined,
+          label: 'Price alerts',
+          subtitle: 'Products you are watching',
+          onTap: () => context.push(Routes.priceAlerts),
+        ),
         _MenuItem(icon: Icons.location_on_outlined, label: 'Addresses', onTap: () => context.push(Routes.addresses)),
         const _NotificationsItem(),
       ],
@@ -86,6 +92,20 @@ class AccountScreen extends ConsumerWidget {
           label: 'My Shopping DNA',
           subtitle: 'What the AI has learned about your taste',
           onTap: () => context.push(Routes.shoppingDna),
+          ai: true,
+        ),
+        _MenuItem(
+          icon: Icons.psychology_alt_outlined,
+          label: 'What Zelora remembers',
+          subtitle: 'Turn memory off or forget everything',
+          onTap: () => context.push(Routes.memory),
+          ai: true,
+        ),
+        _MenuItem(
+          icon: Icons.card_giftcard_rounded,
+          label: 'Gift finder',
+          subtitle: 'Zel picks gifts for someone you love',
+          onTap: () => context.push(Routes.giftFinder),
           ai: true,
         ),
         _MenuItem(

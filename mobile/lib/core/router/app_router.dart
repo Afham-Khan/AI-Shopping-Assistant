@@ -6,6 +6,7 @@ import '../../features/ai/presentation/ai_lab_screen.dart';
 import '../../features/ai/presentation/compare_screen.dart';
 import '../../features/ai/presentation/bundle_builder_screen.dart';
 import '../../features/ai/presentation/finder_screen.dart';
+import '../../features/ai/presentation/gift_finder_screen.dart';
 import '../../features/ai/presentation/product_ask_screen.dart';
 import '../../features/ai/presentation/shopping_dna_screen.dart';
 import '../../features/ai/presentation/smart_search_screen.dart';
@@ -25,6 +26,7 @@ import '../../features/catalog/presentation/explore_screen.dart';
 import '../../features/catalog/presentation/product_list_screen.dart';
 import '../../features/checkout/presentation/checkout_screen.dart';
 import '../../features/checkout/presentation/order_success_screen.dart';
+import '../../features/discover/presentation/discover_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/orders/presentation/order_detail_screen.dart';
@@ -36,9 +38,11 @@ import '../../features/profile/presentation/address_form_screen.dart';
 import '../../features/profile/presentation/addresses_screen.dart';
 import '../../features/profile/presentation/change_password_screen.dart';
 import '../../features/profile/presentation/edit_profile_screen.dart';
+import '../../features/profile/presentation/shopping_memory_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/shell/app_shell.dart';
+import '../../features/wishlist/presentation/price_alerts_screen.dart';
 import '../../features/wishlist/presentation/wishlist_screen.dart';
 import '../widgets/state_views.dart';
 import 'routes.dart';
@@ -192,6 +196,10 @@ final _routes = <RouteBase>[
                 path: _child(Routes.changePassword, Routes.account),
                 builder: (_, _) => const ChangePasswordScreen(),
               ),
+              GoRoute(
+                path: _child(Routes.memory, Routes.account),
+                builder: (_, _) => const ShoppingMemoryScreen(),
+              ),
             ],
           ),
         ],
@@ -240,6 +248,9 @@ final _routes = <RouteBase>[
   GoRoute(path: Routes.visualSearch, builder: (_, _) => const VisualSearchScreen()),
   GoRoute(path: Routes.bundleBuilder, builder: (_, _) => const BundleBuilderScreen()),
   GoRoute(path: Routes.shoppingDna, builder: (_, _) => const ShoppingDnaScreen()),
+  GoRoute(path: Routes.discover, builder: (_, _) => const DiscoverScreen()),
+  GoRoute(path: Routes.giftFinder, builder: (_, _) => const GiftFinderScreen()),
+  GoRoute(path: Routes.priceAlerts, builder: (_, _) => const PriceAlertsScreen()),
 ];
 
 class _NotFoundScreen extends StatelessWidget {

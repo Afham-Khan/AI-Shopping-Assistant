@@ -215,9 +215,11 @@ class QuickActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = [
       (Icons.photo_camera_outlined, 'Snap & Find', 'Search with a photo', () => context.push(Routes.visualSearch)),
-      (Icons.auto_awesome_mosaic_outlined, 'Bundle Builder', 'Complete the set', () => context.push(Routes.bundleBuilder)),
+      (Icons.dashboard_customize_outlined, 'Bundle Builder', 'Complete the set', () => context.push(Routes.bundleBuilder)),
       (Icons.quiz_outlined, 'Guided Finder', 'Answer, get picks', () => context.push(Routes.finder)),
       (Icons.compare_arrows_rounded, 'Compare', 'Side by side', onCompare),
+      (Icons.card_giftcard_outlined, 'Gift Finder', 'Picks for anyone', () => context.push(Routes.giftFinder)),
+      (Icons.notifications_active_outlined, 'Price Alerts', 'Wait for the drop', () => context.push(Routes.priceAlerts)),
     ];
 
     return LayoutBuilder(

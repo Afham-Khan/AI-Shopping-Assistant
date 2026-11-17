@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../../../core/config/app_config.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
@@ -73,7 +72,7 @@ class _AskBarState extends State<AskBar> {
 
     return Semantics(
       textField: true,
-      label: 'Ask Zel, the ${AppConfig.appName} AI',
+      label: 'Ask Zel, your shopping assistant',
       child: AnimatedContainer(
         duration: context.motion(AppDurations.normal),
         padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xxs, AppSpacing.xxs, AppSpacing.xxs),

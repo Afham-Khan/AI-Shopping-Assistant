@@ -61,7 +61,7 @@ class AiCard extends StatelessWidget {
 }
 
 /// The assistant's avatar slot in chat. Renders only the shared identity
-/// mark (no custom mascot) so a new Zelora AI identity applies everywhere.
+/// mark (the bag mascot, via AiSparkleIcon) so the identity applies everywhere.
 class AiAvatar extends StatelessWidget {
   const AiAvatar({super.key, this.size = 32});
 
@@ -334,7 +334,7 @@ class AiSuggestionChip extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon ?? Icons.auto_awesome, size: 14, color: colors.ai),
+                  Icon(icon ?? Icons.chat_bubble_outline_rounded, size: 14, color: colors.ai),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(

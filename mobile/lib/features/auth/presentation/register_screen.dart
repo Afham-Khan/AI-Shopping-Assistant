@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -81,7 +82,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return AuthScaffold(
       eyebrow: 'New account',
       title: 'Create your account',
-      subtitle: 'Takes a minute. Then Zel can remember your taste, your budget and what you saved.',
+      subtitle: 'Takes a minute. Then ${AppConfig.assistantName} can remember your taste, your budget and what you saved.',
       onBack: context.canPop() ? () => context.pop() : null,
       footer: AuthFooterLink(
         question: 'Already have an account?',

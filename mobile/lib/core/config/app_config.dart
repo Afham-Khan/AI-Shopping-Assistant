@@ -15,6 +15,11 @@ class AppConfig {
   const AppConfig(this.baseUrl);
 
   static const appName = 'Zelora';
+
+  /// The AI assistant's display name — the ONE place it is defined. Use it
+  /// for every on-screen mention ("Ask $assistantName", tab label, chat
+  /// header). Placeholder until the owner picks the final name.
+  static const assistantName = 'Zel';
   static const appVersion = '0.1.0';
   static const apiPrefix = '/api/v1';
 

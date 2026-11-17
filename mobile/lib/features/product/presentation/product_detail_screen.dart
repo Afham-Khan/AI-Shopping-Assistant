@@ -14,16 +14,21 @@ import '../../../core/utils/extensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../ai/presentation/widgets/bought_together_rail.dart';
+import '../../ai/presentation/widgets/complete_the_look.dart';
 import '../../ai/presentation/widgets/review_summary_card.dart';
 import '../../ai/presentation/widgets/similar_products_rail.dart';
+import '../../ai/presentation/widgets/spec_explainer.dart';
 import '../../auth/providers/require_auth.dart';
 import '../../cart/providers/cart_controller.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../compare_tray/compare_tray_bar.dart';
 import '../../compare_tray/compare_tray_provider.dart';
+import '../../wishlist/presentation/widgets/watch_price_sheet.dart';
+import '../../wishlist/providers/price_watch_providers.dart';
 import '../../wishlist/providers/wishlist_provider.dart';
 import '../data/models/product_detail.dart';
 import '../providers/product_providers.dart';
+import 'widgets/price_history_card.dart';
 import 'widgets/product_gallery.dart';
 import 'widgets/review_widgets.dart';
 
@@ -265,10 +270,22 @@ abstract final class _DetailSections {
     );
 
     return [
+      Padding(padding: const EdgeInsets.only(top: AppSpacing.xl), child: PriceHistoryCard(product: summary)),
       if (!twoColumn) ...[const SizedBox(height: AppSpacing.xl), _ServiceInfo(detail: detail)],
+      CompleteTheLookSection(product: summary, departmentSlug: detail.department?.slug),
       if (detail.highlights.isNotEmpty) section('Highlights', _Highlights(items: detail.highlights)),
       if (detail.description != null) section('About this item', _ExpandableText(detail.description!)),
-      if (detail.specs.isNotEmpty) section('Specifications', _SpecsTable(specs: detail.specs)),
+      if (detail.specs.isNotEmpty)
+        section(
+          'Specifications',
+          _SpecsTable(specs: detail.specs),
+          trailing: TextButton.icon(
+            onPressed: () => showSpecExplainerSheet(context, productId: detail.id, productTitle: summary.title),
+            style: TextButton.styleFrom(foregroundColor: context.colors.primary),
+            icon: const AiSparkleIcon(size: 16),
+            label: const Text('Explain these specs'),
+          ),
+        ),
       Padding(
         padding: const EdgeInsets.only(top: AppSpacing.xxl),
         child: ReviewSummaryCard(productId: detail.id),
@@ -553,22 +570,38 @@ class _AiAndCompareRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inTray = ref.watch(compareTrayProvider.select((l) => l.any((p) => p.id == product.id)));
+    final watching = ref.watch(priceWatchForProvider(product.id)) != null;
     final colors = context.colors;
     return Wrap(
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
       children: [
         ActionChip(
-          avatar: Icon(Icons.auto_awesome_outlined, size: 18, color: colors.ai),
+          avatar: AiSparkleIcon(size: 18, color: colors.ai),
           label: const Text('Ask Zel about this'),
           onPressed: () => context.push(Routes.productAskOf(product.id)),
+        ),
+        FilterChip(
+          selected: watching,
+          avatar: Icon(
+            watching ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
+            size: 18,
+            color: watching ? colors.primary : colors.muted,
+          ),
+          label: Text(watching ? 'Watching' : 'Watch price'),
+          onSelected: (_) => showWatchPriceSheet(context, ref, product: product),
+        ),
+        ActionChip(
+          avatar: Icon(Icons.lightbulb_outline_rounded, size: 18, color: colors.ai),
+          label: const Text('Explain specs'),
+          onPressed: () => showSpecExplainerSheet(context, productId: product.id, productTitle: product.title),
         ),
         FilterChip(
           selected: inTray,
           avatar: Icon(
             inTray ? Icons.check_rounded : Icons.compare_arrows_rounded,
             size: 18,
-            color: inTray ? colors.onPrimary : colors.muted,
+            color: inTray ? colors.primary : colors.muted,
           ),
           label: Text(inTray ? 'In compare' : 'Compare'),
           onSelected: (_) {

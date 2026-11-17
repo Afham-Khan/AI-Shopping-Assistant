@@ -11,6 +11,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
 import '../providers/wishlist_items_provider.dart';
 import '../providers/wishlist_provider.dart';
+import 'widgets/price_watch_badge.dart';
 
 /// Saved products: grid with "Move to cart" and remove (with undo).
 class WishlistScreen extends ConsumerWidget {
@@ -25,6 +26,14 @@ class WishlistScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(items == null || items.isEmpty ? 'Wishlist' : 'Wishlist (${items.length})'),
+        actions: [
+          IconButton(
+            tooltip: 'Price alerts',
+            onPressed: () => context.push(Routes.priceAlerts),
+            icon: const Icon(Icons.notifications_active_outlined),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -78,6 +87,10 @@ class _Grid extends StatelessWidget {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
+        const SliverResponsiveCenter(
+          verticalPadding: EdgeInsets.only(top: AppSpacing.sm),
+          sliver: SliverToBoxAdapter(child: _SmartNote()),
+        ),
         SliverResponsiveCenter(
           verticalPadding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           sliver: SliverLayoutBuilder(
@@ -85,7 +98,7 @@ class _Grid extends StatelessWidget {
               final width = c.crossAxisExtent;
               final columns = ProductGrid.columnsFor(width);
               final tile = (width - ProductGrid.crossSpacing * (columns - 1)) / columns;
-              final buttonHeight = 44 + AppSpacing.xs;
+              final buttonHeight = 44 + AppSpacing.xs + priceWatchBadgeHeight(context) + AppSpacing.xs;
               return SliverGrid.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columns,
@@ -167,6 +180,8 @@ class _WishlistTileState extends ConsumerState<_WishlistTile> {
       children: [
         Expanded(child: ProductCard(product: p, showWishlist: false, hero: true)),
         const SizedBox(height: AppSpacing.xs),
+        PriceWatchBadge(product: p),
+        const SizedBox(height: AppSpacing.xs),
         SizedBox(
           height: 44,
           child: Row(
@@ -189,6 +204,44 @@ class _WishlistTileState extends ConsumerState<_WishlistTile> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// "Smart wishlist": saved items are watched for price drops and restocks.
+class _SmartNote extends StatelessWidget {
+  const _SmartNote();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final t = context.textTheme;
+    return Semantics(
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
+        decoration: BoxDecoration(
+          color: colors.primarySoft,
+          borderRadius: AppRadii.inputAll,
+          border: Border.all(color: colors.primary.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.notifications_active_outlined, size: 18, color: colors.primary),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: Text(
+                'Zel watches what you save and tells you when a price drops or it is back in stock.',
+                style: t.bodySmall!.copyWith(color: colors.text, height: 1.35),
+              ),
+            ),
+            TextButton(
+              onPressed: () => context.push(Routes.priceAlerts),
+              child: const Text('Alerts'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

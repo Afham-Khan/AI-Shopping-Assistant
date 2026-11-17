@@ -161,7 +161,7 @@ void main() {
   for (final scale in [1.0, 2.0]) {
     testWidgets('home renders at 320 px, text scale $scale', (tester) async {
       await _pump(tester, const HomeScreen(), scale: scale);
-      expect(find.text('Guided Finder'), findsOneWidget);
+      expect(find.text('Shop the room'), findsOneWidget); // the room is Home's hero
       await tester.scrollUntilVisible(find.text('Flash deals'), 300, scrollable: find.byType(Scrollable).first);
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Flash deals'), findsOneWidget);

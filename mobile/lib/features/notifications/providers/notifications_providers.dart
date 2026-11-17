@@ -31,7 +31,7 @@ class AppNotification {
 
   final int id;
 
-  /// `order` | `price_drop` | `promo` | `ai` | `system`.
+  /// `order` | `price_drop` | `restock` | `promo` | `ai` | `system`.
   final String type;
   final String title;
   final String body;
@@ -43,6 +43,16 @@ class AppNotification {
   int? get orderId => JsonX.asIntOrNull(data['orderId']);
   int? get productId => JsonX.asIntOrNull(data['productId']);
   Map<String, dynamic>? get target => JsonX.asMapOrNull(data['target']);
+
+  /// Price-watch alerts (`price_drop`, `restock`) carry the before/after prices.
+  bool get isPriceAlert => type == 'price_drop' || type == 'restock';
+  double? get oldPrice => JsonX.asDoubleOrNull(data['oldPrice']);
+  double? get newPrice => JsonX.asDoubleOrNull(data['newPrice']);
+  double? get dropPercent => JsonX.asDoubleOrNull(data['dropPercent']);
+  String? get thumbnail => JsonX.asStringOrNull(data['thumbnail']);
+
+  /// Both prices known and the price really went down.
+  bool get hasPriceChange => oldPrice != null && newPrice != null && newPrice! < oldPrice!;
 
   AppNotification markRead() => AppNotification(
     id: id,

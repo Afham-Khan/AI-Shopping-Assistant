@@ -2,8 +2,12 @@
 library;
 
 export 'ai_gradient.dart';
+export 'ai_mascot.dart';
+export 'app_background.dart';
 export 'app_badge.dart';
 export 'app_button.dart';
+export 'app_controls.dart';
+export 'app_frame.dart';
 export 'app_logo.dart';
 export 'app_network_image.dart';
 export 'app_snack.dart';

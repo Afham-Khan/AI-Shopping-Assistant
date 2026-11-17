@@ -96,7 +96,7 @@ class _SummaryBody extends StatelessWidget {
             AppSpacing.gapSm,
             Row(
               children: [
-                Icon(Icons.auto_awesome, size: 12, color: colors.muted),
+                AiSparkleIcon(size: 14, color: colors.muted),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(

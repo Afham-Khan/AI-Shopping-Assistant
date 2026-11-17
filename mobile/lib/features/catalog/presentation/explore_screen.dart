@@ -8,6 +8,7 @@ import '../../../core/utils/category_icons.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../discover/presentation/widgets/discover_entry_card.dart';
 import '../data/models/catalog_models.dart';
 import '../providers/catalog_providers.dart';
 import 'widgets/accent.dart';
@@ -88,6 +89,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
     return Column(
       children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(context.pagePadding, 0, context.pagePadding, AppSpacing.sm),
+          child: const DiscoverEntryCard(compact: true),
+        ),
         SizedBox(
           height: 44 + MediaQuery.textScalerOf(context).scale(8),
           child: ListView.separated(

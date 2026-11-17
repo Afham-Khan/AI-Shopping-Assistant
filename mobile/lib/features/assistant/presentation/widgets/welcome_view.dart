@@ -41,6 +41,10 @@ class WelcomeView extends ConsumerWidget {
           route: Routes.bundleBuilder),
       _Capability(Icons.photo_camera_outlined, 'Snap & Find', 'Search with a photo', AppColors.departmentAccent('fashion'),
           route: Routes.visualSearch),
+      _Capability(Icons.card_giftcard_rounded, 'Gift finder', 'Ideas for someone you love', colors.sale,
+          route: Routes.giftFinder),
+      _Capability(Icons.notifications_active_outlined, 'Price alerts', 'Hear when a price drops', colors.success,
+          route: Routes.priceAlerts),
       _Capability(Icons.quiz_outlined, 'Guided finder', 'Answer a few questions', colors.ai, route: Routes.finder),
       _Capability(Icons.fingerprint_rounded, 'Shopping DNA', 'See what the AI learned about you',
           AppColors.departmentAccent('beauty-personal-care'), route: Routes.shoppingDna),
@@ -59,7 +63,7 @@ class WelcomeView extends ConsumerWidget {
                 Semantics(
                   header: true,
                   child: AiText(
-                    first == null ? "Hi, I'm ${AppConfig.appName} AI" : 'Hi $first, I\'m ${AppConfig.appName} AI',
+                    first == null ? "Hi, I'm ${AppConfig.assistantName}" : 'Hi $first, I\'m ${AppConfig.assistantName}',
                     textAlign: TextAlign.center,
                     style: t.headlineSmall!.copyWith(fontWeight: FontWeight.w800),
                   ),

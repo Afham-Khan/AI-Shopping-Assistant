@@ -16,10 +16,13 @@ double compareColumnWidth(double available, int count, {double min = 140}) {
   return math.max(min, available / count);
 }
 
+/// Extra height a "Best for you" label slot adds to the header.
+const double compareBadgeSlot = 26;
+
 /// Height of [CompareHeaderRow] at the current text scale (for pinned headers).
-double compareHeaderHeight(BuildContext context, {double image = 64}) {
+double compareHeaderHeight(BuildContext context, {double image = 64, bool badgeSlot = false}) {
   final s = MediaQuery.textScalerOf(context);
-  return image + 8 + s.scale(38) + 4 + s.scale(22) + 20;
+  return image + 8 + s.scale(38) + 4 + s.scale(22) + 20 + (badgeSlot ? s.scale(compareBadgeSlot) : 0);
 }
 
 /// Product heads (image, title, price) for the columns.
@@ -31,6 +34,7 @@ class CompareHeaderRow extends StatelessWidget {
     this.onRemove,
     this.onOpen,
     this.imageSize = 64,
+    this.bestForYouId,
   });
 
   final List<ProductSummary> products;
@@ -39,10 +43,15 @@ class CompareHeaderRow extends StatelessWidget {
   final ValueChanged<ProductSummary>? onOpen;
   final double imageSize;
 
+  /// The product the server picked for the shopper's need: gets a label.
+  /// When set, every column reserves the label's slot so photos stay aligned.
+  final int? bestForYouId;
+
   @override
   Widget build(BuildContext context) {
     final t = context.textTheme;
     final s = MediaQuery.textScalerOf(context);
+    final colors = context.colors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,6 +69,34 @@ class CompareHeaderRow extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (bestForYouId != null)
+                          SizedBox(
+                            height: s.scale(compareBadgeSlot),
+                            child: p.id == bestForYouId
+                                ? Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(color: colors.primary, borderRadius: AppRadii.pillAll),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          AiSparkleIcon(size: 12, color: colors.onPrimary),
+                                          const SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              'Best for you',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: t.labelSmall!.copyWith(color: colors.onPrimary, fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                          ),
                         AppNetworkImage(
                           p.thumbnail,
                           width: imageSize,

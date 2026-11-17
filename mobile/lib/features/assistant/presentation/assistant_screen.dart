@@ -9,7 +9,10 @@ import '../../../core/utils/extensions.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../ai/presentation/widgets/ai_ui.dart';
 import '../../auth/providers/auth_controller.dart';
+import '../data/speech_out.dart';
+import '../data/speech_text.dart';
 import '../providers/chat_controller.dart';
+import '../providers/read_aloud.dart';
 import 'widgets/assistant_guest_view.dart';
 import 'widgets/chat_input_bar.dart';
 import 'widgets/chat_message_tile.dart';
@@ -54,6 +57,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
 
   @override
   void dispose() {
+    SpeechOut.stop();
     _scroll.dispose();
     super.dispose();
   }
@@ -77,6 +81,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   }
 
   void _send(String text) {
+    SpeechOut.stop();
     _chat.send(text);
     if (_scroll.hasClients) {
       _scroll.animateTo(0, duration: context.motion(AppDurations.normal), curve: AppCurves.standard);
@@ -104,7 +109,14 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     });
 
     final showReasoning = ref.watch(showReasoningProvider);
+    final readAloud = ref.watch(readAloudProvider);
     final selectedId = ref.watch(chatControllerProvider.select((s) => s.conversationId));
+
+    // speak each new reply (not history) when "read replies aloud" is on
+    ref.listen(chatControllerProvider.select((s) => s.entries.isEmpty ? null : s.entries.last), (prev, next) {
+      if (next == null || next.isUser || !next.fresh || prev?.key == next.key) return;
+      if (ref.read(readAloudProvider)) SpeechOut.speak(speechTextFromMarkdown(next.content));
+    });
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -114,6 +126,16 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
           appBar: AppBar(
             title: const _AssistantTitle(),
             actions: [
+              if (SpeechOut.isSupported)
+                IconButton(
+                  tooltip: readAloud ? 'Stop reading replies aloud' : 'Read replies aloud',
+                  isSelected: readAloud,
+                  onPressed: () => ref.read(readAloudProvider.notifier).toggle(),
+                  icon: Icon(
+                    readAloud ? Icons.volume_up_rounded : Icons.volume_off_outlined,
+                    color: readAloud ? context.colors.ai : null,
+                  ),
+                ),
               IconButton(
                 tooltip: showReasoning ? 'Hide AI reasoning' : 'Show AI reasoning',
                 isSelected: showReasoning,
@@ -172,7 +194,7 @@ class _AssistantTitle extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${AppConfig.appName} AI', maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(AppConfig.assistantName, maxLines: 1, overflow: TextOverflow.ellipsis),
               Text(
                 title ?? 'Shopping assistant',
                 maxLines: 1,

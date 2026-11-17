@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/models/json_utils.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/router/routes.dart';
@@ -116,7 +117,7 @@ class _InterestsScreenState extends ConsumerState<InterestsScreen> {
               children: [
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Eyebrow('Teach Zel your taste', leading: AiSparkleIcon(size: 11)),
+                  child: Eyebrow('Teach ${AppConfig.assistantName} your taste', leading: AiSparkleIcon(size: 11)),
                 ),
                 AppSpacing.gapSm,
                 Semantics(
@@ -133,7 +134,7 @@ class _InterestsScreenState extends ConsumerState<InterestsScreen> {
                 ),
                 AppSpacing.gapXs,
                 Text(
-                  'Pick a few. Zel uses them to rank what you see first, and you can change them any time.',
+                  'Pick a few. ${AppConfig.assistantName} uses them to rank what you see first, and you can change them any time.',
                   style: t.bodyLarge!.copyWith(color: colors.muted, fontSize: 15),
                 ),
                 AppSpacing.gapXl,

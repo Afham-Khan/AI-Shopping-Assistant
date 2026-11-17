@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/models/json_utils.dart';
 import '../../core/models/product.dart';
 import '../../core/models/product_preview_cache.dart';
@@ -133,7 +134,7 @@ class _CommandPaletteState extends ConsumerState<_CommandPalette> {
       _Entry(section: 'Go to', title: 'Explore departments', icon: Icons.grid_view_outlined, trailing: 'Alt 2', onOpen: (c) => tab(c, 1)),
       _Entry(
         section: 'Go to',
-        title: 'Ask Zel',
+        title: 'Ask ${AppConfig.assistantName}',
         leading: const AiSparkleIcon(size: 16),
         subtitle: 'Describe what you need in plain words',
         trailing: 'Alt 3',
@@ -183,7 +184,7 @@ class _CommandPaletteState extends ConsumerState<_CommandPalette> {
       ),
       _Entry(
         section: 'Search',
-        title: 'Ask Zel about “$_q”',
+        title: 'Ask ${AppConfig.assistantName} about “$_q”',
         leading: const AiSparkleIcon(size: 16),
         onOpen: (c) => push(c, Routes.assistantWith(prompt: _q)),
       ),
@@ -242,7 +243,7 @@ class _CommandPaletteState extends ConsumerState<_CommandPalette> {
             elevation: 16,
             shadowColor: colors.shadow,
             clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(borderRadius: AppRadii.cardAll, side: BorderSide(color: colors.borderStrong)),
+            shape: RoundedRectangleBorder(borderRadius: AppRadii.sheetAll, side: BorderSide(color: colors.border)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -311,7 +312,14 @@ class _CommandPaletteState extends ConsumerState<_CommandPalette> {
                       const SizedBox(width: 6),
                       Text('to open', style: AppType.data(context, color: colors.faint, size: 11)),
                       const Spacer(),
-                      Text('esc to close', style: AppType.data(context, color: colors.faint, size: 11)),
+                      Flexible(
+                        child: Text(
+                          'esc to close',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.data(context, color: colors.faint, size: 11),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -338,7 +346,7 @@ class _Row extends StatelessWidget {
     return MouseRegion(
       onEnter: (_) => onHover(),
       child: Material(
-        color: selected ? colors.surfaceVariant : Colors.transparent,
+        color: selected ? colors.primarySoft : Colors.transparent,
         borderRadius: AppRadii.inputAll,
         clipBehavior: Clip.antiAlias,
         child: InkWell(

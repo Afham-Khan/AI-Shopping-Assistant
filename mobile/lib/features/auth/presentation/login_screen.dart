@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/widgets.dart';
@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return AuthScaffold(
       eyebrow: greeting,
       title: 'Welcome back',
-      subtitle: 'Your cart, saved items and conversations with Zel are where you left them.',
+      subtitle: 'Your cart, saved items and conversations with ${AppConfig.assistantName} are where you left them.',
       onBack: canPop ? () => context.pop() : null,
       footer: AuthFooterLink(
         question: 'New to Zelora?',
@@ -108,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _DemoButton(loading: _busy == _Action.demo, onPressed: busy ? null : _demo),
-              const OrDivider(label: 'or use your email'),
+              const OrDivider(label: 'or sign in with email'),
               FormErrorBanner(message: fieldErrors.isEmpty ? _error?.message : null),
               AppTextField(
                 label: 'Email',
@@ -138,8 +138,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: TextButton(
                   onPressed: busy ? null : () => context.push(Routes.forgotPassword),
                   style: TextButton.styleFrom(
-                    foregroundColor: context.colors.muted,
-                    textStyle: context.textTheme.labelLarge!.copyWith(fontSize: 13),
+                    foregroundColor: context.colors.primary,
+                    textStyle: context.textTheme.labelLarge!.copyWith(fontSize: 13.5, fontWeight: FontWeight.w700),
                   ),
                   child: const Text('Forgot password?'),
                 ),
@@ -150,8 +150,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: busy ? null : _submit,
                 loading: _busy == _Action.email,
                 expand: true,
-                // with a keyboard, Enter submits: say so
-                trailingIcon: context.isWide ? Icons.keyboard_return_rounded : null,
               ),
               AppSpacing.gapSm,
               AppButton.ghost(
@@ -167,8 +165,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-/// One-tap demo sign-in (for presentations): a bordered card-button with
-/// Zel's spark, a line of context and an arrow that nudges on hover.
+/// One-tap demo sign-in (for presentations) — the most prominent option on
+/// the screen: a light-blue card with a blue outline, the assistant's mascot in a blue
+/// circle, a line of context and an arrow that nudges on hover.
 class _DemoButton extends StatefulWidget {
   const _DemoButton({required this.loading, required this.onPressed});
 
@@ -196,61 +195,79 @@ class _DemoButtonState extends State<_DemoButton> {
       excludeSemantics: true,
       child: Opacity(
         opacity: enabled ? 1 : 0.5,
-        child: Material(
-          color: lifted ? colors.primarySoft : colors.surface,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadii.cardAll,
-            side: BorderSide(color: colors.primary.withValues(alpha: lifted ? 0.9 : 0.5)),
-          ),
-          child: InkWell(
-            onTap: widget.loading ? null : widget.onPressed,
-            onHover: (h) => setState(() => _hovered = h),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: colors.primarySoft, borderRadius: AppRadii.inputAll),
-                    child: widget.loading
-                        ? SizedBox.square(
-                            dimension: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: colors.primary),
-                          )
-                        : const AiSparkleIcon(size: 18),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Continue with demo account',
-                          style: t.labelLarge!.copyWith(fontSize: 15),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+        child: Pressable(
+          enabled: widget.onPressed != null,
+          scale: 0.98,
+          child: AnimatedContainer(
+            duration: context.motion(AppDurations.color),
+            decoration: BoxDecoration(
+              borderRadius: AppRadii.cardAll,
+              boxShadow: lifted ? colors.shadowMd : colors.shadowSm,
+            ),
+            child: Material(
+              color: colors.primarySoft,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: AppRadii.cardAll,
+                side: BorderSide(color: colors.primary, width: 1.5),
+              ),
+              child: InkWell(
+                onTap: widget.loading ? null : widget.onPressed,
+                onHover: (h) => setState(() => _hovered = h),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.sm, 14, AppSpacing.sm, 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: colors.primary, shape: BoxShape.circle),
+                        child: widget.loading
+                            ? SizedBox.square(
+                                dimension: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
+                              )
+                            : AiSparkleIcon(size: 20, color: colors.onPrimary),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Continue with demo account',
+                              style: t.titleMedium!.copyWith(fontSize: 15.5, fontWeight: FontWeight.w800),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'One tap, no sign-up. Cart and chats included.',
+                              style: t.bodySmall!.copyWith(color: colors.muted),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          'ONE TAP \u00b7 NO SIGN-UP',
-                          style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 10, letterSpacing: 1),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      AnimatedSlide(
+                        offset: Offset(lifted && !context.reduceMotion ? 0.15 : 0, 0),
+                        duration: AppDurations.fast,
+                        curve: AppCurves.standard,
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: colors.surface, shape: BoxShape.circle),
+                          child: Icon(Icons.arrow_forward_rounded, size: 18, color: colors.primary),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  AnimatedSlide(
-                    offset: Offset(lifted && !context.reduceMotion ? 0.2 : 0, 0),
-                    duration: AppDurations.fast,
-                    curve: AppCurves.standard,
-                    child: Icon(Icons.arrow_forward_rounded, size: 18, color: colors.primary),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

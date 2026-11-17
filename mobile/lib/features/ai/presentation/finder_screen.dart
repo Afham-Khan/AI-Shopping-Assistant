@@ -198,7 +198,7 @@ class _FinderScreenState extends ConsumerState<FinderScreen> {
                       flex: 2,
                       child: AppButton(
                         label: _step == total - 1 ? 'Show my matches' : (answered ? 'Next' : 'Skip'),
-                        trailingIcon: _step == total - 1 ? Icons.auto_awesome : Icons.arrow_forward_rounded,
+                        trailingIcon: _step == total - 1 ? Icons.check_rounded : Icons.arrow_forward_rounded,
                         onPressed: _next,
                       ),
                     ),

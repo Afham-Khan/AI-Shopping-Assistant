@@ -5,6 +5,7 @@ import '../../auth/providers/auth_controller.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../data/ai_repository.dart';
 import '../data/models/ai_models.dart';
+import '../data/models/shopping_models.dart';
 
 /// Personal "For you" rail. Refetches on login/logout (guests get popular picks).
 final recommendationsProvider = FutureProvider.autoDispose<AiRecommendations>((ref) {
@@ -24,13 +25,29 @@ final reviewSummaryProvider = FutureProvider.autoDispose.family<ReviewSummary, i
   (ref, productId) => ref.watch(aiRepositoryProvider).reviewSummary(productId),
 );
 
-/// Keyed by the canonical id list (`"2,5,9"`) so the same set never refetches.
+/// Keyed by the canonical id list plus the shopper's need (`"2,5,9"` or
+/// `"2,5,9|gaming"`) so the same question never refetches.
 final compareProvider = FutureProvider.autoDispose.family<CompareResult, String>((ref, key) {
-  final ids = [for (final s in key.split(',')) ?int.tryParse(s)];
-  return ref.watch(aiRepositoryProvider).compare(ids);
+  final split = key.indexOf('|');
+  final ids = [for (final s in (split < 0 ? key : key.substring(0, split)).split(',')) ?int.tryParse(s)];
+  final need = split < 0 ? null : key.substring(split + 1);
+  return ref.watch(aiRepositoryProvider).compare(ids, need: need);
 });
 
-String compareKey(List<int> ids) => ids.join(',');
+String compareKey(List<int> ids, {String? need}) {
+  final n = need?.trim() ?? '';
+  return n.isEmpty ? ids.join(',') : '${ids.join(',')}|$n';
+}
+
+/// Outfit picks for a fashion product (hidden when the server has none).
+final completeLookProvider = FutureProvider.autoDispose.family<CompleteLook, int>(
+  (ref, productId) => ref.watch(aiRepositoryProvider).completeLook(productId),
+);
+
+/// "Explain these specs" for a product page.
+final specExplainerProvider = FutureProvider.autoDispose.family<SpecExplainer, int>(
+  (ref, productId) => ref.watch(aiRepositoryProvider).explain(productId),
+);
 
 final smartSearchProvider = FutureProvider.autoDispose.family<SmartSearchResult, String>((ref, q) {
   ref.watch(isAuthenticatedProvider);

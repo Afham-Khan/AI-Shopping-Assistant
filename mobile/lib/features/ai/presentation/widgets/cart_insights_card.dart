@@ -89,7 +89,7 @@ class _CartInsightsCardState extends ConsumerState<CartInsightsCard> {
                     children: [
                       Expanded(
                         child: AiHeader(
-                          title: '${AppConfig.appName} AI cart check',
+                          title: '${AppConfig.assistantName} cart check',
                           caption: insights.totalSavings > 0
                               ? 'Save up to ${Formatters.price(insights.totalSavings)}'
                               : (insights.summary.isEmpty ? null : insights.summary),

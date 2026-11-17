@@ -113,7 +113,7 @@ class _ProductAskScreenState extends ConsumerState<ProductAskScreen> {
                   AppSpacing.gapLg,
                   if (_items.isEmpty) ...[
                     AiHeader(
-                      title: 'Ask ${AppConfig.appName} AI anything about it',
+                      title: 'Ask ${AppConfig.assistantName} anything about it',
                       caption: 'Answers come from the specs, description and real reviews, with sources.',
                     ),
                     AppSpacing.gapMd,

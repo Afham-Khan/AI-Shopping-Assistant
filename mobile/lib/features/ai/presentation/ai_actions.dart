@@ -8,6 +8,7 @@ import '../../../core/router/routes.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../auth/providers/require_auth.dart';
+import '../../cart/providers/cart_controller.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../data/ai_repository.dart';
 
@@ -49,6 +50,34 @@ Future<bool> confirmAddToCart(
     ref.read(cartCountProvider.notifier).set(count);
     if (context.mounted) {
       AppSnack.success(context, 'Added to cart', actionLabel: 'View cart', onAction: () => context.go(Routes.cart));
+    }
+    return true;
+  } on ApiException catch (e) {
+    if (context.mounted) AppSnack.error(context, e);
+    return false;
+  }
+}
+
+/// One-tap add (no confirm) for cards that already show what's being added:
+/// goes through the cart controller (badge syncs itself) and toasts the
+/// server's note. Returns true when added.
+Future<bool> quickAddToCart(
+  BuildContext context,
+  WidgetRef ref,
+  ProductSummary product, {
+  required String source,
+  String? label,
+}) async {
+  if (!requireAuth(context, ref, message: 'Sign in to add items to your cart')) return false;
+  try {
+    final res = await ref.read(cartProvider.notifier).add(product.id, source: source);
+    if (context.mounted) {
+      AppSnack.success(
+        context,
+        res.message ?? '${label ?? 'Item'} added to cart',
+        actionLabel: 'View cart',
+        onAction: () => context.go(Routes.cart),
+      );
     }
     return true;
   } on ApiException catch (e) {

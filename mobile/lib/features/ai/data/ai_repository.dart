@@ -6,6 +6,7 @@ import '../../../core/models/json_utils.dart';
 import '../../../core/models/product.dart';
 import '../../../core/network/api_client.dart';
 import 'models/ai_models.dart';
+import 'models/shopping_models.dart';
 
 /// Every `/ai/*` endpoint except chat (see `AssistantRepository`), plus the
 /// two small cart/interaction calls AI surfaces need (swap, add bundle).
@@ -26,8 +27,34 @@ class AiRepository {
   Future<ReviewSummary> reviewSummary(int productId) =>
       _api.get('/ai/review-summary/$productId', decode: ReviewSummary.fromJson);
 
-  Future<CompareResult> compare(List<int> productIds) =>
-      _api.post('/ai/compare', body: {'productIds': productIds}, decode: CompareResult.fromJson);
+  /// [need] ("gaming", "a gift for mum") asks the server for a "Best for you" pick.
+  Future<CompareResult> compare(List<int> productIds, {String? need}) => _api.post(
+    '/ai/compare',
+    body: {
+      'productIds': productIds,
+      if (need != null && need.trim().isNotEmpty) 'need': need.trim(),
+    },
+    decode: CompareResult.fromJson,
+  );
+
+  /// Outfit picks for a fashion item (`GET /ai/complete-look/:id`).
+  Future<CompleteLook> completeLook(int productId) =>
+      _api.get('/ai/complete-look/$productId', decode: CompleteLook.fromJson);
+
+  /// Plain-language spec explainer (`GET /ai/explain/:id`).
+  Future<SpecExplainer> explain(int productId) => _api.get('/ai/explain/$productId', decode: SpecExplainer.fromJson);
+
+  /// Gift Finder. [budget] is the most the shopper will spend.
+  Future<GiftResult> gift({
+    required String recipient,
+    required String occasion,
+    required num budget,
+    List<String> interests = const [],
+  }) => _api.post(
+    '/ai/gift',
+    body: {'recipient': recipient, 'occasion': occasion, 'budget': budget.round(), 'interests': interests},
+    decode: GiftResult.fromJson,
+  );
 
   Future<SmartSearchResult> smartSearch(String q, {int limit = 20}) =>
       _api.get('/ai/search', query: {'q': q, 'limit': limit}, decode: SmartSearchResult.fromJson);

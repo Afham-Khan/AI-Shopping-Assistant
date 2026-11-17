@@ -159,9 +159,10 @@ class _NotificationTile extends ConsumerWidget {
     final t = context.textTheme;
     final (icon, color) = switch (n.type) {
       'order' => (Icons.local_shipping_outlined, colors.primary),
-      'price_drop' => (Icons.trending_down_rounded, colors.sale),
+      'price_drop' => (Icons.trending_down_rounded, colors.success),
+      'restock' => (Icons.inventory_2_outlined, colors.success),
       'promo' => (Icons.local_offer_outlined, colors.warning),
-      'ai' => (Icons.auto_awesome_outlined, colors.ai),
+      'ai' => (Icons.chat_bubble_outline_rounded, colors.ai),
       _ => (Icons.notifications_none_rounded, colors.secondary),
     };
 
@@ -180,15 +181,43 @@ class _NotificationTile extends ConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: context.isDark ? 0.18 : 0.1),
-                    shape: BoxShape.circle,
+                if (n.isPriceAlert && n.thumbnail != null)
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AppNetworkImage(
+                        n.thumbnail,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.contain,
+                        borderRadius: AppRadii.inputAll,
+                      ),
+                      Positioned(
+                        right: -4,
+                        bottom: -4,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: colors.surface,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: colors.border),
+                          ),
+                          child: Icon(icon, size: 12, color: color),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: context.isDark ? 0.18 : 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, size: 20, color: color),
                   ),
-                  child: Icon(icon, size: 20, color: color),
-                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
@@ -200,6 +229,10 @@ class _NotificationTile extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(n.body, style: t.bodyMedium!.copyWith(color: colors.muted)),
+                      if (n.isPriceAlert && n.hasPriceChange) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        _PriceChange(oldPrice: n.oldPrice!, newPrice: n.newPrice!, percent: n.dropPercent),
+                      ],
                       const SizedBox(height: AppSpacing.xxs),
                       Text(Formatters.relative(n.createdAt), style: t.bodySmall),
                     ],
@@ -221,6 +254,52 @@ class _NotificationTile extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// "Rs 45,000 → Rs 39,999 · -11%" for price-drop and restock alerts.
+class _PriceChange extends StatelessWidget {
+  const _PriceChange({required this.oldPrice, required this.newPrice, this.percent});
+
+  final double oldPrice;
+  final double newPrice;
+  final double? percent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final t = context.textTheme;
+    final pct = percent ?? (oldPrice - newPrice) / oldPrice * 100;
+    return Semantics(
+      label: 'Was ${Formatters.price(oldPrice)}, now ${Formatters.price(newPrice)}, ${pct.round()} percent lower',
+      excludeSemantics: true,
+      child: Wrap(
+        spacing: AppSpacing.xs,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            Formatters.price(oldPrice),
+            style: t.bodySmall!.copyWith(
+              color: colors.faint,
+              decoration: TextDecoration.lineThrough,
+              decorationColor: colors.faint,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          Icon(Icons.arrow_forward_rounded, size: 14, color: colors.muted),
+          Text(
+            Formatters.price(newPrice),
+            style: t.titleSmall!.copyWith(
+              color: colors.success,
+              fontWeight: FontWeight.w800,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          StatusBadge('-${pct.round()}%', tone: StatusTone.success),
+        ],
       ),
     );
   }

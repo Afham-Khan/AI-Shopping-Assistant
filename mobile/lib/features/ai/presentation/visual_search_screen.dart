@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,10 +14,12 @@ import '../data/ai_repository.dart';
 import '../data/models/ai_models.dart';
 import 'widgets/ai_product_widgets.dart';
 import 'widgets/ai_ui.dart';
+import 'widgets/image_cropper.dart';
 
-/// Snap & Find (POST /ai/visual-search): pick or take a photo, watch it get
-/// analyzed, see the detected category and visually similar products.
-/// Also accepts a text description. A 503 (vision model offline) is handled.
+/// Snap & Find (POST /ai/visual-search): pick or take a photo, drag a box
+/// around the item you mean ("select the item"), watch it get analyzed and
+/// see the detected category and visually similar products. Also accepts a
+/// text description. A 503 (vision model offline) is handled.
 class VisualSearchScreen extends ConsumerStatefulWidget {
   const VisualSearchScreen({super.key});
 
@@ -30,10 +33,19 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
   final _picker = ImagePicker();
   final _describe = TextEditingController();
 
+  /// What is sent to the search (the crop, or the whole photo).
   Uint8List? _bytes;
   String _filename = 'photo.jpg';
   String? _mime;
   String? _describedAs;
+
+  // the photo as picked, kept so the selection can be adjusted
+  Uint8List? _original;
+  String _originalName = 'photo.jpg';
+  String? _originalMime;
+  ui.Image? _decoded;
+  Rect _crop = kDefaultCrop;
+  bool _cropping = false;
 
   bool _busy = false;
   VisualSearchResult? _result;
@@ -50,6 +62,7 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
   @override
   void dispose() {
     _describe.dispose();
+    _decoded?.dispose();
     super.dispose();
   }
 
@@ -78,14 +91,79 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
     final mime = file.mimeType ?? _mimeFromName(file.name);
     var name = file.name.isEmpty ? 'photo' : file.name;
     if (!name.contains('.')) name = '$name.${(mime ?? 'image/jpeg').split('/').last}';
+
+    // decode for the "select the item" step; if that fails, search the whole photo
+    ui.Image? decoded;
+    try {
+      decoded = await decodeImageBytes(bytes);
+    } catch (_) {
+      decoded = null;
+    }
+    if (!mounted) {
+      decoded?.dispose();
+      return;
+    }
+    _decoded?.dispose();
+    setState(() {
+      _original = bytes;
+      _originalName = name;
+      _originalMime = mime;
+      _decoded = decoded;
+      _crop = kDefaultCrop;
+      _describedAs = null;
+      _result = null;
+      _error = null;
+      _bytes = bytes;
+      _filename = name;
+      _mime = mime;
+      _cropping = decoded != null;
+    });
+    if (decoded == null) await _searchImage();
+  }
+
+  /// Sends the selected area (or the whole photo) to the search.
+  Future<void> _searchSelection({bool whole = false}) async {
+    final original = _original;
+    final decoded = _decoded;
+    if (original == null) return;
+    var bytes = original;
+    var name = _originalName;
+    var mime = _originalMime;
+    var note = false;
+    if (!whole && decoded != null && !isWholeImage(_crop)) {
+      try {
+        final cut = await cropToPng(decoded, _crop);
+        if (cut != null && cut.isNotEmpty) {
+          bytes = cut;
+          name = 'selection.png';
+          mime = 'image/png';
+        } else {
+          note = true;
+        }
+      } catch (_) {
+        note = true;
+      }
+    }
+    if (!mounted) return;
+    if (bytes.length > VisualSearchScreen.maxBytes) {
+      AppSnack.error(context, 'That image is over 5 MB. Please choose a smaller one.');
+      return;
+    }
+    if (note) AppSnack.info(context, "Couldn't cut out that area, so Zel is searching the whole photo.");
     setState(() {
       _bytes = bytes;
       _filename = name;
       _mime = mime;
-      _describedAs = null;
+      _cropping = false;
     });
     await _searchImage();
   }
+
+  void _adjustSelection() => setState(() {
+    _cropping = true;
+    _result = null;
+    _error = null;
+  });
 
   static String? _mimeFromName(String name) {
     final n = name.toLowerCase();
@@ -107,6 +185,8 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
     context.unfocus();
     setState(() {
       _bytes = null;
+      _original = null;
+      _cropping = false;
       _describedAs = text;
     });
     await _run(() => ref.read(aiRepositoryProvider).describeSearch(text));
@@ -128,21 +208,29 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
     }
   }
 
-  void _reset() => setState(() {
-    _bytes = null;
-    _result = null;
-    _error = null;
-    _describedAs = null;
-  });
+  void _reset() {
+    _decoded?.dispose();
+    setState(() {
+      _bytes = null;
+      _original = null;
+      _decoded = null;
+      _cropping = false;
+      _crop = kDefaultCrop;
+      _result = null;
+      _error = null;
+      _describedAs = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final cropping = _cropping && _decoded != null;
     final hasQuery = _bytes != null || _describedAs != null;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Snap & Find'),
         actions: [
-          if (hasQuery) TextButton(onPressed: _busy ? null : _reset, child: const Text('New search')),
+          if (hasQuery || cropping) TextButton(onPressed: _busy ? null : _reset, child: const Text('New search')),
           const SizedBox(width: AppSpacing.xs),
         ],
       ),
@@ -151,11 +239,59 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
           SliverResponsiveCenter(
             maxWidth: 900,
             verticalPadding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            sliver: SliverToBoxAdapter(child: hasQuery ? _queryHeader(context) : _start(context)),
+            sliver: SliverToBoxAdapter(
+              child: cropping ? _cropStage(context) : (hasQuery ? _queryHeader(context) : _start(context)),
+            ),
           ),
-          ..._resultSlivers(context),
+          if (!cropping) ..._resultSlivers(context),
         ],
       ),
+    );
+  }
+
+  /// "Select the item": drag the box over what to look for.
+  Widget _cropStage(BuildContext context) {
+    final t = context.textTheme;
+    final colors = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const AiHeader(title: 'Select the item', caption: 'Drag the box over the item you want to find.'),
+        AppSpacing.gapMd,
+        ImageCropper(image: _decoded!, rect: _crop, onChanged: (r) => setState(() => _crop = r)),
+        AppSpacing.gapXs,
+        Center(
+          child: Text(
+            'Move the box, or drag a corner to resize it.',
+            style: t.bodySmall!.copyWith(color: colors.muted),
+          ),
+        ),
+        AppSpacing.gapMd,
+        AppButton(
+          label: 'Search this area',
+          icon: Icons.image_search_rounded,
+          expand: true,
+          onPressed: _searchSelection,
+        ),
+        AppSpacing.gapXs,
+        Row(
+          children: [
+            Expanded(
+              child: AppButton.secondary(
+                label: 'Whole photo',
+                onPressed: () => _searchSelection(whole: true),
+              ),
+            ),
+            AppSpacing.gapXs,
+            Expanded(
+              child: AppButton.ghost(
+                label: 'Reset box',
+                onPressed: () => setState(() => _crop = kDefaultCrop),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -211,7 +347,21 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
               ],
             ),
           )
-        : _ScanPreview(bytes: bytes, scanning: _busy);
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ScanPreview(bytes: bytes, scanning: _busy),
+              if (_decoded != null) ...[
+                AppSpacing.gapXs,
+                AppButton.secondary(
+                  label: 'Adjust selection',
+                  icon: Icons.crop_rounded,
+                  size: AppButtonSize.small,
+                  onPressed: _busy ? null : _adjustSelection,
+                ),
+              ],
+            ],
+          );
     return LayoutBuilder(
       builder: (context, c) {
         final side = c.maxWidth >= 640;
@@ -336,7 +486,7 @@ class _ScanPreviewState extends State<_ScanPreview> with SingleTickerProviderSta
             fit: StackFit.expand,
             children: [
               ColoredBox(color: colors.surfaceVariant),
-              Image.memory(widget.bytes, fit: BoxFit.cover, gaplessPlayback: true),
+              Image.memory(widget.bytes, fit: BoxFit.contain, gaplessPlayback: true),
               if (widget.scanning) ...[
                 ColoredBox(color: colors.background.withValues(alpha: 0.25)),
                 if (!context.reduceMotion)
