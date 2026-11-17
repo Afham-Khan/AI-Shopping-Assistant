@@ -17,6 +17,7 @@ import '../utils/formatters.dart';
 import 'ai_gradient.dart';
 import 'app_network_image.dart';
 import 'app_snack.dart';
+import 'feedback.dart';
 import 'price_text.dart';
 import 'rating_stars.dart';
 
@@ -118,8 +119,10 @@ class _ProductCardState extends State<ProductCard> {
   Widget _buildCompact(BuildContext context) {
     final colors = context.colors;
     final p = widget.product;
-    return AnimatedContainer(
-      duration: context.motion(AppDurations.fast),
+    return Pressable(
+      scale: 0.98,
+      child: AnimatedContainer(
+      duration: context.motion(AppDurations.color),
       decoration: BoxDecoration(
         borderRadius: AppRadii.cardAll,
         boxShadow: _hovered ? colors.shadowMd : const [],
@@ -157,6 +160,7 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

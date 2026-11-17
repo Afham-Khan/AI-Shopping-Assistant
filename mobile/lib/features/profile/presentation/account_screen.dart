@@ -378,32 +378,16 @@ class _SignOutButton extends ConsumerStatefulWidget {
 }
 
 class _SignOutButtonState extends ConsumerState<_SignOutButton> {
-  bool _busy = false;
-
   Future<void> _signOut() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign out?'),
-        content: Text('You can sign back in any time to see your orders and wishlist on ${AppConfig.appName}.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: context.colors.error),
-            child: const Text('Sign out'),
-          ),
-        ],
-      ),
+    final out = await ConfirmDialog.show(
+      context,
+      title: 'Sign out?',
+      message: 'You can sign back in any time to see your orders and wishlist.',
+      confirmLabel: 'Sign out',
+      icon: Icons.logout_rounded,
+      onConfirm: () => ref.read(authControllerProvider.notifier).logout(),
     );
-    if (ok != true || !mounted) return;
-    setState(() => _busy = true);
-    try {
-      await ref.read(authControllerProvider.notifier).logout();
-      if (mounted) context.go(Routes.home);
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    if (out && mounted) context.go(Routes.home);
   }
 
   @override
@@ -412,7 +396,6 @@ class _SignOutButtonState extends ConsumerState<_SignOutButton> {
       label: 'Sign out',
       icon: Icons.logout_rounded,
       expand: true,
-      loading: _busy,
       onPressed: _signOut,
     );
   }

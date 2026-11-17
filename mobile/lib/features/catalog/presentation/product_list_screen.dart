@@ -46,6 +46,9 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   /// Facets of the last successful load, so the filter sheet works while a new query loads.
   ProductFacets _facets = const ProductFacets();
 
+  /// Last results shown, kept (dimmed) while a new sort/filter loads.
+  ProductListState? _last;
+
   ProductQuery _initialQuery() => ProductQuery(
     q: widget.q,
     category: widget.category,
@@ -101,7 +104,11 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(productListProvider(_query));
     final data = async.value;
-    if (data != null && !async.isLoading) _facets = data.facets;
+    if (data != null && !async.isLoading) {
+      _facets = data.facets;
+      _last = data;
+    }
+    final shownData = data ?? (async.isLoading ? _last : null);
 
     return Scaffold(
       appBar: AppBar(
@@ -132,7 +139,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           ResponsiveCenter(
             child: _Toolbar(
               query: _query,
-              total: async.isLoading ? null : data?.total,
+              total: shownData?.total,
+              shown: shownData?.items.length ?? 0,
               onSort: _openSort,
               onFilter: _openFilters,
             ),
@@ -159,8 +167,10 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   }
 
   Widget _results(AsyncValue<ProductListState> async) {
-    // keep showing the old results while a refresh runs; skeleton on a new query
-    final data = async.isLoading && !async.isRefreshing ? null : async.value;
+    final fresh = async.isLoading && !async.isRefreshing ? null : async.value;
+    // a new sort/filter keeps the previous results on screen, dimmed
+    final stale = fresh == null && async.isLoading ? _last : null;
+    final data = fresh ?? stale;
 
     if (data == null) {
       if (async.hasError && !async.isLoading) {
@@ -184,7 +194,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     if (data.items.isEmpty) return _Scrollable(child: _empty());
 
     final notifier = ref.read(productListProvider(_query).notifier);
-    return CustomScrollView(
+    final list = CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         if (_query.q != null)
@@ -222,6 +232,15 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
         ),
       ],
     );
+    if (stale == null) return list;
+    return Stack(
+      children: [
+        IgnorePointer(
+          child: AnimatedOpacity(opacity: 0.45, duration: context.motion(AppDurations.fast), child: list),
+        ),
+        const Positioned(top: 0, left: 0, right: 0, child: LinearProgressIndicator(minHeight: 2)),
+      ],
+    );
   }
 
   Widget _empty() {
@@ -234,8 +253,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           icon: Icons.search_off_rounded,
           title: 'No products found',
           message: hasFilters
-              ? 'Nothing matches these filters. Try removing some, or describe what you want to our AI.'
-              : "We couldn't find a match. Our AI assistant can help you describe it differently.",
+              ? 'Nothing matches these filters. Remove some, or describe what you want to Zel.'
+              : "No match yet. Describe it to Zel, our AI assistant.",
           actionLabel: hasFilters ? 'Clear filters' : null,
           onAction: hasFilters ? () => _setQuery(_query.clearFilters()) : null,
         ),
@@ -275,7 +294,7 @@ class _AskAiButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppButton(label: 'Ask the AI instead', icon: Icons.auto_awesome_outlined, onPressed: onTap);
+    return AppButton(label: 'Ask Zel instead', icon: Icons.auto_awesome_outlined, onPressed: onTap);
   }
 }
 
@@ -321,10 +340,17 @@ class _SmartSearchHint extends StatelessWidget {
 }
 
 class _Toolbar extends StatelessWidget {
-  const _Toolbar({required this.query, required this.total, required this.onSort, required this.onFilter});
+  const _Toolbar({
+    required this.query,
+    required this.total,
+    required this.shown,
+    required this.onSort,
+    required this.onFilter,
+  });
 
   final ProductQuery query;
   final int? total;
+  final int shown;
   final VoidCallback onSort;
   final VoidCallback onFilter;
 
@@ -343,8 +369,10 @@ class _Toolbar extends StatelessWidget {
               child: total == null
                   ? const Align(alignment: Alignment.centerLeft, child: Skeleton(width: 80, height: 12))
                   : Text(
-                      Formatters.plural(total!, 'result'),
-                      key: ValueKey(total),
+                      total == 0
+                          ? 'No results'
+                          : '1–${Formatters.number(shown)} of ${Formatters.plural(total!, 'result')}',
+                      key: ValueKey('$shown/$total'),
                       style: t.bodyMedium!.copyWith(color: colors.muted),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -482,7 +510,7 @@ class _ActiveFilters extends StatelessWidget {
           TextButton(
             onPressed: () => onChanged(q.clearFilters()),
             style: TextButton.styleFrom(foregroundColor: colors.secondary),
-            child: const Text('Clear all'),
+            child: const Text('Reset all'),
           ),
         ],
       ),

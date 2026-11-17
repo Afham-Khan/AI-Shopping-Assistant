@@ -392,12 +392,12 @@ class _EmptyCart extends StatelessWidget {
           EmptyState(
             icon: Icons.shopping_bag_outlined,
             title: 'Your cart is empty',
-            message: 'Find something you love, or let our AI assistant suggest a few ideas.',
+            message: 'Find something you love, or let Zel suggest a few ideas.',
             actionLabel: 'Start shopping',
             onAction: () => context.go(Routes.home),
           ),
           AppButton.ghost(
-            label: 'Ask the assistant',
+            label: 'Ask Zel for ideas',
             icon: Icons.auto_awesome_outlined,
             onPressed: () => context.go(Routes.assistantWith(prompt: 'Suggest something I might like')),
           ),
@@ -429,10 +429,11 @@ class _CartSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ResponsiveCenter(
+    return ResponsiveCenter(
       maxWidth: 720,
-      child: Column(
-        children: [
+      child: ListView(
+        physics: const NeverScrollableScrollPhysics(),
+        children: const [
           SizedBox(height: AppSpacing.sm),
           Skeleton(height: 64, borderRadius: AppRadii.cardAll),
           SizedBox(height: AppSpacing.md),

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/utils/form_reveal.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/formatters.dart';
@@ -220,8 +221,11 @@ class _WriteReviewSheetState extends ConsumerState<_WriteReviewSheet> {
   }
 
   Future<void> _submit() async {
-    final validForm = _form.currentState!.validate();
-    setState(() => _ratingMissing = _rating == 0);
+    final validForm = FormReveal.validate(_form);
+    setState(() {
+      _ratingMissing = _rating == 0;
+      _error = validForm && _rating != 0 ? null : const ApiException(FormReveal.fixFields);
+    });
     if (!validForm || _rating == 0) return;
     setState(() {
       _busy = true;

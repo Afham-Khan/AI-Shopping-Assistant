@@ -91,24 +91,13 @@ class _AddressCard extends ConsumerWidget {
         case _Action.edit:
           context.push(Routes.addressFormFor(addressId: address.id));
         case _Action.delete:
-          final ok = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Delete this address?'),
-              content: Text(address.oneLine),
-              actions: [
-                TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: TextButton.styleFrom(foregroundColor: context.colors.error),
-                  child: const Text('Delete'),
-                ),
-              ],
-            ),
+          final deleted = await ConfirmDialog.show(
+            context,
+            title: 'Delete ${address.label ?? 'this address'}?',
+            confirmLabel: 'Delete',
+            onConfirm: () => notifier.delete(address.id),
           );
-          if (ok != true) return;
-          await notifier.delete(address.id);
-          if (context.mounted) AppSnack.info(context, 'Address deleted');
+          if (deleted && context.mounted) AppSnack.success(context, 'Address deleted');
       }
     } on ApiException catch (e) {
       if (context.mounted) AppSnack.error(context, e);

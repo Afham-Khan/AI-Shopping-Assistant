@@ -9,7 +9,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
-import '../../cart/providers/cart_controller.dart';
 import '../providers/wishlist_items_provider.dart';
 import '../providers/wishlist_provider.dart';
 
@@ -121,10 +120,14 @@ class _WishlistTileState extends ConsumerState<_WishlistTile> {
     final p = widget.product;
     setState(() => _moving = true);
     try {
-      await ref.read(cartProvider.notifier).add(p.id, source: 'wishlist');
-      await ref.read(wishlistIdsProvider.notifier).toggle(p.id);
+      final res = await ref.read(wishlistActionsProvider).moveToCart(p.id);
       if (!mounted) return;
-      AppSnack.success(context, 'Moved to cart', actionLabel: 'View cart', onAction: () => context.go(Routes.cart));
+      AppSnack.success(
+        context,
+        res.message ?? 'Moved to cart',
+        actionLabel: 'View cart',
+        onAction: () => context.go(Routes.cart),
+      );
     } on ApiException catch (e) {
       if (mounted) AppSnack.error(context, e);
     } finally {

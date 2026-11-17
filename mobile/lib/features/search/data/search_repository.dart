@@ -71,10 +71,38 @@ final trendingSearchesProvider = FutureProvider.autoDispose<List<String>>(
 );
 
 /// Recent searches (signed-in only). Empty for guests.
-final searchHistoryProvider = FutureProvider.autoDispose<List<String>>((ref) {
-  if (!ref.watch(isAuthenticatedProvider)) return const <String>[];
-  return ref.watch(searchRepositoryProvider).history();
-});
+/// `.notifier.record(q)` after a search, `.notifier.clear()` to wipe.
+final searchHistoryProvider = AsyncNotifierProvider.autoDispose<SearchHistoryController, List<String>>(
+  SearchHistoryController.new,
+);
+
+class SearchHistoryController extends AsyncNotifier<List<String>> {
+  @override
+  Future<List<String>> build() async {
+    if (!ref.watch(isAuthenticatedProvider)) return const <String>[];
+    return ref.watch(searchRepositoryProvider).history();
+  }
+
+  /// Saves [query] (signed-in only) and moves it to the top locally.
+  /// Never throws: history is a convenience.
+  Future<void> record(String query) async {
+    final q = query.trim();
+    if (q.isEmpty || !ref.read(isAuthenticatedProvider)) return;
+    final current = state.value ?? const <String>[];
+    state = AsyncData([q.toLowerCase(), ...current.where((e) => e != q.toLowerCase())].take(10).toList());
+    try {
+      await ref.read(searchRepositoryProvider).saveHistory(q);
+    } on ApiException {
+      // keep the local copy
+    }
+  }
+
+  /// Throws [ApiException] so the UI can say why.
+  Future<void> clear() async {
+    await ref.read(searchRepositoryProvider).clearHistory();
+    if (ref.mounted) state = const AsyncData(<String>[]);
+  }
+}
 
 /// Debounced in the screen; keyed by the trimmed query so repeats are cached.
 final searchSuggestionsProvider = FutureProvider.autoDispose.family<SearchSuggestions, String>(

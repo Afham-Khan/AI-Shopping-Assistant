@@ -262,11 +262,10 @@ class _ItemRow extends StatelessWidget {
                 children: [
                   Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: t.bodyMedium),
                   Text('Qty ${item.quantity} × ${Formatters.price(item.unitPrice)}', style: t.bodySmall),
+                  Text(Formatters.price(item.lineTotal), style: t.titleSmall),
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(Formatters.price(item.lineTotal), style: t.titleSmall),
           ],
         ),
       ),
@@ -284,60 +283,42 @@ class _Actions extends ConsumerStatefulWidget {
 }
 
 class _ActionsState extends ConsumerState<_Actions> {
-  bool _cancelling = false;
   bool _buying = false;
 
   Future<void> _cancel() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel this order?'),
-        content: Text(
-          widget.order.paymentStatus == 'paid'
-              ? 'Your card payment of ${Formatters.price(widget.order.total)} will be refunded.'
-              : 'The items will go back on sale. This can\'t be undone.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Keep order')),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: context.colors.error),
-            child: const Text('Cancel order'),
-          ),
-        ],
-      ),
+    final paid = widget.order.paymentStatus == 'paid';
+    final cancelled = await ConfirmDialog.show(
+      context,
+      title: 'Cancel this order?',
+      message: paid
+          ? 'This action cannot be undone. ${Formatters.price(widget.order.total)} will be refunded to your card.'
+          : 'This action cannot be undone.',
+      confirmLabel: 'Cancel order',
+      cancelLabel: 'Keep order',
+      icon: Icons.cancel_outlined,
+      onConfirm: () async {
+        try {
+          await ref.read(orderDetailProvider(widget.order.id).notifier).cancel();
+        } on ApiException catch (e) {
+          // status moved on (e.g. shipped): show the latest
+          if (e.isConflict) ref.invalidate(orderDetailProvider(widget.order.id));
+          rethrow;
+        }
+      },
     );
-    if (ok != true || !mounted) return;
-    setState(() => _cancelling = true);
-    try {
-      await ref.read(orderDetailProvider(widget.order.id).notifier).cancel();
-      if (mounted) AppSnack.success(context, 'Order cancelled');
-    } on ApiException catch (e) {
-      if (!mounted) return;
-      AppSnack.error(context, e.isConflict ? 'This order can no longer be cancelled.' : e.message);
-      if (e.isConflict) ref.invalidate(orderDetailProvider(widget.order.id));
-    } finally {
-      if (mounted) setState(() => _cancelling = false);
-    }
+    if (cancelled && mounted) AppSnack.success(context, 'Order cancelled');
   }
 
   Future<void> _buyAgain() async {
     setState(() => _buying = true);
-    final cart = ref.read(cartProvider.notifier);
-    var added = 0;
-    String? lastError;
-    for (final item in widget.order.items) {
-      try {
-        await cart.add(item.productId, quantity: item.quantity, source: 'buy_again');
-        added++;
-      } on ApiException catch (e) {
-        lastError = e.message;
-      }
-    }
+    final result = await ref.read(cartProvider.notifier).addAll([
+      for (final i in widget.order.items) (productId: i.productId, quantity: i.quantity),
+    ], source: 'buy_again');
+    final added = result.added;
     if (!mounted) return;
     setState(() => _buying = false);
     if (added == 0) {
-      AppSnack.error(context, lastError ?? 'Couldn\'t add these items');
+      AppSnack.error(context, result.error ?? 'Couldn\'t add these items');
     } else {
       AppSnack.success(
         context,
@@ -359,12 +340,7 @@ class _ActionsState extends ConsumerState<_Actions> {
           AppButton(label: 'Buy again', icon: Icons.replay_rounded, expand: true, loading: _buying, onPressed: _buyAgain),
           if (o.status.canCancel) ...[
             const SizedBox(height: AppSpacing.sm),
-            AppButton.ghost(
-              label: 'Cancel order',
-              expand: true,
-              loading: _cancelling,
-              onPressed: _cancel,
-            ),
+            AppButton.ghost(label: 'Cancel order', expand: true, onPressed: _cancel),
           ],
         ],
       ),

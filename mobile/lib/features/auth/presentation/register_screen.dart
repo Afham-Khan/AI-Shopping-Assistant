@@ -49,7 +49,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _submit() async {
-    if (_busy || !_formKey.currentState!.validate()) return;
+    if (_busy) return;
+    if (!validateForm(_formKey)) {
+      setState(() => _error = const ApiException(kFixFieldsMessage));
+      return;
+    }
     context.unfocus();
     setState(() {
       _busy = true;
@@ -93,6 +97,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               FormErrorBanner(message: fieldErrors.isEmpty ? _error?.message : null),
               AppTextField(
                 label: 'Full name',
+                required: true,
                 controller: _name,
                 hint: 'Ali Khan',
                 prefixIcon: Icons.person_outline_rounded,
@@ -105,6 +110,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               AppSpacing.gapMd,
               AppTextField(
                 label: 'Email',
+                required: true,
                 controller: _email,
                 hint: 'you@example.com',
                 prefixIcon: Icons.mail_outline_rounded,
@@ -117,6 +123,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               AppSpacing.gapMd,
               AppTextField(
                 label: 'Password',
+                required: true,
                 controller: _password,
                 isPassword: true,
                 prefixIcon: Icons.lock_outline_rounded,
@@ -130,6 +137,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               AppSpacing.gapMd,
               AppTextField(
                 label: 'Confirm password',
+                required: true,
                 controller: _confirm,
                 isPassword: true,
                 prefixIcon: Icons.lock_outline_rounded,

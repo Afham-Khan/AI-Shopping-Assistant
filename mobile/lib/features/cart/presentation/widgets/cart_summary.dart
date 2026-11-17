@@ -185,7 +185,11 @@ class _CouponCardState extends ConsumerState<CouponCard> {
                           padding: EdgeInsets.all(AppSpacing.sm),
                           child: SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)),
                         )
-                      : TextButton(onPressed: _remove, child: const Text('Remove')),
+                      : IconButton(
+                          tooltip: 'Remove coupon',
+                          onPressed: _remove,
+                          icon: Icon(Icons.close_rounded, color: colors.muted),
+                        ),
                 ],
               )
             : Column(
@@ -360,7 +364,13 @@ class SummaryBox extends StatelessWidget {
         children: [
           Expanded(child: Text(label, style: style ?? t.bodyMedium!.copyWith(color: colors.muted))),
           const SizedBox(width: AppSpacing.sm),
-          Text(value, style: (style ?? t.bodyMedium!).copyWith(color: color, fontFeatures: tabular)),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: (style ?? t.bodyMedium!).copyWith(color: color, fontFeatures: tabular),
+            ),
+          ),
         ],
       ),
     );

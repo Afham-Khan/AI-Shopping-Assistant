@@ -59,7 +59,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!validateForm(_formKey)) {
+      setState(() => _error = const ApiException(kFixFieldsMessage));
+      return;
+    }
     _run(
       _Action.email,
       () => ref.read(authControllerProvider.notifier).login(email: _email.text, password: _password.text),

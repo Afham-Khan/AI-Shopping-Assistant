@@ -5,7 +5,9 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../utils/extensions.dart';
 
-/// Floating snackbars with consistent styling.
+/// Floating toasts: bottom-centre, one at a time (a new one replaces the
+/// old), gone after 3 s, first letter capitalised. Show the server's
+/// `message` for both success and error.
 ///
 /// ```dart
 /// AppSnack.success(context, 'Added to cart');
@@ -31,6 +33,12 @@ abstract final class AppSnack {
   // the bar is dark, so status icons come from the dark palette
   static AppPalette _inverse(BuildContext context) => AppPalette.dark;
 
+  // server messages arrive in any case; show them as a sentence
+  static String _sentence(String text) {
+    final trimmed = text.trim();
+    return trimmed.isEmpty ? trimmed : '${trimmed[0].toUpperCase()}${trimmed.substring(1)}';
+  }
+
   static void _show(
     BuildContext context,
     String message, {
@@ -44,19 +52,20 @@ abstract final class AppSnack {
     final wide = context.isWide;
 
     messenger
-      ..hideCurrentSnackBar()
+      // one at a time: a new message replaces the old one immediately
+      ..removeCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           // a full-width toast looks odd on desktop; cap it
           width: wide ? 420 : null,
-          duration: Duration(milliseconds: actionLabel == null ? 3000 : 5000),
+          duration: const Duration(seconds: 3),
           content: Row(
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 20, color: iconColor),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Expanded(child: Text(message)),
+              Expanded(child: Text(_sentence(message))),
             ],
           ),
           action: actionLabel == null

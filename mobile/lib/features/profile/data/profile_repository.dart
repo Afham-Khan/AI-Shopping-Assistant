@@ -36,10 +36,15 @@ class ProfileRepository {
     decode: (d) => User.fromJson(d as Json),
   );
 
-  Future<void> changePassword({required String currentPassword, required String newPassword}) => _api.post<void>(
-    '/users/me/change-password',
-    body: {'currentPassword': currentPassword, 'newPassword': newPassword},
-  );
+  /// Returns the server's confirmation message.
+  Future<String?> changePassword({required String currentPassword, required String newPassword}) async {
+    final res = await _api.send(
+      'POST',
+      '/users/me/change-password',
+      body: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
+    return res.message;
+  }
 
   Future<UserStats> stats() => _api.get('/users/me/stats', decode: (d) => UserStats.fromJson(d as Json));
 

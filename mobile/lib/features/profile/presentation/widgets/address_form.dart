@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/utils/form_reveal.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/validators.dart';
@@ -58,7 +59,10 @@ class _AddressFormState extends ConsumerState<AddressForm> {
   }
 
   Future<void> _submit() async {
-    if (!_form.currentState!.validate()) return;
+    if (!FormReveal.validate(_form)) {
+      setState(() => _error = const ApiException(FormReveal.fixFields));
+      return;
+    }
     context.unfocus();
     setState(() {
       _busy = true;

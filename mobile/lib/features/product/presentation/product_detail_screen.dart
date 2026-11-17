@@ -560,7 +560,7 @@ class _AiAndCompareRow extends ConsumerWidget {
       children: [
         ActionChip(
           avatar: Icon(Icons.auto_awesome_outlined, size: 18, color: colors.ai),
-          label: const Text('Ask about this product'),
+          label: const Text('Ask Zel about this'),
           onPressed: () => context.push(Routes.productAskOf(product.id)),
         ),
         FilterChip(

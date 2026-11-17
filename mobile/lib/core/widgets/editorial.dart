@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/extensions.dart';
+import 'feedback.dart';
 
 /// Small uppercase mono label that sits above a heading.
 ///
@@ -91,7 +92,22 @@ class StatBlock extends StatelessWidget {
     this.valueColor,
     this.compact = false,
     this.crossAxisAlignment = CrossAxisAlignment.start,
+    this.count,
   });
+
+  /// Counts up to [count] when it appears (1.2 s ease-out). Until the number
+  /// is known pass null and an em dash is shown.
+  const StatBlock.count({
+    super.key,
+    required this.count,
+    required this.caption,
+    this.valueColor,
+    this.compact = false,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+  }) : value = '\u2014';
+
+  /// Animated number; takes precedence over [value] when set.
+  final num? count;
 
   final String value;
   final String caption;
@@ -111,13 +127,13 @@ class StatBlock extends StatelessWidget {
       height: 1.05,
     );
     return Semantics(
-      label: '$caption: $value',
+      label: '$caption: ${count ?? value}',
       excludeSemantics: true,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: crossAxisAlignment,
         children: [
-          Text(value, style: number, maxLines: 1),
+          if (count != null) CountUp(count!, style: number) else Text(value, style: number, maxLines: 1),
           const SizedBox(height: 6),
           Text(
             caption.toUpperCase(),
@@ -148,13 +164,9 @@ class KbdChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
         borderRadius: AppRadii.tagAll,
-        // a heavier bottom edge reads as a physical key
-        border: Border(
-          top: BorderSide(color: colors.borderStrong.withValues(alpha: 0.6)),
-          left: BorderSide(color: colors.borderStrong.withValues(alpha: 0.6)),
-          right: BorderSide(color: colors.borderStrong.withValues(alpha: 0.6)),
-          bottom: BorderSide(color: colors.borderStrong, width: 2),
-        ),
+        border: Border.all(color: colors.borderStrong.withValues(alpha: 0.7)),
+        // a hard (unblurred) lower edge reads as a physical key
+        boxShadow: [BoxShadow(color: colors.borderStrong, offset: const Offset(0, 1.5))],
       ),
       child: Text(
         label,
@@ -171,15 +183,27 @@ class KbdChip extends StatelessWidget {
 /// KeyValueRow(label: 'Version', value: '0.1.0', onTap: copy)
 /// ```
 class KeyValueRow extends StatelessWidget {
-  const KeyValueRow({super.key, required this.label, required this.value, this.valueColor, this.trailing});
+  const KeyValueRow({super.key, required this.label, required this.value, this.valueColor, this.trailing, this.copyable = false});
 
   final String label;
   final String value;
   final Color? valueColor;
   final Widget? trailing;
 
+  /// Tap to copy the value (confirms with a snack).
+  final bool copyable;
+
   @override
   Widget build(BuildContext context) {
+    final row = _row(context);
+    if (!copyable) return row;
+    return Tooltip(
+      message: 'Copy',
+      child: InkWell(onTap: () => copyToClipboard(context, value, label: label), child: row),
+    );
+  }
+
+  Widget _row(BuildContext context) {
     final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 13),
@@ -196,6 +220,10 @@ class KeyValueRow extends StatelessWidget {
               style: AppType.data(context, color: valueColor ?? colors.text, size: 12.5),
             ),
           ),
+          if (copyable) ...[
+            const SizedBox(width: AppSpacing.xs),
+            Icon(Icons.copy_rounded, size: 13, color: colors.faint),
+          ],
           if (trailing != null) ...[const SizedBox(width: AppSpacing.xs), trailing!],
         ],
       ),
@@ -309,8 +337,11 @@ class _CategoryTopBorderCardState extends State<CategoryTopBorderCard> {
     return Semantics(
       button: interactive,
       label: widget.semanticLabel,
-      child: AnimatedContainer(
-        duration: context.motion(AppDurations.fast),
+      child: Pressable(
+        enabled: interactive,
+        scale: 0.98,
+        child: AnimatedContainer(
+        duration: context.motion(AppDurations.color),
         decoration: BoxDecoration(
           borderRadius: AppRadii.cardAll,
           boxShadow: lifted ? colors.shadowMd : const [],
@@ -341,6 +372,7 @@ class _CategoryTopBorderCardState extends State<CategoryTopBorderCard> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

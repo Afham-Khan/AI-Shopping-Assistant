@@ -49,7 +49,7 @@ void main() {
   testWidgets('compact card shows brand, title, rating, prices and discount', (tester) async {
     await _pump(tester, const Center(child: SizedBox(width: 180, child: ProductCard(product: _product))));
 
-    expect(find.text('Apple'), findsOneWidget);
+    expect(find.text('APPLE'), findsOneWidget); // brand is set as an uppercase eyebrow
     expect(find.textContaining('iPhone 13 Pro'), findsOneWidget);
     expect(find.text('Rs 279,999'), findsOneWidget);
     expect(find.text('Rs 309,999'), findsOneWidget);

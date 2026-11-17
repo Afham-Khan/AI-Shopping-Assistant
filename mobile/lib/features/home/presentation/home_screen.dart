@@ -187,7 +187,9 @@ class _HomeAppBar extends ConsumerWidget {
       snap: true,
       titleSpacing: context.pagePadding,
       // the rail already shows the logo on wide screens
-      title: context.useBottomNav ? const AppLogo(size: 30) : null,
+      title: context.useBottomNav
+          ? const FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AppLogo(size: 30))
+          : null,
       actions: [
         IconButton(
           tooltip: 'Search',
@@ -241,10 +243,10 @@ class _Greeting extends ConsumerWidget {
               children: [
                 const TextSpan(text: 'Tell '),
                 TextSpan(
-                  text: AppConfig.appName,
+                  text: 'Zel',
                   style: TextStyle(color: colors.primary, fontWeight: FontWeight.w600),
                 ),
-                const TextSpan(text: ' what you need — it finds the best match.'),
+                const TextSpan(text: ' what you need. It finds the best match.'),
               ],
             ),
             style: t.bodyMedium!.copyWith(color: colors.muted),

@@ -10,6 +10,7 @@ export 'app_snack.dart';
 export 'app_text_field.dart';
 export 'bottom_sheet_scaffold.dart';
 export 'editorial.dart';
+export 'feedback.dart';
 export 'form_error_banner.dart';
 export 'price_text.dart';
 export 'product_card.dart';
