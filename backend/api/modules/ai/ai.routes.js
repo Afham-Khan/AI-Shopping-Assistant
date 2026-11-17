@@ -3,6 +3,7 @@ const controller = require('./controllers/ai.controller');
 const v = require('./middlewares/ai.validator');
 const { requireAuth, optionalAuth } = require('../../middlewares/auth');
 const { warmup } = require('./engine');
+const { isServerless } = require('../../../helpers/runtime');
 
 router.post('/chat', requireAuth, v.chat, controller.chat);
 router.get('/conversations', requireAuth, controller.listConversations);
@@ -34,7 +35,8 @@ router.get('/complete-look/:productId', v.completeLook, controller.completeLook)
 router.get('/explain/:productId', v.explain, controller.explain);
 router.post('/gift', optionalAuth, v.gift, controller.gift);
 
-// build indexes after boot without delaying startup
-if (process.env.NODE_ENV !== 'test') setTimeout(() => warmup(), 1500).unref();
+// build indexes after boot without delaying startup. Serverless instances skip this: they may be frozen right
+// after the first response, so the index is built lazily by the first AI request and cached for the warm instance.
+if (process.env.NODE_ENV !== 'test' && !isServerless()) setTimeout(() => warmup(), 1500).unref();
 
 module.exports = router;

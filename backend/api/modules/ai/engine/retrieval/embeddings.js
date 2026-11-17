@@ -1,11 +1,10 @@
 // neural sentence embeddings (all-MiniLM-L6-v2 via transformers.js / onnxruntime), loaded lazily once.
 // everything degrades to the tf-idf/lsa space when the model is disabled, missing or still loading.
-const path = require('path');
+const { transformersCacheDir } = require('../../../../../helpers/aiCache');
 
 const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
 const MODEL_KEY = 'all-MiniLM-L6-v2';
 const DIMS = 384;
-const CACHE_DIR = path.join(__dirname, '../../../../../.cache/transformers');
 
 const state = { status: 'idle', error: null, loadMs: null, extractor: null, promise: null };
 const queryCache = new Map();
@@ -23,7 +22,7 @@ const load = () => {
   state.promise = (async () => {
     try {
       const { pipeline, env } = require('@huggingface/transformers');
-      env.cacheDir = CACHE_DIR;
+      env.cacheDir = transformersCacheDir(); // AI_CACHE_DIR (e.g. /home/.cache on Azure) or backend/.cache
       // offline-first: use the cached model when present, download only once
       if (process.env.AI_OFFLINE === 'true') env.allowRemoteModels = false;
       state.extractor = await pipeline('feature-extraction', MODEL_ID, { dtype: 'q8' });
