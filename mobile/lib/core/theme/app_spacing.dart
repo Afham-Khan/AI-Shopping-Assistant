@@ -52,6 +52,9 @@ abstract final class AppRadii {
 abstract final class AppDurations {
   /// Hover / press / focus color changes.
   static const fast = Duration(milliseconds: 150);
+
+  /// Hover lift / grow and the shadow that follows it (`Pressable`).
+  static const hover = Duration(milliseconds: 180);
   static const normal = Duration(milliseconds: 250);
 
   /// Color / border transitions on buttons, cards and links.

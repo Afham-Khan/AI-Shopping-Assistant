@@ -184,6 +184,50 @@ abstract final class RoomLayout {
     return Rect.fromLTWH(slot.left + step * i, slot.bottom - h, w, h);
   }
 
+  /// Horizontal centre for pinned setup pieces where it differs from the
+  /// slot's (the desk's slot sits left of the monitor; pinned pieces stand
+  /// across the desk top).
+  static const _pinCentreX = {'desk': 452.0};
+
+  /// Where a setup's pieces land in [zoneId] (null = the rug): larger than
+  /// the featured cut-outs so the change reads on a small phone. Up to three
+  /// side by side on the zone's surface, kept inside the scene.
+  static List<Rect> pinRects(String? zoneId, int count) {
+    final slot = zoneId == null ? rugSlot : (spec(zoneId)?.slot ?? rugSlot);
+    final n = count.clamp(1, 3);
+    final s = switch (n) {
+      1 => 1.35,
+      2 => 1.18,
+      _ => 1.0,
+    };
+    final w = slot.width * s;
+    final h = slot.height * s;
+    final gap = w * 0.86; // neighbours overlap a little, like objects on a shelf
+    final span = gap * (n - 1) + w;
+    final cx = _pinCentreX[zoneId] ?? slot.center.dx;
+    final left = (cx - span / 2).clamp(8.0, size.width - 8 - span);
+    final top = math.max(8.0, slot.bottom - h);
+    return [for (var i = 0; i < n; i++) Rect.fromLTWH(left + gap * i, top, w, slot.bottom - top)];
+  }
+
+  static final _floorPiece = RegExp(r'\b(chair|sofa|couch|table|stool|bean ?bag|ottoman)\b');
+  static final _shelfPiece = RegExp(r'\b(speakers?|homepod|soundbar|decor|plant|vase)\b');
+  static final _deskPiece = RegExp(
+    r'\b(lamp|headphones?|earphones?|earbuds?|headset|keyboard|mouse|monitor|webcam)\b',
+  );
+
+  /// Which zone a bundle piece belongs to: the role and title first (a
+  /// speaker goes on the shelf, a chair or table on the floor, headphones and
+  /// lamps on the desk), then the category ([zoneForProduct]). Null = the rug.
+  static String? zoneForItem(ProductSummary p, String role, List<RoomZone> zones) {
+    final text = '$role ${p.title}'.toLowerCase();
+    bool has(String id) => zones.any((z) => z.id == id);
+    if (_floorPiece.hasMatch(text)) return null;
+    if (_shelfPiece.hasMatch(text) && has('shelf')) return 'shelf';
+    if (_deskPiece.hasMatch(text) && has('desk')) return 'desk';
+    return zoneForProduct(p, zones);
+  }
+
   /// Which zone a product belongs to (category slug match), or null.
   static String? zoneForProduct(ProductSummary p, List<RoomZone> zones) {
     final slugs = {?p.category?.slug, ...p.tags};

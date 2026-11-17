@@ -18,11 +18,19 @@ const { explainProduct } = require('../explain');
 const { buildGift } = require('../gift');
 const { completeLook, FASHION } = require('../outfit');
 const { money, stars, list, titleCase, truncate, plural, shortMoney } = require('../format');
+const faq = require('./faq');
+const off = require('./offscope');
+const { conceptQuery } = require('../concepts');
+const { findNamedProduct } = require('../retrieval/named');
 
 const CHAT_LIMIT = 5;
 const FREE_SHIPPING = 5000;
 const NO_LIMIT = /\b(?:no limit|any budget|doesn'?t matter|does not matter|koi bhi|anything|no budget|whatever)\b/;
 const SEARCH_FAMILY = new Set(['product_search', 'recommendation', 'budget_query', 'refine_cheaper', 'refine_premium', 'refine_filter', 'show_more', 'gift_suggestion', 'deals']);
+// off-script routing helpers (the optional llm only answers out_of_scope, with its own persona prompt)
+const SLOT_PENDING = new Set(['gift_recipient', 'gift_budget', 'gift_interest', 'bundle_budget', 'which_product']);
+const FACT_Q = /^(?:is|does|do|can|has|have|will|are|kya|how (?:much|many|long|good|big|heavy|fast)|what(?: is|s)? (?:the )?(?:price|cost|warranty|battery|ram|storage|camera|screen|display|size|weight|colou?r|return|rating|processor|specs?))\b|\b(?:waterproof|water resistant|warranty|battery life|in stock|price|prise|cost|how much is|kitne ka|worth it|good for)\b/;
+const MULTI_SPLIT = /\s*,?\s+(?:and also|and then|and|aur|plus|as well as|also|along with|&)\s+/i;
 const LLM_INTENTS = new Set(['bundle', 'product_question', 'product_search', 'recommendation', 'budget_query', 'refine_cheaper', 'refine_premium', 'refine_filter', 'show_more', 'gift_suggestion', 'deals', 'compare', 'product_info', 'greeting', 'help', 'small_talk']);
 const ORDINAL_NAMES = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
 const EXPLAIN_RE = /\b(?:explain|simplify|in simple (?:words|terms|language)|plain (?:english|language|words)|(?:specs?|specifications?) mean|what do (?:the|these|its|their) specs|break down the specs|layman)\b/;
@@ -98,6 +106,171 @@ const decideIntent = (a, e, ctx, refs, text) => {
   if (/\b(?:bought together|goes with|go with|complete the (?:look|set)|accessories for)\b/.test(text) && (hasShown || refs.ids.length)) return 'bought_together';
   if (a.source === 'low_confidence') return 'fallback';
   return intent;
+};
+
+// ---------------------------------------------------------------- off-script routing
+
+// safety and noise run before the classifier's intent is trusted
+const routeScope = (a, e, ctx, catalog) => {
+  const sig = a.signals;
+  if (!sig) return null;
+  const pending = ctx.pending?.type;
+  if (sig.crisis) return { intent: 'feelings', topic: 'crisis' };
+  if (sig.profanity) return { intent: 'abuse', topic: 'profanity' };
+  if (sig.noise) {
+    const { kind } = sig.noise;
+    if (kind === 'numbers') {
+      // answering "what's your budget?" / any number that is a realistic budget -> normal budget flow
+      const n = sig.noise.value;
+      const plausible = n && n >= catalog.minPrice && n <= catalog.maxPrice * 1.5 && (sig.noise.digits.length <= 6 || n % 1000 === 0);
+      if (pending || plausible) return null;
+      return { intent: 'fallback', topic: 'numbers', number: { n, min: catalog.minPrice, max: catalog.maxPrice, digits: Number(sig.noise.digits).toLocaleString('en-US') } };
+    }
+    return { intent: 'fallback', topic: kind };
+  }
+  if (pending && SLOT_PENDING.has(pending)) return null;
+  if (sig.insult && !sig.strongProduct && !sig.shopping) return { intent: 'abuse', topic: 'insult' };
+  return null;
+};
+
+const OVERRIDABLE_BY_FAQ = new Set(['order_status', 'cart_help', 'product_search', 'recommendation', 'budget_query', 'help', 'small_talk', 'fallback', 'deals', 'out_of_scope', 'store_info', 'greeting', 'refine_filter', 'about_assistant', 'gift_suggestion']);
+const OVERRIDABLE_BY_OOS = new Set(['product_search', 'recommendation', 'budget_query', 'small_talk', 'help', 'fallback', 'out_of_scope', 'refine_filter', 'gift_suggestion', 'deals', 'product_info', 'bundle', 'about_assistant', 'feelings']);
+const VAGUE_INTENTS = new Set(['fallback', 'product_search', 'small_talk', 'gift_suggestion', 'help', 'recommendation', 'budget_query', 'out_of_scope', 'feelings']);
+const VAGUE_WORDS = /^(?:something|anything|nice|cool|special|interesting|amazing|fun|unique|awesome|beautiful|exciting|surprise|cheer|treat|myself|idea|sure|confused|impress|inspire|today|buy|get|order|know|thing|stuff|kuch)$/;
+
+// after the normal decision: off-topic, store faq, questions about zel, glossary, named-product facts, vague shopping
+const refineIntent = (intent, a, e, ctx, refs, extras, catalog) => {
+  const sig = a.signals;
+  if (!sig) return intent;
+  const text = a.normalized;
+  const pending = ctx.pending?.type;
+  if (pending && SLOT_PENDING.has(pending) && !['out_of_scope', 'about_assistant', 'feelings', 'abuse'].includes(intent)) return intent;
+  const strong = sig.strongProduct;
+  const search = SEARCH_FAMILY.has(intent);
+
+  if (/\b(?:joke|jokes|chutkula|latifa|funny thing)\b/.test(text) && !strong) return 'small_talk';
+  // "i ordered something last week, has it shipped?" -> the order, not a product search
+  if (sig.personal && !strong && /\b(?:ordered|order|orders|parcel|package)\b/.test(text)
+    && /\b(?:shipped|arrive\w*|deliver\w*|status|check|where|track\w*|happening|late|delayed|received|come|came|dispatch\w*)\b/.test(text)
+    && !['order_status', 'return_policy', 'cart_help'].includes(intent) && !sig.faq?.match(/^(?:returns|cancel|payment|cod|coupons)$/)) return 'order_status';
+
+  if (sig.about && !strong && ['help', 'small_talk', 'out_of_scope', 'fallback', 'about_assistant', 'product_search', 'recommendation', 'greeting', 'feelings'].includes(intent)) {
+    extras.topic = sig.about;
+    return 'about_assistant';
+  }
+  if (intent === 'about_assistant') {
+    extras.topic = sig.about || 'intro';
+    return intent;
+  }
+
+  const concept = !refs.ids.length ? conceptQuery(text) || conceptQuery(String(a.raw || '').toLowerCase()) : null;
+  if (concept && !['add_to_cart', 'order_status', 'cart_help'].includes(intent)) {
+    extras.concept = concept;
+    return 'concept';
+  }
+
+  // "is the iphone 13 waterproof?" -> grounded q&a on that product, no list on screen needed
+  if (!refs.ids.length && FACT_Q.test(text) && !['order_status', 'cart_help', 'add_to_cart', 'compare'].includes(intent)
+    && !['delivery_time', 'delivery_area', 'payment', 'cod', 'coupons', 'international', 'shipping_fee'].includes(sig.faq)) {
+    const named = findNamedProduct(a.tokens, catalog, e.categories);
+    if (named) {
+      extras.named = named;
+      refs.ids.push(named.product.id);
+      return 'product_question';
+    }
+  }
+
+  if (sig.faq) {
+    const topic = sig.faq;
+    extras.topic = topic;
+    if (topic === 'returns' || topic === 'cancel') return ['return_policy', 'order_status', 'add_to_cart'].includes(intent) ? intent : 'return_policy';
+    if (intent === 'return_policy' && /\b(?:refund|return|exchange)\b/.test(text)) return intent;
+    if (topic === 'warranty' && (refs.ids.length || ctx.focus)) return intent;
+    if (topic === 'delivery_time' && sig.personal && intent === 'order_status') return intent;
+    if (topic === 'shipping_fee' && /\bcart\b/.test(text)) return 'cart_help';
+    // "laptops under 50k with cash on delivery": answer the search, add the faq line
+    if (strong && (search || intent === 'gift_suggestion')) {
+      extras.faqNote = faq.shortAnswer(topic);
+      return intent;
+    }
+    if (OVERRIDABLE_BY_FAQ.has(intent)) return 'store_info';
+  }
+  if (intent === 'store_info') {
+    extras.topic = sig.faq || (/\b(?:sell|stock|categories|products do you have)\b/.test(text) ? 'catalog' : 'overview');
+    return intent;
+  }
+
+  if (sig.oos && OVERRIDABLE_BY_OOS.has(intent) && !refs.ids.length) {
+    extras.topic = sig.oos;
+    return 'out_of_scope';
+  }
+  if (intent === 'out_of_scope') {
+    if (strong && (sig.shopping || a.confidence < 0.75)) return 'product_search';
+    extras.topic = sig.oos || sig.oosAny || 'general';
+    return intent;
+  }
+
+  if (intent === 'abuse') {
+    if (strong && sig.shopping) return 'product_search';
+    extras.topic = 'insult';
+    return intent;
+  }
+
+  if (sig.vague && !pending && ctx.lastIntent !== 'gift_suggestion' && !e.recipient && VAGUE_INTENTS.has(intent)
+    && !e.keywords.some((k) => !VAGUE_WORDS.test(k))) {
+    extras.vague = true;
+    return 'recommendation';
+  }
+
+  if (intent === 'feelings' || (sig.feeling && ['small_talk', 'fallback', 'help'].includes(intent) && !strong)) {
+    if (strong && sig.shopping) return 'product_search';
+    extras.topic = sig.feeling || 'general';
+    return 'feelings';
+  }
+
+  // the model was unsure and nothing rescued it: a confident off-script runner-up beats a generic fallback
+  if (intent === 'fallback') {
+    const alt = a.alternatives.find((x) => ['out_of_scope', 'about_assistant', 'feelings', 'store_info'].includes(x.intent));
+    if (alt && alt.confidence >= 0.2 && alt.confidence >= (a.alternatives[0]?.confidence || 0) * 0.8) {
+      extras.topic = { out_of_scope: 'general', store_info: 'overview', feelings: 'general', about_assistant: 'intro' }[alt.intent];
+      return alt.intent;
+    }
+    extras.topic = 'low';
+  }
+  return intent;
+};
+
+// "cheap phone and a cover for it": answer the first need, offer the second as a chip
+const detectMulti = (raw, a) => {
+  const bundleWords = /\b(?:setup|kit|bundle|set|routine|outfit|pack|combo|everything|starter|makeover|hamper|look|box)\b/i.test(raw);
+  const searchy = ['product_search', 'recommendation', 'budget_query'].includes(a.intent) || a.source === 'entities' || (a.intent === 'bundle' && !bundleWords);
+  // "show me shoes and the delivery time" can classify as store_info as a whole; the split decides
+  if (!searchy && !(['store_info', 'order_status'].includes(a.intent) && a.signals?.faq && a.signals.strongProduct)) return null;
+  const m = String(raw).match(MULTI_SPLIT);
+  if (!m) return null;
+  const leftText = raw.slice(0, m.index).trim();
+  const rightText = raw.slice(m.index + m[0].length).trim().replace(/[?.!]+$/, '');
+  if (!leftText || !rightText) return null;
+  const A = analyze(leftText);
+  const B = analyze(rightText);
+  const ca = A.entities.categories;
+  const cb = B.entities.categories;
+  if (!ca.length) return null;
+  if (B.signals?.faq && !cb.length) return { kind: 'faq', left: A, topic: B.signals.faq };
+  if (/\b(?:or|vs|versus|compare|either)\b/i.test(raw)) return null;
+  const merge = () => {
+    const le = { ...A.entities };
+    for (const k of ['budget', 'recipient', 'gender', 'occasion', 'sort', 'minRating']) if (!le[k] && B.entities[k]) le[k] = B.entities[k];
+    return le;
+  };
+  if (cb.length && cb.some((c) => !ca.includes(c))) return { kind: 'product', left: A, right: B, entities: merge(), rightText };
+  if (!cb.length && B.entities.keywords.length && B.tokens.length <= 5 && !B.signals?.oos && !B.signals?.noise) return { kind: 'unknown', left: A, right: B, entities: merge(), rightText };
+  return null;
+};
+
+const chipFor = (text) => {
+  const clean = text.replace(/^(?:also|then|please|me|i need|i want|show me|and)\s+/i, '').replace(/\s+/g, ' ').trim();
+  return truncate(`Show ${clean}`, 40);
 };
 
 const viewAllQuery = (slots) => {
@@ -542,13 +715,33 @@ const handleProductQuestion = async (t) => {
   const p = catalog.byId.get(id);
   if (!p) return handleProductInfo(t);
   ctx.focus = p.id;
-  const question = raw.replace(/\b(?:the\s+)?(?:first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th)\s+(?:one|item|product)?\b/gi, 'it').replace(/\s+/g, ' ');
+  const named = t.extras?.named;
+  let question = raw.replace(/\b(?:the\s+)?(?:first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th)\s+(?:one|item|product)?\b/gi, 'it').replace(/\s+/g, ' ');
+  // a product named in the question ("can the iphone x fly?") must not match its own title passage
+  if (named) {
+    const titleWords = new Set([...p.title.toLowerCase().split(/\s+/), ...String(p.brand_name || '').toLowerCase().split(/\s+/), 'iphone', 'galaxy', 'macbook', 'ipad']);
+    question = question.split(/\s+/).filter((w) => !titleWords.has(w.toLowerCase().replace(/[^a-z0-9]/g, ''))).join(' ');
+    if (!/\b(?:it|its)\b/i.test(question)) question = `${question} it`.trim();
+  }
   const r = await qa.ask(p.id, question);
+  if (named) ctx.lastProducts = [p.id];
+  let content = r.answer;
+  let suggestions = r.followUps.slice(0, 3);
+  if (r.confidence <= 0.15) {
+    // honest "not in the listing" + what we do know, instead of guessing
+    const known = Object.entries(p.specs || {}).slice(0, 2).map(([k, v]) => `${k}: ${truncate(String(v), 40)}`);
+    content = `I don't have that detail for **${p.title}**: it isn't in the product listing, and I'd rather not guess.${known.length ? ` Here's what I do know: ${known.join(' · ')}.` : ''} I can explain its specs in plain words or show similar items.`;
+    suggestions = ['Explain its specs', 'Show similar items', ...r.followUps.slice(0, 1)];
+  } else if (named?.partial) {
+    content = `We don't carry the plain ${named.asked}, but we do have the **${p.title}** (**${money(p.price)}**). ${r.answer}`;
+  } else if (named && !r.answer.includes(p.title)) {
+    content = `**${p.title}**: ${r.answer}`;
+  }
   return {
-    content: r.answer,
+    content,
     products: [simpleItem(p, catalog)],
     qa: r,
-    suggestions: r.followUps.slice(0, 3),
+    suggestions,
     actions: p.stock > 0 ? [{ type: 'add_to_cart', label: `Add ${truncate(p.title, 30)} to cart`, productId: p.id, quantity: 1 }] : [],
   };
 };
@@ -563,8 +756,22 @@ const STATIC = {
   goodbye: () => ({ content: 'Bye for now! Your chat is saved — come back anytime. Happy shopping!', suggestions: [] }),
   thanks: (t) => ({ content: 'You\'re welcome! Anything else I can find for you?', suggestions: t.ctx.lastProducts.length ? ['Show more', 'Compare the first two', "Today's deals"] : ['Recommend something', "Today's deals"] }),
   help: () => ({ content: nlg.HELP, suggestions: ['Gaming laptop under 300k', 'Gift for my sister', 'Compare iPhone and Samsung', 'sasta mobile chahiye'] }),
-  small_talk: (t) => ({ content: nlg.smallTalk(t.text), suggestions: ['Recommend something', "Today's deals", 'Help'] }),
-  fallback: () => ({ content: nlg.fallback(), suggestions: ['Phones under 50k', 'Gift ideas', 'Help'] }),
+  small_talk: (t) => (/\b(?:joke|jokes|funny)\b/.test(t.text) || /\bjoke\b/i.test(t.raw)
+    ? off.joke(t.seed + t.ctx.turns * 3)
+    : { content: nlg.smallTalk(t.text, t.seed), suggestions: ['Recommend something', "Today's deals", 'Help'] }),
+  fallback: (t) => off.unclear(t.extras?.topic || 'low', t),
+  out_of_scope: (t) => off.outOfScope(t.extras?.topic, t),
+  about_assistant: (t) => off.aboutAssistant(t.extras?.topic, t),
+  feelings: (t) => off.feelings(t.extras?.topic, t),
+  abuse: (t) => off.abuse(t.extras?.topic, t),
+  concept: (t) => ({ content: t.extras.concept.text, suggestions: t.extras.concept.chips || [], title: t.extras.concept.title, scope: { kind: 'concept', topic: t.extras.concept.key } }),
+};
+
+const handleStoreInfo = async (t) => {
+  const topic = t.extras?.topic || 'overview';
+  if (topic === 'returns' || topic === 'cancel') return handleReturns(t);
+  const out = await faq.answer(topic, { userId: t.userId, signals: t.a.signals, e: t.e, text: t.text, catalog: t.catalog });
+  return { ...out, scope: { kind: 'store_info', topic } };
 };
 
 const HANDLERS = {
@@ -588,6 +795,7 @@ const HANDLERS = {
   bundle: handleBundle,
   product_question: handleProductQuestion,
   explain_specs: handleExplain,
+  store_info: handleStoreInfo,
 };
 
 const titleFromSlots = (slots, catalog) => {
@@ -604,16 +812,60 @@ const respond = async ({ text, context, userId = null }) => {
   const ctx = S.loadContext(context);
   const profile = userId ? await getProfile(userId, catalog).catch(() => null) : null;
   const a = analyze(text);
-  const e = a.entities;
+  a.raw = text;
+  let e = a.entities;
   e._text = a.normalized;
   if (/\b(?:start over|reset|new search|clear)\b/.test(a.normalized)) {
     Object.assign(ctx, S.initialContext(), { turns: ctx.turns });
   }
+  if (!catalog.minPrice) {
+    const prices = catalog.products.map((p) => Number(p.price)).filter((v) => v > 0);
+    catalog.minPrice = Math.min(...prices);
+    catalog.maxPrice = Math.max(...prices);
+  }
+  const extras = {};
+  const routed = routeScope(a, e, ctx, catalog);
+  let multi = null;
+  if (!routed && !ctx.pending) {
+    multi = detectMulti(text, a);
+    if (multi?.entities) {
+      e = multi.entities;
+      e._text = a.normalized;
+    } else if (multi?.kind === 'faq') {
+      e = { ...multi.left.entities, _text: a.normalized };
+      extras.faqNote = faq.shortAnswer(multi.topic);
+    }
+  }
   const refs = resolveRefs(e, ctx, catalog);
-  const intent = decideIntent(a, e, ctx, refs, a.normalized);
-  const turn = { text: a.normalized, raw: text, e, a, ctx, refs, intent, catalog, profile, userId, seed: ctx.turns * 7 + text.length };
-  const handler = HANDLERS[intent] || STATIC[intent] || STATIC.fallback;
+  let intent;
+  if (routed) {
+    intent = routed.intent;
+    extras.topic = routed.topic;
+    if (routed.number) extras.number = routed.number;
+  } else {
+    intent = decideIntent(a, e, ctx, refs, a.normalized);
+    if (multi && (multi.kind === 'faq' || ['product_search', 'recommendation', 'budget_query', 'bundle'].includes(intent))) intent = 'product_search';
+    else intent = refineIntent(intent, a, e, ctx, refs, extras, catalog);
+  }
+  const turn = { text: a.normalized, raw: text, e, a, ctx, refs, intent, catalog, profile, userId, extras, number: extras.number, seed: ctx.turns * 7 + text.length };
+  // vague shopping ("something nice", "surprise me"): skip the keyword search, show personal/trending picks
+  const handler = extras.vague ? handlePersonal : HANDLERS[intent] || STATIC[intent] || STATIC.fallback;
   const out = await handler(turn);
+  if (extras.vague && out.products?.length) {
+    out.content = `Here's a little inspiration to get you started. ${out.content}`;
+    out.suggestions = ['Gift ideas', 'Phones under 50k', "Today's deals", 'Something more premium'];
+  }
+  if (multi && out.products?.length && multi.kind !== 'faq') {
+    const second = await retrieve(S.mergeSlots(S.EMPTY_SLOTS(), multi.right.entities, 'new'), { limit: 1 }).catch(() => null);
+    if (second && !second.noMatch && second.items.length) {
+      const chip = chipFor(multi.rightText);
+      out.suggestions = [chip, ...(out.suggestions || []).filter((c) => c !== chip)];
+      out.content = `${out.content} Let's start with that, then tap **${chip}** for the second thing you asked about.`;
+    } else {
+      out.content = `${out.content} I couldn't find ${truncate(multi.rightText, 40)} in our catalog right now, so I've focused on the first part.`;
+    }
+  }
+  if (extras.faqNote) out.content = `${out.content} ${extras.faqNote}`;
 
   ctx.pending = out.pending || null;
   ctx.turns += 1;
@@ -622,7 +874,12 @@ const respond = async ({ text, context, userId = null }) => {
 
   let content = out.content;
   let source = 'local';
-  if (!out.personal && LLM_INTENTS.has(intent) && llm.active()) {
+  if (intent === 'out_of_scope' && llm.active()) {
+    // optional free llm for general questions only: persona-locked, cached, rate-limited; any failure keeps the offline reply
+    const general = await llm.general({ query: text, fallback: content, topic: extras.topic });
+    content = general.content;
+    source = general.source;
+  } else if (!out.personal && LLM_INTENTS.has(intent) && llm.active()) {
     const enhanced = await llm.enhance({ query: text, draft: content, intent, products, facts: (out.comparison?.verdict?.picks || []).map((p) => `${p.label}: product ${p.productId} — ${p.reason}`) });
     content = enhanced.content;
     source = enhanced.source;
@@ -645,6 +902,7 @@ const respond = async ({ text, context, userId = null }) => {
       explain: out.explain || null,
       gift: out.gift || null,
       clarify: out.clarify || null,
+      scope: out.scope || null,
       fallback: Boolean(out.fallback),
       nlu: { source: a.source, alternatives: a.alternatives, corrections: a.corrections, normalized: a.normalized },
       source,

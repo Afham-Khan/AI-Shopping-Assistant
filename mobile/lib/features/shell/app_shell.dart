@@ -295,8 +295,9 @@ class _ZelItem extends StatelessWidget {
                         size: 30,
                         color: colors.onPrimary,
                         eyeColor: colors.primary,
+                        // idle: blinks / glances / squints now and then (one
+                        // controller, only while the bar is visible)
                         mood: selected ? AiMood.happy : AiMood.idle,
-                        animate: false,
                       ),
                     ),
                   ),

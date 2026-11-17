@@ -291,7 +291,8 @@ class _GridPainter extends CustomPainter {
 
 /// White rounded category card with the soft resting shadow. v2 drops the
 /// colored top edge by default (pass `topBorderWidth: 2` to bring it back);
-/// [accent] still tints the edge when one is drawn. Hover deepens the shadow.
+/// [accent] still tints the edge when one is drawn. Under a mouse it lifts 2 px
+/// and the shadow deepens; a press settles it to 0.98.
 ///
 /// ```dart
 /// CategoryTopBorderCard(
@@ -300,7 +301,7 @@ class _GridPainter extends CustomPainter {
 ///   child: Column(children: [Text(dept.name), Text('38 products')]),
 /// )
 /// ```
-class CategoryTopBorderCard extends StatefulWidget {
+class CategoryTopBorderCard extends StatelessWidget {
   const CategoryTopBorderCard({
     super.key,
     required this.child,
@@ -321,59 +322,53 @@ class CategoryTopBorderCard extends StatefulWidget {
   final String? semanticLabel;
 
   @override
-  State<CategoryTopBorderCard> createState() => _CategoryTopBorderCardState();
-}
-
-class _CategoryTopBorderCardState extends State<CategoryTopBorderCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final interactive = widget.onTap != null;
-    final lifted = _hovered && interactive;
+    final interactive = onTap != null;
+
+    Widget card(bool hovered) => AnimatedContainer(
+      duration: context.motion(AppDurations.hover),
+      curve: AppCurves.standard,
+      decoration: BoxDecoration(
+        borderRadius: AppRadii.cardAll,
+        boxShadow: hovered ? colors.shadowMd : colors.shadowSm,
+      ),
+      child: Material(
+        color: colors.surface,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadii.cardAll,
+          side: BorderSide(color: context.isDark ? colors.border : colors.border.withValues(alpha: 0.6)),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: topBorderWidth),
+                child: Padding(padding: padding, child: child),
+              ),
+              if (topBorderWidth > 0)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: topBorderWidth,
+                  child: ColoredBox(color: accent ?? colors.primary),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
 
     return Semantics(
       button: interactive,
-      label: widget.semanticLabel,
-      child: Pressable(
+      label: semanticLabel,
+      child: Pressable.builder(
         enabled: interactive,
         scale: 0.98,
-        child: AnimatedContainer(
-        duration: context.motion(AppDurations.color),
-        decoration: BoxDecoration(
-          borderRadius: AppRadii.cardAll,
-          boxShadow: lifted ? colors.shadowMd : colors.shadowSm,
-        ),
-        child: Material(
-          color: colors.surface,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadii.cardAll,
-            side: BorderSide(color: context.isDark ? colors.border : colors.border.withValues(alpha: 0.6)),
-          ),
-          child: InkWell(
-            onTap: widget.onTap,
-            onHover: (h) => setState(() => _hovered = h),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: widget.topBorderWidth),
-                  child: Padding(padding: widget.padding, child: widget.child),
-                ),
-                if (widget.topBorderWidth > 0)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: widget.topBorderWidth,
-                    child: ColoredBox(color: widget.accent ?? colors.primary),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        ),
+        builder: (context, hovered, _) => card(hovered),
       ),
     );
   }

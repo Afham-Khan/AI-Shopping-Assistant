@@ -7,6 +7,7 @@ const Interactions = require('../../interactions/models/interactions.models');
 const { summarize, billableQuantity, rs } = require('../../cart/services/cart.service');
 const { toAddress } = require('../../../../helpers/serializers');
 const { badRequest, notFound, conflict } = require('../../../../helpers/errors');
+const { FAST_DELIVERY_CITIES, FAST_DELIVERY_DAYS, STANDARD_DELIVERY_DAYS } = require('../../../../helpers/constants');
 
 const MINUTE = 60 * 1000;
 const PROGRESSION_WINDOW_MS = 24 * 60 * MINUTE;
@@ -20,13 +21,11 @@ const STEPS = [
   { status: 'delivered', after: 10, title: 'Order delivered', note: 'Delivered successfully', body: (n) => `Order ${n} was delivered. Enjoy! Tap to leave a review.` },
 ];
 
-const FAST_CITIES = ['karachi', 'lahore', 'islamabad', 'rawalpindi'];
-
 const estimatedDelivery = (order) => {
   if (order.status === 'cancelled') return null;
   if (order.delivered_at) return order.delivered_at;
   const city = String(order.shipping_address?.city || '').toLowerCase();
-  const days = FAST_CITIES.includes(city) ? 2 : 4;
+  const days = FAST_DELIVERY_CITIES.includes(city) ? FAST_DELIVERY_DAYS : STANDARD_DELIVERY_DAYS;
   return new Date(new Date(order.placed_at).getTime() + days * 24 * 60 * MINUTE).toISOString();
 };
 

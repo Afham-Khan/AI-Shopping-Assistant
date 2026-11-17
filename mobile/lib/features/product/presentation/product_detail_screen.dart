@@ -31,6 +31,7 @@ import '../providers/product_providers.dart';
 import 'widgets/price_history_card.dart';
 import 'widgets/product_gallery.dart';
 import 'widgets/review_widgets.dart';
+import 'widgets/specs_section.dart';
 
 /// Product page. Paints instantly from [ProductPreviewCache] (hero image,
 /// title, price) while the full detail loads. Phones get a sticky buy bar;
@@ -136,6 +137,7 @@ class _OneColumn extends StatelessWidget {
                 thumbnail: summary.thumbnail,
                 title: summary.title,
                 dimmed: !summary.inStock,
+                wellColor: context.colors.departmentWell(detail?.department?.slug ?? summary.category?.slug),
               ),
               const SizedBox(height: AppSpacing.lg),
               _Headline(summary: summary, detail: detail),
@@ -182,6 +184,7 @@ class _TwoColumn extends StatelessWidget {
                   thumbnail: summary.thumbnail,
                   title: summary.title,
                   dimmed: !summary.inStock,
+                  wellColor: colors.departmentWell(detail?.department?.slug ?? summary.category?.slug),
                 ),
                 ..._DetailSections.build(context, summary: summary, detail: detail, error: error, onRetry: onRetry),
               ],
@@ -273,17 +276,14 @@ abstract final class _DetailSections {
       Padding(padding: const EdgeInsets.only(top: AppSpacing.xl), child: PriceHistoryCard(product: summary)),
       if (!twoColumn) ...[const SizedBox(height: AppSpacing.xl), _ServiceInfo(detail: detail)],
       CompleteTheLookSection(product: summary, departmentSlug: detail.department?.slug),
-      if (detail.highlights.isNotEmpty) section('Highlights', _Highlights(items: detail.highlights)),
+      if (detail.highlights.isNotEmpty) section('Highlights', HighlightChips(items: detail.highlights)),
       if (detail.description != null) section('About this item', _ExpandableText(detail.description!)),
       if (detail.specs.isNotEmpty)
         section(
           'Specifications',
-          _SpecsTable(specs: detail.specs),
-          trailing: TextButton.icon(
-            onPressed: () => showSpecExplainerSheet(context, productId: detail.id, productTitle: summary.title),
-            style: TextButton.styleFrom(foregroundColor: context.colors.primary),
-            icon: const AiSparkleIcon(size: 16),
-            label: const Text('Explain these specs'),
+          SpecsSection(
+            specs: detail.specs,
+            onExplain: () => showSpecExplainerSheet(context, productId: detail.id, productTitle: summary.title),
           ),
         ),
       Padding(
@@ -698,36 +698,6 @@ class _InfoTile extends StatelessWidget {
   }
 }
 
-class _Highlights extends StatelessWidget {
-  const _Highlights({required this.items});
-
-  final List<String> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Column(
-      children: [
-        for (final h in items)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Icon(Icons.check_rounded, size: 18, color: colors.primary),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(h, style: context.textTheme.bodyMedium)),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _ExpandableText extends StatefulWidget {
   const _ExpandableText(this.text);
 
@@ -761,70 +731,6 @@ class _ExpandableTextState extends State<_ExpandableText> {
             onPressed: () => setState(() => _open = !_open),
             style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: context.colors.secondary),
             child: Text(_open ? 'Show less' : 'Read more'),
-          ),
-      ],
-    );
-  }
-}
-
-class _SpecsTable extends StatefulWidget {
-  const _SpecsTable({required this.specs});
-
-  final List<MapEntry<String, String>> specs;
-
-  @override
-  State<_SpecsTable> createState() => _SpecsTableState();
-}
-
-class _SpecsTableState extends State<_SpecsTable> {
-  static const _collapsed = 6;
-  bool _all = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final t = context.textTheme;
-    final rows = _all ? widget.specs : widget.specs.take(_collapsed).toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: AppRadii.cardAll,
-            border: Border.all(color: colors.border),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: AnimatedSize(
-            duration: context.motion(AppDurations.normal),
-            alignment: Alignment.topCenter,
-            child: Column(
-              children: [
-                for (var i = 0; i < rows.length; i++)
-                  Container(
-                    color: i.isEven ? colors.surfaceVariant.withValues(alpha: 0.6) : colors.surface,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 2, child: Text(rows[i].key, style: t.bodyMedium!.copyWith(color: colors.muted))),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(flex: 3, child: Text(rows[i].value, style: t.bodyMedium!.copyWith(fontWeight: FontWeight.w500))),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        if (widget.specs.length > _collapsed)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => setState(() => _all = !_all),
-              style: TextButton.styleFrom(foregroundColor: colors.secondary),
-              icon: Icon(_all ? Icons.expand_less_rounded : Icons.expand_more_rounded),
-              label: Text(_all ? 'Show fewer' : 'Show all ${widget.specs.length} specifications'),
-            ),
           ),
       ],
     );

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -92,10 +93,31 @@ class RoomPalette {
 /// The room, drawn in code as a calm flat illustration with soft depth.
 /// Painted once (and once a minute for the clock / light) behind a
 /// RepaintBoundary; the camera only transforms the cached layer.
+/// Which depth layer of the room a [RoomPainter] draws. Home scrolls the
+/// back wall slower than the furniture (depth parallax); [all] is the flat
+/// illustration.
+enum RoomDepth {
+  all,
+
+  /// The far wall: wall, window and clock (drawn with a bleed so a vertical
+  /// shift never shows an edge).
+  back,
+
+  /// Everything in front of the wall: shelf, floor, rug, furniture, plus the
+  /// night tint (full-scene, so it also tints the back layer behind it) and
+  /// the lamp's light.
+  front,
+}
+
 class RoomPainter extends CustomPainter {
-  RoomPainter({required this.palette, required this.night, required this.time});
+  RoomPainter({required this.palette, required this.night, required this.time, this.depth = RoomDepth.all});
 
   final RoomPalette palette;
+
+  final RoomDepth depth;
+
+  /// Design units painted beyond the scene on the shifting layers.
+  static const bleed = 90.0;
 
   /// 0 day … 1 night.
   final double night;
@@ -107,20 +129,24 @@ class RoomPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.save();
     canvas.scale(size.width / RoomLayout.size.width, size.height / RoomLayout.size.height);
-    _wall(canvas);
-    _window(canvas);
-    _clock(canvas);
-    _shelf(canvas);
-    _floor(canvas);
-    _sunPatch(canvas);
-    _rug(canvas);
-    _wardrobe(canvas);
-    _desk(canvas);
-    _vanity(canvas);
-    _kitchen(canvas);
-    _corner(canvas);
-    _nightOverlay(canvas);
-    _lamplight(canvas);
+    if (depth != RoomDepth.front) {
+      _wall(canvas);
+      _window(canvas);
+      _clock(canvas);
+    }
+    if (depth != RoomDepth.back) {
+      _shelf(canvas);
+      _floor(canvas);
+      _sunPatch(canvas);
+      _rug(canvas);
+      _wardrobe(canvas);
+      _desk(canvas);
+      _vanity(canvas);
+      _kitchen(canvas);
+      _corner(canvas);
+      _nightOverlay(canvas);
+      _lamplight(canvas);
+    }
     canvas.restore();
   }
 
@@ -164,7 +190,9 @@ class RoomPainter extends CustomPainter {
   // ---------- scene ----------
 
   void _wall(Canvas canvas) {
-    const wall = Rect.fromLTWH(0, 0, 1000, RoomLayout.floorY);
+    final wall = depth == RoomDepth.all
+        ? const Rect.fromLTWH(0, 0, 1000, RoomLayout.floorY)
+        : const Rect.fromLTRB(0, -bleed, 1000, RoomLayout.floorY + bleed);
     canvas.drawRect(
       wall,
       Paint()
@@ -332,7 +360,7 @@ class RoomPainter extends CustomPainter {
   }
 
   void _floor(Canvas canvas) {
-    const floor = Rect.fromLTWH(0, RoomLayout.floorY, 1000, 280);
+    final floor = Rect.fromLTWH(0, RoomLayout.floorY, 1000, 280 + (depth == RoomDepth.all ? 0 : bleed));
     canvas.drawRect(
       floor,
       Paint()
@@ -584,7 +612,8 @@ class RoomPainter extends CustomPainter {
 
   void _nightOverlay(Canvas canvas) {
     if (night <= 0.01) return;
-    canvas.drawRect(Offset.zero & RoomLayout.size, _fill(p.nightTint.withValues(alpha: 0.2 * night)));
+    final r = Offset.zero & RoomLayout.size;
+    canvas.drawRect(depth == RoomDepth.all ? r : r.inflate(bleed), _fill(p.nightTint.withValues(alpha: 0.2 * night)));
   }
 
   /// The desk lamp's pool of light, drawn after the night tint so it reads.
@@ -607,7 +636,11 @@ class RoomPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(RoomPainter old) =>
-      old.palette != palette || (old.night - night).abs() > 0.001 || old.time.minute != time.minute || old.time.hour != time.hour;
+      old.palette != palette ||
+      old.depth != depth ||
+      (old.night - night).abs() > 0.001 ||
+      old.time.minute != time.minute ||
+      old.time.hour != time.hour;
 }
 
 /// Dims everything but the focused zone while the camera is in. Repaints
@@ -640,4 +673,62 @@ class RoomFocusPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(RoomFocusPainter old) => old.focus != focus || old.color != color;
+}
+
+/// "Furnished" spotlight: dims the zones a setup didn't touch so they fade
+/// back, leaves the furnished areas ([holes], design space) bright and rings
+/// them. Only the alpha follows [amount]; the path is built once per size.
+class RoomSpotlightPainter extends CustomPainter {
+  RoomSpotlightPainter({
+    required this.holes,
+    required this.amount,
+    required this.shade,
+    required this.ring,
+    required Listenable repaint,
+  }) : super(repaint: repaint);
+
+  final List<Rect> holes;
+
+  /// 0 (normal room) … 1 (spotlight on), read every frame.
+  final ValueGetter<double> amount;
+  final Color shade;
+  final Color ring;
+
+  Size? _builtFor;
+  Path? _dim;
+  Path? _outline;
+
+  void _build(Size size) {
+    final k = size.width / RoomLayout.size.width;
+    var union = Path();
+    for (final h in holes) {
+      final r = RRect.fromRectAndRadius(
+        Rect.fromLTRB(h.left * k, h.top * k, h.right * k, h.bottom * k),
+        const Radius.circular(14),
+      );
+      union = Path.combine(PathOperation.union, union, Path()..addRRect(r));
+    }
+    _outline = union;
+    _dim = Path.combine(PathOperation.difference, Path()..addRect(Offset.zero & size), union);
+    _builtFor = size;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = amount();
+    if (t <= 0.01) return;
+    if (_builtFor != size) _build(size);
+    canvas.drawPath(_dim!, Paint()..color = shade.withValues(alpha: shade.a * t));
+    canvas.drawPath(
+      _outline!,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = ring.withValues(alpha: ring.a * t),
+    );
+  }
+
+  @override
+  bool shouldRepaint(RoomSpotlightPainter old) =>
+      !listEquals(old.holes, holes) || old.shade != shade || old.ring != ring;
 }

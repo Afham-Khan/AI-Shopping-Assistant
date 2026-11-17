@@ -22,11 +22,15 @@ import 'room/room_section.dart';
 import 'widgets/ask_bar.dart';
 import 'widgets/home_sections.dart';
 import 'widgets/parallax_deals_rail.dart';
+import 'widgets/scroll_depth.dart';
 import 'widgets/scroll_story.dart';
 
-/// Home, composed as a calm story: greeting and "Ask Zel", the interactive
-/// room (hero), one scroll-driven featured product, flash deals, personal
-/// picks, the Discover entry, then trending and Zel's tools.
+/// Home, composed as a calm story: greeting and "Ask Zel" (they compress as
+/// the page scrolls), the scroll-driven featured product (it lands on open and
+/// moves with the very first scroll), the interactive room (hero, with depth
+/// parallax), flash deals, personal picks, the Discover entry, then trending
+/// and Zel's tools. All scroll motion is paint-only and static under reduced
+/// motion.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -52,8 +56,31 @@ class HomeScreen extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             const _HomeAppBar(),
-            const _Box(child: _Greeting()),
-            const _Box(top: AppSpacing.md, child: AskBar()),
+            const SliverToBoxAdapter(
+              child: ScrollCollapse(
+                child: ResponsiveCenter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [_Greeting(), SizedBox(height: AppSpacing.md), AskBar()],
+                  ),
+                ),
+              ),
+            ),
+            // the signature scroll moment sits in the first screen so the very
+            // first scroll moves it; its space is held while the feed loads
+            ...switch (feed) {
+              AsyncValue(:final value?) => [
+                if (_featured(value) case final featured?)
+                  _Box(top: AppSpacing.xl, child: ScrollStory(product: featured)),
+              ],
+              AsyncValue(hasError: true) => const <Widget>[],
+              _ => const [
+                _Box(
+                  top: AppSpacing.xl,
+                  child: Skeleton(height: 240, borderRadius: AppRadii.sheetAll),
+                ),
+              ],
+            },
             // the hero: works on its own data, so it shows even if the feed fails
             const _Box(top: AppSpacing.xl, child: RoomSection()),
             ...switch (feed) {
@@ -80,10 +107,6 @@ class HomeScreen extends ConsumerWidget {
   }
 
   List<Widget> _loading(BuildContext context) => [
-    const _Box(
-      top: AppSpacing.xxl,
-      child: Skeleton(height: 240, borderRadius: AppRadii.sheetAll),
-    ),
     const _Box(top: AppSpacing.xl, child: _HeaderSkeleton()),
     const _Rail(top: AppSpacing.sm, child: ProductRail.loading()),
   ];
@@ -99,9 +122,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   List<Widget> _content(BuildContext context, WidgetRef ref, HomeFeed feed) {
-    final featured = _featured(feed);
     return [
-      if (featured != null) _Box(top: AppSpacing.xxl, child: ScrollStory(product: featured)),
       if (feed.flashDeals.isNotEmpty) ...[
         _Box(
           top: AppSpacing.xl,
@@ -192,6 +213,9 @@ class _HomeAppBar extends ConsumerWidget {
     return SliverAppBar(
       floating: true,
       snap: true,
+      // a soft lift once content scrolls under the floating logo row
+      scrolledUnderElevation: 2,
+      shadowColor: context.colors.shadow.withValues(alpha: 0.3),
       centerTitle: false,
       titleSpacing: context.pagePadding,
       title: const FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AppLogo(size: 30)),

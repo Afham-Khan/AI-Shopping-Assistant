@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: the system splash screen already shows the logo (values-v31/styles.xml), so what stays behind
+     Flutter until its first frame is just the wash (no second logo). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#F3F5FD"
+                android:centerColor="#EEF1FB"
+                android:endColor="#E6EAF8"
+                android:centerY="0.42" />
+        </shape>
+    </item>
+</layer-list>

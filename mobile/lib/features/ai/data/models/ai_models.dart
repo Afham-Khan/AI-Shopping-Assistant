@@ -464,26 +464,71 @@ class AiInsights {
   final Map<String, dynamic> catalog;
 }
 
-/// `POST /ai/visual-search`.
+/// `POST /ai/visual-search` and `GET /ai/visual-search/text`.
+///
+/// When the photo isn't something the catalog sells (class notes, a street, a
+/// pet…) the API answers `recognized: false` with what it looks like
+/// (`detected.label`), a friendly `message`, no products and popular
+/// category names as `suggestions`. Older payloads without the flag count as
+/// recognized.
 @immutable
 class VisualSearchResult {
-  const VisualSearchResult({this.products = const [], this.category, this.confidence = 0, this.latencyMs});
+  const VisualSearchResult({
+    this.products = const [],
+    this.category,
+    this.confidence = 0,
+    this.latencyMs,
+    this.recognized = true,
+    this.label,
+    this.message,
+    this.suggestions = const [],
+  });
 
   factory VisualSearchResult.fromJson(Object? data) {
     final j = JsonX.asMap(data);
     final detected = JsonX.asMap(j['detected']);
+    final recognized = j['recognized'] != false;
     return VisualSearchResult(
-      products: _products(j['products']),
+      // never show products for a photo that wasn't recognized
+      products: recognized ? _products(j['products']) : const [],
       category: JsonX.asStringOrNull(detected['category'] is Map ? detected['category']['name'] : detected['category']),
       confidence: _ratio(detected['confidence']),
       latencyMs: JsonX.asIntOrNull(j['latencyMs']),
+      recognized: recognized,
+      label: JsonX.asStringOrNull(detected['label']),
+      message: JsonX.asStringOrNull(j['message']),
+      suggestions: JsonX.asStringList(j['suggestions']),
     );
   }
 
   final List<ProductSummary> products;
+
+  /// Detected catalog category (recognized results only).
   final String? category;
+
+  /// Probability of [category] (or of [label] when not recognized), 0..1.
   final double confidence;
   final int? latencyMs;
+
+  /// False when the photo isn't a product the store sells.
+  final bool recognized;
+
+  /// What the photo looks like ("a page of handwritten notes"), or the
+  /// category name when recognized.
+  final String? label;
+
+  /// Friendly explanation for an unrecognized photo.
+  final String? message;
+
+  /// Popular category names to try instead.
+  final List<String> suggestions;
+
+  /// Plain-language strength of the detection, so the percentage reads honestly.
+  static String confidenceWord(double c) => c >= 0.7
+      ? 'Confident'
+      : c >= 0.4
+      ? 'Fairly sure'
+      : 'Best guess';
 }
 
 @immutable

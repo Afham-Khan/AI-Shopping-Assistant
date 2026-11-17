@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../ai/presentation/widgets/ai_ui.dart';
 
 /// Assistant "typing": avatar, three bouncing dots and a cycling
@@ -65,7 +66,8 @@ class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProv
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AiAvatar(size: 30),
+          // eyes sweep side to side while the answer is on its way
+          const AiMascot(size: 28, mood: AiMood.thinking),
           const SizedBox(width: AppSpacing.sm),
           Flexible(
             child: Container(

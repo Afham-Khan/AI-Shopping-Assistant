@@ -95,19 +95,24 @@ const HELP = [
 ].join('\n');
 
 const SMALL_TALK = [
-  [/how are you|kaise ho|kya haal|kaisa hai/, "I'm doing great and ready to shop! What are you looking for today?"],
-  [/joke/, 'Why did the shopping cart go to therapy? It had too much baggage! Speaking of carts — want me to find you something?'],
-  [/weather|mausam/, "I can't check the weather, but I can find you sunglasses for sunny days or a cozy jacket alternative. What do you need?"],
-  [/love you|marry|married/, "That's sweet! My heart belongs to great deals though. Can I find you something nice?"],
-  [/bored/, "Let's fix that with some window shopping! Want to see today's biggest deals?"],
-  [/stupid|bad bot|useless/, "Sorry I missed the mark. Try telling me the product, budget or brand you want and I'll do better."],
-  [/good bot|smart|clever/, 'Thank you! Want to put me to work on something?'],
+  [/how are you|kaise ho|kya haal|kaisa hai|how is your day|how's it going|how is it going|what'?s up|wassup/, ["I'm doing great and ready to shop! What are you looking for today?", "All good here, thanks for asking! What can I find for you?"]],
+  [/joke/, ['Why did the shopping cart go to therapy? It had too much baggage! Speaking of carts, want me to find you something?']],
+  [/weather|mausam/, ["I can't check the weather, but I can find you sunglasses for sunny days. What do you need?"]],
+  [/love you|love me|marry|married|cute|crush/, ["That's sweet! My heart belongs to great deals though. Can I find you something nice?"]],
+  [/bored/, ["Let's fix that with some window shopping! Want to see today's biggest deals or what's trending?"]],
+  [/stupid|bad bot|useless/, ["Sorry I missed the mark. Try telling me the product, budget or brand you want and I'll do better."]],
+  [/good bot|smart|clever|awesome|amazing|you are funny|you'?re funny|nice talking/, ['Thank you, that made my day! Want to put me to work on something?']],
+  [/\b(?:lol|haha\w*|hehe\w*|lmao|rofl)\b/, ['Glad I made you smile! Want me to find something fun next?', 'Ha! Happy shopper, happy Zel. What should we look for?']],
+  [/^(?:ok|okay|k|kk|cool|nice|fine|alright|hmm+|hm+|sure|got it|wow|great|acha|achha|theek|thik|ok cool|hmm ok|nice nice|good|ok then)\b/, ["Got it! Whenever you're ready, tell me what you're looking for, or pick one below.", "Sure thing! What should we shop for next?"]],
+  [/are you there|you there|anyone there|hello\?/, ["I'm here! What can I help you find?"]],
+  [/never ?mind|forget it|nothing|kuch nahi|not now/, ["No problem! I'm here whenever you need me."]],
+  [/do you (?:sleep|eat|dance|play|watch|like)|favou?rite|can you dance|feelings/, ["I don't sleep, eat or dance, but I never get tired of finding great deals! What are you after today?"]],
 ];
 
-const smallTalk = (text) => {
-  const t = String(text || '').toLowerCase();
-  for (const [re, reply] of SMALL_TALK) if (re.test(t)) return reply;
-  return "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!";
+const smallTalk = (text, seed = 0) => {
+  const t = String(text || '').toLowerCase().trim();
+  for (const [re, replies] of SMALL_TALK) if (re.test(t)) return pick(replies, seed);
+  return "I'm better at shopping than small talk, but I'm all ears! Tell me what you're looking for, or try one of these.";
 };
 
 const fallback = () => "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.";

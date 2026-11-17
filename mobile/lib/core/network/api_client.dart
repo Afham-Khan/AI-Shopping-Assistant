@@ -163,7 +163,7 @@ class ApiClient {
     } on ApiException {
       rethrow;
     } catch (e, st) {
-      debugPrint('ApiClient: failed to parse response: $e\n$st');
+      if (kDebugMode) debugPrint('ApiClient: failed to parse response: $e\n$st');
       throw const ApiException('Unexpected data from the server.', code: 'PARSE_ERROR');
     }
   }

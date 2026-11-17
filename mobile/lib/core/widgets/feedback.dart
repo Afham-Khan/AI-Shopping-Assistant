@@ -8,44 +8,168 @@ import 'app_button.dart';
 import 'app_network_image.dart';
 import 'app_snack.dart';
 
-/// Press feedback for anything tappable: the child settles to ~0.96 while a
-/// pointer is down and springs back on release. Wrap cards and custom
-/// buttons with it (AppButton and ProductCard already do).
+/// What a mouse pointer resting on a [Pressable] does to it (web / desktop;
+/// touch has no hover).
+enum PressableHover {
+  /// Nothing — rows inside lists and surfaces that already tint themselves.
+  none,
+
+  /// Rises 2 px (cards, tiles, quick actions). Pair it with `shadowMd` via
+  /// [Pressable.builder] so the shadow deepens as the card lifts.
+  lift,
+
+  /// Grows a hair (circular buttons, small chips, logos); see `hoverScale`.
+  grow,
+}
+
+/// Builds a [Pressable]'s content from its pointer state.
+typedef PressableBuilder = Widget Function(BuildContext context, bool hovered, bool pressed);
+
+/// The one place hover and press feedback lives, so every tappable surface
+/// behaves the same: under a mouse it **lifts** 2 px (or grows 2 %), under any
+/// pointer it settles to 0.97 while pressed and springs back on release.
+/// 150–200 ms, `easeOutCubic`, transforms only (no blur, no layers beyond one
+/// `RepaintBoundary`). Reduced motion keeps colour changes but drops all
+/// movement.
 ///
 /// ```dart
-/// Pressable(child: CategoryTile(...))            // visual only; child owns onTap
-/// Pressable(scale: 0.98, child: BigBanner(...))  // large surfaces move less
+/// Pressable(child: CategoryTile(...))                  // visual only; child owns onTap
+/// Pressable(scale: 0.98, child: BigBanner(...))        // large surfaces move less
+/// Pressable(hover: PressableHover.none, child: Row())  // list rows: press only
+/// Pressable.builder(                                    // deepen the shadow with the lift
+///   builder: (context, hovered, pressed) => DecoratedBox(
+///     decoration: BoxDecoration(boxShadow: hovered ? colors.shadowMd : colors.shadowSm),
+///     child: tile,
+///   ),
+/// )
 /// ```
+/// A press that turns into a scroll or drag (the pointer moves more than
+/// ~14 px) releases at once, so a card doesn't stay shrunk under a swipe.
 class Pressable extends StatefulWidget {
-  const Pressable({super.key, required this.child, this.scale = 0.96, this.enabled = true});
+  const Pressable({
+    super.key,
+    required Widget this.child,
+    this.scale = 0.97,
+    this.enabled = true,
+    this.hover = PressableHover.lift,
+    this.hoverScale = 1.02,
+    this.cursor = MouseCursor.defer,
+  }) : builder = null;
 
-  final Widget child;
+  /// Like the default constructor, but [builder] gets `hovered` / `pressed`
+  /// so the content can swap shadows, tints or icons with the pointer.
+  const Pressable.builder({
+    super.key,
+    required PressableBuilder this.builder,
+    this.scale = 0.97,
+    this.enabled = true,
+    this.hover = PressableHover.lift,
+    this.hoverScale = 1.02,
+    this.cursor = MouseCursor.defer,
+  }) : child = null;
+
+  final Widget? child;
+  final PressableBuilder? builder;
+
+  /// Scale while pressed (0.97; large surfaces use 0.98, small circles ~0.94).
   final double scale;
   final bool enabled;
+  final PressableHover hover;
+
+  /// Scale under a mouse for [PressableHover.grow].
+  final double hoverScale;
+
+  /// Mouse cursor over the surface; the default leaves it to the child
+  /// (an `InkWell` already shows the click cursor).
+  final MouseCursor cursor;
+
+  /// How far a hovered [PressableHover.lift] surface rises, in logical px.
+  static const double liftDistance = 2;
 
   @override
   State<Pressable> createState() => _PressableState();
 }
 
 class _PressableState extends State<Pressable> {
-  bool _down = false;
+  static const _hoverTime = AppDurations.hover;
+  static const _pressTime = Duration(milliseconds: 90);
+  static const _slop = 14.0;
 
-  void _set(bool down) {
+  bool _down = false;
+  bool _hovered = false;
+  Offset _downAt = Offset.zero;
+
+  void _setDown(bool down) {
     if (_down != down && mounted) setState(() => _down = down);
+  }
+
+  void _setHovered(bool hovered) {
+    if (_hovered != hovered && mounted) setState(() => _hovered = hovered);
+  }
+
+  @override
+  void didUpdateWidget(Pressable old) {
+    super.didUpdateWidget(old);
+    // a disabled surface neither lifts nor stays pressed
+    if (!widget.enabled && (_down || _hovered)) {
+      _down = false;
+      _hovered = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final active = widget.enabled && _down && !context.reduceMotion;
-    return Listener(
-      onPointerDown: (_) => _set(true),
-      onPointerUp: (_) => _set(false),
-      onPointerCancel: (_) => _set(false),
-      child: AnimatedScale(
-        scale: active ? widget.scale : 1,
-        duration: active ? const Duration(milliseconds: 90) : AppDurations.normal,
-        curve: AppCurves.standard,
-        child: widget.child,
+    final reduce = context.reduceMotion;
+    final pressed = widget.enabled && _down;
+    final hovered = widget.enabled && _hovered;
+    final content = widget.builder != null ? widget.builder!(context, hovered, pressed) : widget.child!;
+
+    var scale = 1.0;
+    var lift = 0.0;
+    if (!reduce) {
+      if (pressed) {
+        scale = widget.scale;
+      } else if (hovered) {
+        switch (widget.hover) {
+          case PressableHover.lift:
+            lift = -Pressable.liftDistance;
+          case PressableHover.grow:
+            scale = widget.hoverScale;
+          case PressableHover.none:
+            break;
+        }
+      }
+    }
+    final duration = reduce ? Duration.zero : (pressed ? _pressTime : _hoverTime);
+
+    // the mouse region sits OUTSIDE the transforms: a lifted card's resting
+    // footprint stays hoverable, so the pointer can't flicker at its lower edge
+    return MouseRegion(
+      cursor: widget.cursor,
+      onEnter: (_) => _setHovered(true),
+      onExit: (_) => _setHovered(false),
+      child: Listener(
+        onPointerDown: (e) {
+          _downAt = e.position;
+          _setDown(true);
+        },
+        onPointerMove: (e) {
+          if (_down && (e.position - _downAt).distance > _slop) _setDown(false);
+        },
+        onPointerUp: (_) => _setDown(false),
+        onPointerCancel: (_) => _setDown(false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: duration,
+          curve: AppCurves.standard,
+          child: AnimatedContainer(
+            duration: duration,
+            curve: AppCurves.standard,
+            transform: Matrix4.translationValues(0, lift, 0),
+            // the animated subtree repaints on its own, not with the page
+            child: RepaintBoundary(child: content),
+          ),
+        ),
       ),
     );
   }
@@ -210,7 +334,17 @@ class AppAvatar extends StatelessWidget {
   }
 }
 
-enum StatusTone { neutral, success, warning, danger, info, accent }
+enum StatusTone {
+  neutral,
+  success,
+  warning,
+  danger,
+  info,
+  accent,
+
+  /// Warm amber "deal" pill (flash deals, limited offers).
+  deal,
+}
 
 /// Status badge: soft background, strong text, subtle border.
 ///
@@ -235,13 +369,25 @@ class StatusBadge extends StatelessWidget {
       StatusTone.danger => colors.error,
       StatusTone.info => colors.secondary,
       StatusTone.accent => colors.primary,
+      StatusTone.deal => colors.dealInk,
     };
+    final deal = tone == StatusTone.deal;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: tone == StatusTone.neutral ? colors.surfaceVariant : ink.withValues(alpha: context.isDark ? 0.14 : 0.09),
+        color: deal
+            ? colors.dealSoft
+            : tone == StatusTone.neutral
+            ? colors.surfaceVariant
+            : ink.withValues(alpha: context.isDark ? 0.14 : 0.09),
         borderRadius: AppRadii.pillAll,
-        border: Border.all(color: tone == StatusTone.neutral ? colors.border : ink.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: deal
+              ? colors.deal.withValues(alpha: 0.6)
+              : tone == StatusTone.neutral
+              ? colors.border
+              : ink.withValues(alpha: 0.32),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -253,6 +399,49 @@ class StatusBadge extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.labelSmall!.copyWith(color: ink, fontWeight: FontWeight.w600, letterSpacing: 0.1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A solid amber "deal" pill with navy ink (9.8:1) — flash deals, limited
+/// offers, "Deal of the day". Use sparingly: one per surface, next to (not
+/// instead of) the red discount tag.
+///
+/// ```dart
+/// DealTag('Flash deal')
+/// DealTag('Ends today', icon: Icons.timer_outlined)
+/// ```
+class DealTag extends StatelessWidget {
+  const DealTag(this.label, {super.key, this.icon = Icons.bolt_rounded});
+
+  final String label;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: colors.deal, borderRadius: AppRadii.pillAll),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[Icon(icon, size: 12, color: colors.onDeal), const SizedBox(width: 3)],
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.labelSmall!.copyWith(
+                color: colors.onDeal,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.1,
+                fontFeatures: AppType.tabular,
+              ),
             ),
           ),
         ],

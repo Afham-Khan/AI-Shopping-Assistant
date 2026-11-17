@@ -8,7 +8,6 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../../ai/presentation/widgets/ai_ui.dart';
 import '../../../auth/providers/auth_controller.dart';
 
 /// Sign-in prompt shown inside the assistant tab for guests.
@@ -53,7 +52,7 @@ class _AssistantGuestViewState extends ConsumerState<AssistantGuestView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Center(child: AiAvatar(size: 56)),
+              const Center(child: AiMascot(size: 52)),
               AppSpacing.gapMd,
               Semantics(
                 header: true,

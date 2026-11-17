@@ -182,12 +182,12 @@ const cartInsights = async (userId) => {
 
 const visualSearch = async (buffer, limit) => {
   const r = await visual.visualSearch(buffer, { limit });
-  return { products: recommendedList(r.items), detected: r.detected, latencyMs: r.latencyMs };
+  return { recognized: r.recognized, message: r.message, products: recommendedList(r.items), detected: r.detected, suggestions: r.suggestions, ...(r.reason ? { reason: r.reason } : {}), latencyMs: r.latencyMs };
 };
 
 const visualTextSearch = async (q, limit) => {
   const r = await visual.textToImage(q, { limit });
-  return { products: recommendedList(r.items), latencyMs: r.latencyMs };
+  return { recognized: r.recognized, message: r.message, products: recommendedList(r.items), suggestions: r.suggestions, latencyMs: r.latencyMs };
 };
 
 const completeLook = async (productId, limit) => {

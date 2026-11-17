@@ -17,6 +17,7 @@ class ProductGallery extends StatefulWidget {
     this.thumbnail,
     this.title = '',
     this.dimmed = false,
+    this.wellColor,
   });
 
   final int productId;
@@ -28,6 +29,10 @@ class ProductGallery extends StatefulWidget {
 
   /// Out of stock: show images faded.
   final bool dimmed;
+
+  /// Tile behind the photos; defaults to the quiet surface fill. Pass
+  /// `colors.departmentWell(slug)` for the soft department tint.
+  final Color? wellColor;
 
   @override
   State<ProductGallery> createState() => _ProductGalleryState();
@@ -89,7 +94,7 @@ class _ProductGalleryState extends State<ProductGallery> {
       child: ClipRRect(
         borderRadius: AppRadii.sheetAll,
         child: ColoredBox(
-          color: colors.surfaceVariant,
+          color: widget.wellColor ?? colors.surfaceVariant,
           child: Stack(
             children: [
               Positioned.fill(

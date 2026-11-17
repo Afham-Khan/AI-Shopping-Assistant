@@ -15,7 +15,7 @@ const CUE_GROUPS = {
   premium: 'premium expensive pricier costlier luxury luxurious upscale fancy fancier flagship pro elite classier higher upgrade high end tier quality best',
   deal: 'deal deals discount discounts discounted sale sales offer offers coupon coupons promo promotion promotions voucher bargain bargains savings clearance cashback drops',
   order: 'order orders delivery delivered track tracking shipped dispatch dispatched parcel package arrive arrived shipping status late delayed',
-  cart: 'cart basket bag checkout total subtotal pay payment bill owe cod',
+  cart: 'cart basket bag checkout total subtotal bill owe',
   ret: 'return returns refund refunds exchange warranty cancel replacement defective damaged broken guarantee',
   more: 'more else other others another next additional rest continue alternatives different load',
   cmp: 'compare comparison vs versus difference better between which pros cons',
@@ -28,6 +28,11 @@ const CUE_GROUPS = {
   bot: 'you your yourself bot human ai robot',
   add: 'add put take buy purchase lelo basket',
   offtopic: 'weather joke song music news poem movie score minister capital python homework dinner cook dance sing married sleep feelings bored lol haha hmm wow',
+  general: 'won match cricket football election president politics translate assignment essay code coding javascript bitcoin crypto recipe netflix drama planet population invented alarm flight uber rain temperature mausam barish khabar medicine headache stock gold',
+  whoami: 'made created built developed creator programmed owner company chatgpt gpt gemini google siri alexa openai model trained artificial intelligence robot human real name kaun banaya technology brain',
+  feel: 'sad unhappy lonely alone depressed upset stressed stress anxious anxiety worried nervous tired exhausted angry frustrated heartbroken crying hopeless scared udaas udaasi pareshan tension mood khush excited happy',
+  insult: 'stupid idiot useless dumb trash rubbish pathetic garbage worst suck hate annoying nonsense bakwas pagal bewakoof bekaar shut chup lost waste fuck damn wtf',
+  storefaq: 'cod cash pay paying payment payments paymnt jazzcash easypaisa card cards accept charges fee fees international abroad outside dubai physical visit hours open sunday contact support customer care complaint human sell categories lahore karachi islamabad quetta peshawar multan days',
 };
 const CUES = new Map();
 for (const [cue, words] of Object.entries(CUE_GROUPS)) for (const w of words.split(' ')) if (!CUES.has(w)) CUES.set(w, cue);

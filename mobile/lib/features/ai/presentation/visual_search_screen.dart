@@ -19,7 +19,9 @@ import 'widgets/image_cropper.dart';
 /// Snap & Find (POST /ai/visual-search): pick or take a photo, drag a box
 /// around the item you mean ("select the item"), watch it get analyzed and
 /// see the detected category and visually similar products. Also accepts a
-/// text description. A 503 (vision model offline) is handled.
+/// text description. A 503 (vision model offline) is handled. When the photo
+/// isn't something the store sells (`recognized: false`, e.g. class notes) a
+/// friendly [VisualNoMatch] state replaces the results: no products are shown.
 class VisualSearchScreen extends ConsumerStatefulWidget {
   const VisualSearchScreen({super.key});
 
@@ -48,6 +50,7 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
   bool _cropping = false;
 
   bool _busy = false;
+  ImageSource _lastSource = ImageSource.gallery;
   VisualSearchResult? _result;
   ApiException? _error;
 
@@ -82,6 +85,7 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
       return;
     }
     if (file == null || !mounted) return;
+    _lastSource = source;
     final bytes = await file.readAsBytes();
     if (!mounted) return;
     if (bytes.length > VisualSearchScreen.maxBytes) {
@@ -206,6 +210,16 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  /// "Try another photo" from the no-match state: reopen the source used last.
+  void _tryAnotherPhoto() =>
+      _pick(_lastSource == ImageSource.camera && _cameraSupported ? ImageSource.camera : ImageSource.gallery);
+
+  /// Popular-category chip: search it by description.
+  void _searchSuggestion(String name) {
+    _describe.text = name;
+    _searchText();
   }
 
   void _reset() {
@@ -401,6 +415,24 @@ class _VisualSearchScreenState extends ConsumerState<VisualSearchScreen> {
       ];
     }
     if (r == null) return const [];
+    if (!r.recognized) {
+      return [
+        SliverResponsiveCenter(
+          maxWidth: 900,
+          verticalPadding: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.xxl),
+          sliver: SliverToBoxAdapter(
+            child: VisualNoMatch(
+              result: r,
+              fromPhoto: _describedAs == null,
+              cameraFirst: _lastSource == ImageSource.camera && _cameraSupported,
+              onTryAnother: _busy ? null : _tryAnotherPhoto,
+              onSuggestion: _busy ? null : _searchSuggestion,
+              describe: _DescribeBox(controller: _describe, onSubmit: _searchText, busy: _busy, prominent: true),
+            ),
+          ),
+        ),
+      ];
+    }
     if (r.products.isEmpty) {
       return [
         SliverFillRemaining(
@@ -548,6 +580,30 @@ class _DetectedInfo extends StatelessWidget {
     }
     final r = result;
     if (r == null) return const SizedBox.shrink();
+    if (!r.recognized) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Detected', style: t.labelLarge!.copyWith(color: colors.muted)),
+          AppSpacing.gapXs,
+          _Pill(
+            icon: Icons.do_not_disturb_alt_rounded,
+            color: colors.warning,
+            background: colors.surfaceVariant,
+            label: r.label == null ? 'No product found' : 'Not a product',
+          ),
+          AppSpacing.gapSm,
+          Text(
+            r.label == null ? 'Nothing in the catalog matches this.' : 'This looks like ${r.label}.',
+            style: t.bodyMedium,
+          ),
+          if (r.latencyMs != null) ...[
+            AppSpacing.gapSm,
+            Text('Analyzed in ${r.latencyMs} ms', style: t.bodySmall),
+          ],
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -573,6 +629,11 @@ class _DetectedInfo extends StatelessWidget {
           if (r.confidence > 0) ...[
             AppSpacing.gapSm,
             SizedBox(width: 220, child: AiConfidenceBar(value: r.confidence, semanticLabel: 'Detection confidence')),
+            AppSpacing.gapXxs,
+            Text(
+              '${VisualSearchResult.confidenceWord(r.confidence)} · ${Formatters.percentFromRatio(r.confidence)} detection confidence',
+              style: t.bodySmall!.copyWith(color: colors.muted),
+            ),
           ],
         ] else
           Text('Matched by overall look and description', style: t.bodyMedium),
@@ -614,6 +675,154 @@ class _DescribeBox extends StatelessWidget {
             AppButton(label: 'Find', loading: busy, onPressed: onSubmit),
           ],
         ),
+      ],
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({required this.icon, required this.label, required this.color, required this.background});
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: background, borderRadius: AppRadii.pillAll),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Flexible(child: Text(label, style: context.textTheme.titleSmall)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown instead of results when the photo (or description) isn't something
+/// the store sells: what it looks like, why, a way to try again, the describe
+/// box and popular categories. Never shows products.
+class VisualNoMatch extends StatelessWidget {
+  const VisualNoMatch({
+    super.key,
+    required this.result,
+    required this.onTryAnother,
+    required this.onSuggestion,
+    this.describe,
+    this.fromPhoto = true,
+    this.cameraFirst = false,
+  });
+
+  final VisualSearchResult result;
+  final VoidCallback? onTryAnother;
+  final ValueChanged<String>? onSuggestion;
+
+  /// The "Describe it instead" box.
+  final Widget? describe;
+
+  /// False when the query was a text description.
+  final bool fromPhoto;
+
+  /// Use the camera icon for "Try another photo".
+  final bool cameraFirst;
+
+  static const fallbackMessage = 'Try a clear photo of a product — shoes, a phone, a bag…';
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.textTheme;
+    final colors = context.colors;
+    final r = result;
+    final label = r.label;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: AppRadii.cardAll,
+            border: Border.all(color: colors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(color: colors.aiSoft, shape: BoxShape.circle),
+                    child: Icon(fromPhoto ? Icons.image_search_rounded : Icons.manage_search_rounded, color: colors.ai),
+                  ),
+                  AppSpacing.gapSm,
+                  Expanded(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        fromPhoto ? "That's not something we sell" : 'Nothing in the catalog looks like that',
+                        style: t.titleMedium,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (label != null) ...[
+                AppSpacing.gapMd,
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    _Pill(
+                      icon: Icons.visibility_outlined,
+                      color: colors.ai,
+                      background: colors.aiSoft,
+                      label: 'Looks like ${label.toLowerCase()}',
+                    ),
+                    if (r.confidence > 0)
+                      Text(
+                        '${Formatters.percentFromRatio(r.confidence)} likely',
+                        style: t.labelLarge!.copyWith(color: colors.muted),
+                      ),
+                  ],
+                ),
+              ],
+              AppSpacing.gapSm,
+              Text(r.message ?? fallbackMessage, style: t.bodyMedium!.copyWith(color: colors.muted)),
+              AppSpacing.gapMd,
+              AppButton(
+                label: fromPhoto ? 'Try another photo' : 'Try a photo',
+                icon: cameraFirst ? Icons.photo_camera_outlined : Icons.photo_library_outlined,
+                onPressed: onTryAnother,
+              ),
+            ],
+          ),
+        ),
+        if (describe != null) ...[AppSpacing.gapLg, describe!],
+        if (r.suggestions.isNotEmpty) ...[
+          AppSpacing.gapLg,
+          Text('Popular categories', style: t.labelLarge),
+          AppSpacing.gapXs,
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              for (final name in r.suggestions)
+                AiSuggestionChip(
+                  label: name,
+                  icon: Icons.category_outlined,
+                  onTap: onSuggestion == null ? null : () => onSuggestion!(name),
+                ),
+            ],
+          ),
+        ],
       ],
     );
   }

@@ -1,6 +1,7 @@
 /* Idempotent seed: upserts by natural keys, never deletes, deterministic RNG -> safe to re-run. */
 require('dotenv').config({ quiet: true, path: require('path').join(__dirname, '..', '.env') });
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -12,6 +13,13 @@ const { createBasketBuilder, weightedPick } = require('./seed-data/orders');
 const { createRng, hashString } = require('./seed-data/random');
 const { summarize } = require('../api/modules/cart/services/cart.service');
 const { BCRYPT_COST } = require('../helpers/constants');
+const { imageMode } = require('../helpers/imageMode');
+const { usesHostedUrl } = require('../helpers/dbConfig');
+
+// cdn: image URLs are always the original absolute cdn.dummyjson.com ones (what a deployed API needs)
+// local: a fresh insert uses the same URLs, but rows already cached by `npm run images:cache` keep their local copies
+const IMAGE_MODE = imageMode();
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || (usesHostedUrl() ? null : ADMIN_USER.password);
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DAY = 24 * 60 * 60 * 1000;
@@ -65,6 +73,28 @@ const HISTORY_FLOW = [
   ['delivered', 'Delivered successfully', 76],
 ];
 
+// a database that was cached locally earlier is pointed back at the CDN (no-op on a fresh database)
+const restoreCdnImages = async (trx, products) => {
+  const cdnUrl = new Map(products.flatMap((p) => p.images.map((url, i) => [`${p.db.id}:${i}`, url])));
+  const local = await trx('product_images').whereRaw("url NOT LIKE 'http%'").select('id', 'product_id', 'sort_order');
+  for (const row of local) {
+    const url = cdnUrl.get(`${row.product_id}:${row.sort_order}`);
+    if (url) await trx('product_images').where({ id: row.id }).update({ url });
+  }
+  // order history keeps a copy of the thumbnail it was bought with
+  await trx.raw("UPDATE order_items oi SET thumbnail_url = p.thumbnail_url FROM products p WHERE oi.product_id = p.id AND oi.thumbnail_url NOT LIKE 'http%'");
+};
+
+// every image column that still holds a server-relative path, e.g. /uploads/products/...
+const IMAGE_COLUMNS = [['products', 'thumbnail_url'], ['product_images', 'url'], ['categories', 'image_url'], ['departments', 'image_url'], ['banners', 'image_url'], ['order_items', 'thumbnail_url']];
+const countLocalImages = async () => {
+  let total = 0;
+  for (const [table, column] of IMAGE_COLUMNS) {
+    total += Number((await db(table).whereNotNull(column).whereRaw(`"${column}" NOT LIKE 'http%'`).count('* as n').first()).n);
+  }
+  return total;
+};
+
 const seedCatalog = async (trx, products) => {
   for (const [i, d] of DEPARTMENTS.entries()) {
     await trx('departments').insert({ name: d.name, slug: d.slug, icon: d.icon, description: d.description, sort_order: i })
@@ -101,9 +131,11 @@ const seedCatalog = async (trx, products) => {
       updated_at: new Date(NOW),
     };
   });
+  // stock, counters and rating are runtime state: only set on first insert. The thumbnail is too (it may be a locally
+  // cached copy), except in cdn mode where it is always reset to the CDN URL.
+  const mergeColumns = IMAGE_MODE === 'cdn' ? [...CONTENT_COLUMNS, 'thumbnail_url'] : CONTENT_COLUMNS;
   for (let i = 0; i < rows.length; i += 50) {
-    // stock, counters, rating and (possibly cached) thumbnail are runtime state: only set on first insert
-    await trx('products').insert(rows.slice(i, i + 50)).onConflict('sku').merge(CONTENT_COLUMNS);
+    await trx('products').insert(rows.slice(i, i + 50)).onConflict('sku').merge(mergeColumns);
   }
   const dbProducts = await trx('products').select('id', 'sku', 'external_id', 'thumbnail_url', 'price', 'title', 'category_id');
   const bySku = new Map(dbProducts.map((r) => [r.sku, r]));
@@ -113,6 +145,7 @@ const seedCatalog = async (trx, products) => {
   const imageRows = products.flatMap((p) => p.images.map((url, i) => ({ product_id: p.db.id, url, sort_order: i })))
     .filter((r) => !existingImages.has(`${r.product_id}:${r.sort_order}`));
   await chunkInsert(trx, 'product_images', imageRows);
+  if (IMAGE_MODE === 'cdn') await restoreCdnImages(trx, products);
 
   // category / department images follow a representative product's current thumbnail
   for (const d of DEPARTMENTS) {
@@ -165,11 +198,16 @@ const seedUsers = async (trx, shoppers) => {
     preferences: json(DEMO_USER.preferences), is_onboarded: true, created_at: daysAgo(90),
   }).onConflict('email').merge(['name', 'password_hash', 'phone', 'preferences', 'is_onboarded']);
 
-  const adminHash = await bcrypt.hash(ADMIN_USER.password, BCRYPT_COST);
+  // Admin password: ADMIN_PASSWORD when set; the well-known default only on a local database. On a hosted database
+  // without ADMIN_PASSWORD a first-time admin gets an unguessable password and an existing one is left untouched,
+  // so running the seed again never puts the public default back.
+  const adminColumns = ['name', 'phone', 'role', 'is_onboarded'];
+  if (ADMIN_PASSWORD) adminColumns.push('password_hash');
+  const adminHash = await bcrypt.hash(ADMIN_PASSWORD || crypto.randomBytes(24).toString('base64url'), BCRYPT_COST);
   await trx('users').insert({
     name: ADMIN_USER.name, email: ADMIN_USER.email, password_hash: adminHash, phone: ADMIN_USER.phone,
     role: 'admin', preferences: json({}), is_onboarded: true, created_at: daysAgo(120),
-  }).onConflict('email').merge(['name', 'password_hash', 'phone', 'role', 'is_onboarded']);
+  }).onConflict('email').merge(adminColumns);
 
   const existing = new Set((await trx('users').whereIn('email', shoppers.map((s) => s.email)).select('email')).map((r) => r.email));
   const missing = shoppers.filter((s) => !existing.has(s.email));
@@ -502,8 +540,12 @@ const main = async () => {
   console.log(`This run: ${stats.ordersInserted} orders, ${stats.interactions} interactions, ${stats.searches} searches inserted; ${stats.featuredCount} featured`);
   console.table(totals);
   console.log(`Price history rows added this run: ${stats.priceHistory}`);
+  const localImages = await countLocalImages();
+  if (IMAGE_MODE === 'cdn' && localImages) console.warn(`WARNING: IMAGE_MODE=cdn but ${localImages} image URLs are still server-relative paths and would be broken on a deployed API.`);
+  else console.log(`Image mode: ${IMAGE_MODE} (${localImages ? `${localImages} locally cached image URLs` : 'every image URL is an absolute CDN URL'})`);
   console.log(`Demo login: ${DEMO_USER.email} / ${DEMO_USER.password}`);
-  console.log(`Admin login: ${ADMIN_USER.email} / ${ADMIN_USER.password}`);
+  if (ADMIN_PASSWORD) console.log(`Admin login: ${ADMIN_USER.email} / ${process.env.ADMIN_PASSWORD ? '(the ADMIN_PASSWORD you set)' : ADMIN_PASSWORD}`);
+  else console.log(`Admin account ${ADMIN_USER.email}: password left as it is (hosted database, ADMIN_PASSWORD not set; a new admin is created locked). Set ADMIN_PASSWORD and run the seed to choose one.`);
 };
 
 main()

@@ -6,6 +6,7 @@
   "scripts": {
     "db:start": "pg_ctl -D \"%USERPROFILE%/.cartwise/pgdata\" -l \"%USERPROFILE%/.cartwise/pg.log\" start",
     "start": "node server.js",
+    "start:prod": "node --env-file=.env.production server.js",
     "dev": "nodemon server.js",
     "db:create": "node scripts/createDatabase.js",
     "db:migrate": "knex migrate:latest",
@@ -13,6 +14,8 @@
     "images:cache": "node scripts/cacheImages.js",
     "ai:train": "node api/modules/ai/training/train.js",
     "ai:index": "node api/modules/ai/training/buildIndex.js",
+    "ai:prefetch": "node scripts/prefetchModels.js",
+    "deploy:init": "node scripts/deployInit.js",
     "demo:price-drop": "node scripts/demoPriceDrop.js",
     "setup": "npm run db:create && npm run db:migrate && npm run db:seed && npm run images:cache && npm run ai:train && npm run ai:index",
     "test": "mocha --timeout 30000 --exit"

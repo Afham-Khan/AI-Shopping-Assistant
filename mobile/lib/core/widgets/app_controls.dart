@@ -58,6 +58,10 @@ class CircleIconButton extends StatelessWidget {
       glyph = AppBadge(count: badgeCount, child: glyph);
     }
 
+    final base = color ?? (filled ? colors.surface : colors.surfaceVariant);
+    // under a mouse: grows a hair, takes a light blue tint and a deeper shadow
+    final tinted = Color.alphaBlend(colors.primary.withValues(alpha: 0.10), base);
+
     return Semantics(
       button: true,
       enabled: enabled,
@@ -65,24 +69,31 @@ class CircleIconButton extends StatelessWidget {
       excludeSemantics: true,
       child: Tooltip(
         message: tooltip,
-        child: Pressable(
+        child: Pressable.builder(
           enabled: enabled,
-          scale: 0.92,
-          child: SizedBox.square(
+          scale: 0.94,
+          hover: PressableHover.grow,
+          hoverScale: 1.06,
+          builder: (context, hovered, pressed) => SizedBox.square(
             dimension: size < 44 ? 44 : size,
             child: Center(
-              child: Material(
-                color: color ?? (filled ? colors.surface : colors.surfaceVariant),
-                shape: const CircleBorder(),
-                clipBehavior: Clip.antiAlias,
-                child: Ink(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: filled ? colors.shadowSm : null,
-                    border: filled ? Border.all(color: colors.border.withValues(alpha: 0.8)) : null,
-                  ),
+              child: AnimatedContainer(
+                duration: context.motion(AppDurations.hover),
+                curve: AppCurves.standard,
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: hovered ? tinted : base,
+                  boxShadow: filled ? (hovered ? colors.shadowMd : colors.shadowSm) : null,
+                  border: filled
+                      ? Border.all(color: (hovered ? colors.borderStrong : colors.border).withValues(alpha: 0.8))
+                      : null,
+                ),
+                child: Material(
+                  type: MaterialType.transparency,
+                  shape: const CircleBorder(),
+                  clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: onPressed,
                     customBorder: const CircleBorder(),
@@ -106,7 +117,11 @@ class CircleIconButton extends StatelessWidget {
 /// AppCard(onTap: open, padding: EdgeInsets.all(12), child: Row(...))
 /// AppCard(padding: EdgeInsets.zero, child: Column(children: [ListTile(...), ...])) // list group
 /// ```
-class AppCard extends StatefulWidget {
+///
+/// With [onTap] the card is a tappable surface: under a mouse it lifts 2 px
+/// while the shadow deepens (`shadowSm` → `shadowMd`) and the blue hover tint
+/// washes in; a press settles it to 0.98. Without [onTap] it is plain.
+class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
@@ -129,46 +144,40 @@ class AppCard extends StatefulWidget {
   final String? semanticLabel;
 
   @override
-  State<AppCard> createState() => _AppCardState();
-}
-
-class _AppCardState extends State<AppCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final radius = BorderRadius.circular(widget.radius);
-    final interactive = widget.onTap != null;
-    final card = AnimatedContainer(
-      duration: context.motion(AppDurations.color),
+    final borderRadius = BorderRadius.circular(radius);
+    final interactive = onTap != null;
+
+    Widget card(bool hovered) => AnimatedContainer(
+      duration: context.motion(AppDurations.hover),
       curve: AppCurves.standard,
       decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: _hovered && interactive ? colors.shadowMd : colors.shadowSm,
+        borderRadius: borderRadius,
+        boxShadow: hovered ? colors.shadowMd : colors.shadowSm,
       ),
       child: Material(
-        color: widget.color ?? colors.surface,
+        color: color ?? colors.surface,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: widget.selected
+          borderRadius: borderRadius,
+          side: selected
               ? BorderSide(color: colors.primary, width: 1.5)
               : BorderSide(color: context.isDark ? colors.border : colors.border.withValues(alpha: 0.6)),
         ),
-        child: InkWell(
-          onTap: widget.onTap,
-          onHover: interactive ? (h) => setState(() => _hovered = h) : null,
-          child: Padding(padding: widget.padding, child: widget.child),
-        ),
+        // InkWell paints the hover tint (theme hoverColor) and the splash
+        child: InkWell(onTap: onTap, child: Padding(padding: padding, child: child)),
       ),
     );
+
     return Semantics(
       container: true,
       button: interactive,
-      selected: widget.selected,
-      label: widget.semanticLabel,
-      child: interactive ? Pressable(scale: 0.98, child: card) : card,
+      selected: selected,
+      label: semanticLabel,
+      child: interactive
+          ? Pressable.builder(scale: 0.98, builder: (context, hovered, _) => card(hovered))
+          : card(false),
     );
   }
 }
@@ -250,13 +259,15 @@ class AppSearchBar extends StatelessWidget {
       ],
     );
 
-    final bar = Container(
+    Widget bar(bool hovered) => AnimatedContainer(
+      duration: context.motion(AppDurations.hover),
+      curve: AppCurves.standard,
       height: height,
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: AppRadii.pillAll,
-        border: Border.all(color: colors.border),
-        boxShadow: colors.shadowSm,
+        border: Border.all(color: hovered ? colors.primary.withValues(alpha: 0.4) : colors.border),
+        boxShadow: hovered ? colors.shadowMd : colors.shadowSm,
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -266,7 +277,18 @@ class AppSearchBar extends StatelessWidget {
       ),
     );
 
-    if (!isButton) return bar;
-    return Semantics(button: true, label: hint, excludeSemantics: trailing == null, child: bar);
+    if (!isButton) return bar(false);
+    // the button-mode bar answers a mouse with a blue hairline and a deeper
+    // shadow (it stays put; it is a long bar, not a card)
+    return Semantics(
+      button: true,
+      label: hint,
+      excludeSemantics: trailing == null,
+      child: Pressable.builder(
+        scale: 0.99,
+        hover: PressableHover.none,
+        builder: (context, hovered, _) => bar(hovered),
+      ),
+    );
   }
 }
