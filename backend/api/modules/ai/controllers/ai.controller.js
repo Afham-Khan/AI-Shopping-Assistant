@@ -137,6 +137,8 @@ module.exports.bundle = async (req, res) => {
   return ok(res, result);
 };
 
+module.exports.bundleTemplates = async (req, res) => ok(res, await engine.bundleTemplates());
+
 module.exports.askProduct = async (req, res) => {
   const result = await engine.askProduct(req.params.id, req.body.question);
   if (!result) throw notFound('Product not found');

@@ -6,7 +6,7 @@ const { getCatalog } = require('./retrieval/catalog');
 const embeddings = require('./retrieval/embeddings');
 const { analyzeText } = require('./retrieval/bm25');
 const { cosine } = require('./retrieval/vectorspace');
-const { money, list, stars, truncate } = require('./format');
+const { money, list, stars, truncate, plural } = require('./format');
 
 const BUCKETS = 500;
 const CANDIDATES_PER_ROLE = 8;
@@ -14,7 +14,7 @@ const CANDIDATES_PER_ROLE = 8;
 // role: { role, categories | byGender, keywords, features, required, weight }
 const TEMPLATES = {
   gaming_setup: {
-    title: 'Gaming setup', triggers: ['gaming', 'gamer', 'game setup', 'esports', 'streaming'],
+    title: 'Gaming setup', goal: 'gaming setup', triggers: ['gaming', 'gamer', 'game setup', 'esports', 'streaming'],
     description: 'gaming setup with a powerful laptop, headphones, speaker and comfortable chair',
     roles: [
       { role: 'Gaming laptop', categories: ['laptops'], features: ['gaming'], required: true, weight: 3 },
@@ -24,7 +24,7 @@ const TEMPLATES = {
     ],
   },
   home_office: {
-    title: 'Home office setup', triggers: ['office', 'work from home', 'wfh', 'home office', 'workspace', 'desk setup', 'remote work'],
+    title: 'Home office setup', goal: 'home office setup', triggers: ['office', 'work from home', 'wfh', 'home office', 'workspace', 'desk setup', 'remote work'],
     description: 'home office workspace with laptop, desk, ergonomic chair, lamp and accessories for productivity',
     roles: [
       { role: 'Laptop', categories: ['laptops'], features: ['work'], required: true, weight: 3 },
@@ -35,7 +35,7 @@ const TEMPLATES = {
     ],
   },
   university_kit: {
-    title: 'University starter kit', triggers: ['university', 'uni', 'college', 'student', 'school', 'campus', 'semester', 'studies'],
+    title: 'University starter kit', goal: 'university starter kit', triggers: ['university', 'uni', 'college', 'student', 'school', 'campus', 'semester', 'studies'],
     description: 'university student starter kit with laptop or tablet, earphones, watch and essentials',
     roles: [
       { role: 'Laptop or tablet', categories: ['laptops', 'tablets'], required: true, weight: 3 },
@@ -46,7 +46,7 @@ const TEMPLATES = {
     ],
   },
   gym_starter: {
-    title: 'Gym starter pack', triggers: ['gym', 'workout', 'fitness', 'exercise', 'training', 'bodybuilding'],
+    title: 'Gym starter pack', goal: 'gym starter pack', triggers: ['gym', 'workout', 'fitness', 'exercise', 'training', 'bodybuilding'],
     description: 'gym and fitness starter pack with protein, running shoes, wireless earbuds, water and sports gear',
     roles: [
       { role: 'Protein', categories: ['groceries'], keywords: ['protein'], required: true, weight: 1.5 },
@@ -57,7 +57,7 @@ const TEMPLATES = {
     ],
   },
   gift_set: {
-    title: 'Gift set', triggers: ['gift set', 'gift box', 'hamper', 'eid gift', 'gift', 'present', 'surprise'],
+    title: 'Gift set', goal: 'gift set', triggers: ['gift set', 'gift box', 'hamper', 'eid gift', 'gift', 'present', 'surprise'],
     description: 'curated gift set with fragrance, jewellery or watch, accessories and beauty items',
     roles: [
       { role: 'Fragrance', categories: ['fragrances'], required: true, weight: 1.5 },
@@ -67,7 +67,7 @@ const TEMPLATES = {
     ],
   },
   skincare_routine: {
-    title: 'Skincare routine', triggers: ['skincare', 'skin care', 'routine', 'self care', 'pamper', 'glow', 'beauty routine', 'makeup kit'],
+    title: 'Skincare routine', goal: 'skincare routine', triggers: ['skincare', 'skin care', 'routine', 'self care', 'pamper', 'glow', 'beauty routine', 'makeup kit'],
     description: 'daily skincare and beauty routine with cleanser, moisturizer, makeup and fragrance',
     roles: [
       { role: 'Cleanser', categories: ['skin-care'], keywords: ['soap', 'wash', 'cleanser'], required: true, weight: 1.3 },
@@ -77,7 +77,7 @@ const TEMPLATES = {
     ],
   },
   kitchen_starter: {
-    title: 'Kitchen starter set', triggers: ['kitchen', 'cooking', 'new home', 'housewarming', 'first apartment', 'cook'],
+    title: 'Kitchen starter set', goal: 'kitchen starter set', triggers: ['kitchen', 'cooking', 'new home', 'housewarming', 'first apartment', 'cook'],
     description: 'kitchen starter set with cookware, knife, utensils, an appliance and pantry basics',
     roles: [
       { role: 'Cookware', categories: ['kitchen-accessories'], keywords: ['pan', 'pot', 'cooking'], required: true, weight: 1.4 },
@@ -88,7 +88,7 @@ const TEMPLATES = {
     ],
   },
   travel_kit: {
-    title: 'Travel kit', triggers: ['travel', 'trip', 'vacation', 'holiday', 'tour', 'journey', 'safar'],
+    title: 'Travel kit', goal: 'travel kit', triggers: ['travel', 'trip', 'vacation', 'holiday', 'tour', 'journey', 'safar'],
     description: 'travel kit with sunglasses, power bank, earphones, a watch and a bag',
     roles: [
       { role: 'Sunglasses', categories: ['sunglasses'], required: true, weight: 1 },
@@ -99,7 +99,7 @@ const TEMPLATES = {
     ],
   },
   photography_kit: {
-    title: 'Photography & vlogging kit', triggers: ['photography', 'vlog', 'vlogging', 'content creator', 'youtube', 'selfie', 'camera'],
+    title: 'Photography & vlogging kit', goal: 'photography and vlogging kit', triggers: ['photography', 'vlog', 'vlogging', 'content creator', 'youtube', 'selfie', 'camera'],
     description: 'content creator kit with a camera phone, monopod or selfie stick, selfie lamp and power bank',
     roles: [
       { role: 'Camera phone', categories: ['smartphones'], features: ['camera'], required: true, weight: 3 },
@@ -109,7 +109,7 @@ const TEMPLATES = {
     ],
   },
   party_outfit: {
-    title: 'Party / wedding look', triggers: ['party', 'wedding', 'shaadi', 'outfit', 'look', 'dinner', 'mehndi', 'reception', 'date night'],
+    title: 'Party / wedding look', goal: 'party outfit', triggers: ['party', 'wedding', 'shaadi', 'outfit', 'look', 'dinner', 'mehndi', 'reception', 'date night'],
     description: 'complete outfit for a party or wedding with clothing, shoes, accessories and fragrance',
     roles: [
       { role: 'Outfit', byGender: { men: ['mens-shirts'], women: ['womens-dresses', 'tops'], any: ['womens-dresses', 'mens-shirts'] }, required: true, weight: 2 },
@@ -120,7 +120,7 @@ const TEMPLATES = {
     ],
   },
   living_room: {
-    title: 'Living room makeover', triggers: ['living room', 'lounge', 'makeover', 'decor', 'redecorate', 'drawing room', 'furnish'],
+    title: 'Living room makeover', goal: 'living room makeover', triggers: ['living room', 'lounge', 'makeover', 'decor', 'redecorate', 'drawing room', 'furnish'],
     description: 'living room makeover with sofa, table, decor and lighting',
     roles: [
       { role: 'Sofa', categories: ['furniture'], keywords: ['sofa', 'couch'], required: true, weight: 2 },
@@ -168,12 +168,13 @@ const adHocTemplate = (entities, catalog) => {
 
 const roleCategories = (role, gender) => role.categories || role.byGender?.[gender || 'any'] || role.byGender?.any || [];
 
-const roleCandidates = (role, catalog, gender, budget) => {
+// products that can fill a role (category, stock, gender, keyword relevance) scored for utility; maxPrice caps the price
+const scoreRole = (role, catalog, gender, maxPrice) => {
   const cats = roleCategories(role, gender);
   const kw = (role.keywords || []).map((k) => k.toLowerCase());
   const feats = role.features || [];
   const scored = catalog.products
-    .filter((p) => cats.includes(p.category_slug) && p.stock > 0 && p.price <= budget)
+    .filter((p) => cats.includes(p.category_slug) && p.stock > 0 && p.price <= maxPrice)
     .filter((p) => !(gender && p.gender === (gender === 'men' ? 'women' : 'men')))
     .map((p) => {
       const title = p.title.toLowerCase();
@@ -184,10 +185,89 @@ const roleCandidates = (role, catalog, gender, budget) => {
       return { p, relevance, utility, titleHit: kwHit === 1 };
     })
     .filter((c) => !kw.length || c.relevance > 0.2);
+  return { kw, scored };
+};
+
+const roleCandidates = (role, catalog, gender, budget) => {
+  const { kw, scored } = scoreRole(role, catalog, gender, budget);
   // when real title matches exist, description-only matches don't qualify
   const titled = scored.filter((c) => c.titleHit);
   const pool = kw.length && titled.some((c) => c.p.price <= budget * 0.6) ? titled : scored;
-  return pool.sort((a, b) => b.utility - a.utility).slice(0, CANDIDATES_PER_ROLE);
+  pool.sort((a, b) => b.utility - a.utility);
+  const top = pool.slice(0, CANDIDATES_PER_ROLE);
+  // keep the cheapest viable product in the running so a budget that covers the minimum stays feasible
+  const cheapest = pool.reduce((m, c) => (!m || c.p.price < m.p.price ? c : m), null);
+  if (cheapest && !top.includes(cheapest)) top[top.length - 1] = cheapest;
+  return top;
+};
+
+// ---- budget advice: what each role costs at its cheapest, whatever the shopper's budget ----
+const HEADROOM = 1.15;
+
+// round up to a "nice" figure a shopper would type (Rs 350,000 rather than Rs 354,198)
+const niceCeil = (n) => {
+  const v = Math.max(0, Number(n) || 0);
+  const step = v < 10000 ? 500 : v < 100000 ? 5000 : v < 1000000 ? 25000 : 100000;
+  return Math.ceil(v / step) * step;
+};
+
+// the budget worth suggesting for a set of required roles: their cheapest total plus ~15% headroom, rounded up
+const suggestFor = (minimumForRequired) => (minimumForRequired ? niceCeil(minimumForRequired * HEADROOM) : 0);
+
+// cheapest in-stock product per role (a product fills one role only); price/productId are null when a role has none
+const cheapestByRole = (template, catalog, gender) => {
+  const pools = template.roles.map((role) => {
+    const { kw, scored } = scoreRole(role, catalog, gender, Infinity);
+    const titled = scored.filter((c) => c.titleHit);
+    return (kw.length && titled.length ? titled : scored).sort((a, b) => a.p.price - b.p.price || b.utility - a.utility);
+  });
+  const used = new Set();
+  const picked = new Array(pools.length).fill(null);
+  pools.map((pool, i) => i).sort((a, b) => pools[a].length - pools[b].length).forEach((i) => {
+    const c = pools[i].find((x) => !used.has(x.p.id));
+    if (c) {
+      used.add(c.p.id);
+      picked[i] = c;
+    }
+  });
+  return template.roles.map((role, i) => ({
+    role: role.role,
+    required: Boolean(role.required),
+    price: picked[i] ? Number(picked[i].p.price) : null,
+    productId: picked[i] ? picked[i].p.id : null,
+  }));
+};
+
+const sumPrices = (rows) => rows.reduce((s, r) => s + (r.price || 0), 0);
+
+const budgetFloor = (template, catalog, gender) => {
+  const rows = cheapestByRole(template, catalog, gender);
+  const minimumForRequired = sumPrices(rows.filter((r) => r.required));
+  return { rows, minimumForAll: sumPrices(rows), minimumForRequired, suggestedBudget: suggestFor(minimumForRequired) };
+};
+
+// honest, actionable wording about whether the budget covers the bundle
+const adviseBudget = ({ floor, budget, skipped, relaxed }) => {
+  const byRole = new Map(floor.rows.map((r) => [r.role, r]));
+  const lower = (r) => r.toLowerCase();
+  const missing = skipped.filter((r) => byRole.get(r)?.required);
+  if (!missing.length) {
+    if (skipped.length) return `Your essentials fit, but the ${list(skipped.map(lower))} didn't — getting every piece starts at ${money(floor.minimumForAll)}.`;
+    return floor.minimumForAll ? `Everything fits — the cheapest way to get every piece is ${money(floor.minimumForAll)}.` : '';
+  }
+  const parts = [];
+  const priced = missing.filter((r) => byRole.get(r).price);
+  const tooPricey = priced.filter((r) => byRole.get(r).price > budget);
+  tooPricey.forEach((r) => parts.push(`No ${lower(r)} fits ${money(budget)} — the most affordable one is ${money(byRole.get(r).price)}.`));
+  const noStock = missing.filter((r) => !byRole.get(r).price);
+  if (noStock.length) parts.push(`No ${list(noStock.map(lower), 'or')} is in stock right now.`);
+  // each essential is affordable alone but not all together
+  if (priced.some((r) => relaxed.includes(r) && !tooPricey.includes(r))) {
+    const essentials = floor.rows.filter((r) => r.required && r.price).map((r) => lower(r.role));
+    parts.push(`The essentials together (${list(essentials)}) start at ${money(floor.minimumForRequired)}, more than ${money(budget)}.`);
+  }
+  if (floor.suggestedBudget > budget) parts.push(`Raise the budget to about ${money(floor.suggestedBudget)} to include ${missing.length === 1 ? 'it' : 'them'}.`);
+  return parts.join(' ');
 };
 
 // multiple-choice knapsack: pick at most one product per role (required roles exactly one),
@@ -310,14 +390,19 @@ const buildBundle = async ({ goal, budget, gender = null }) => {
   const coupon = coupons.find((c) => spent >= Number(c.min_order_amount || 0));
   if (coupon) savingsTips.push(`Use code ${coupon.code} at checkout: ${coupon.description}.`);
 
+  const floor = budgetFloor(template, catalog, who);
+  const advice = adviseBudget({ floor, budget: total, skipped, relaxed: relaxedRequired });
+  const missingRequired = skipped.filter((r) => template.roles.find((x) => x.role === r)?.required);
+  const leftOut = skipped.filter((r) => !missingRequired.includes(r));
+
   const explanation = [
     items.length
-      ? `I split your ${money(total)} budget across ${items.length} pieces for a ${template.title.toLowerCase()}, choosing the combination with the best overall ratings and fit (a knapsack optimization over ${groups.reduce((s, g) => s + g.candidates.length, 0)} candidates).`
+      ? `I split your ${money(total)} budget across ${plural(items.length, 'piece')} for a ${template.title.toLowerCase()}, choosing the combination with the best overall ratings and fit (a knapsack optimization over ${groups.reduce((s, g) => s + g.candidates.length, 0)} candidates).`
       : `I couldn't fit a ${template.title.toLowerCase()} into ${money(total)}.`,
+    // required pieces that didn't fit are called out honestly, with what it would take
+    missingRequired.length ? advice : '',
     biggest ? `The ${biggest.role.toLowerCase()} is the biggest piece (${Math.round((biggest.product.product.price / total) * 100)}% of the budget).` : '',
-    skipped.length ? `I left out ${list(skipped.map((s) => s.toLowerCase()))} to stay within budget.` : '',
-    unaffordable.length ? `Nothing affordable for ${list(unaffordable.map((s) => s.toLowerCase()))} at this budget.` : '',
-    relaxedRequired.length ? `Everything didn't fit in ${money(total)}, so I made the ${list(relaxedRequired.map((r) => r.toLowerCase()))} optional.` : '',
+    leftOut.length ? `I left out ${list(leftOut.map((s) => s.toLowerCase()))} to stay within budget.` : '',
     `Total ${money(spent)}, leaving ${money(total - spent)}.`,
   ].filter(Boolean).join(' ');
 
@@ -332,7 +417,34 @@ const buildBundle = async ({ goal, budget, gender = null }) => {
     skippedRoles: skipped,
     explanation,
     savingsTips,
+    budgetAdvice: {
+      minimumForAll: floor.minimumForAll,
+      minimumForRequired: floor.minimumForRequired,
+      suggestedBudget: floor.suggestedBudget,
+      cheapestByRole: floor.rows.filter((r) => r.price).map(({ role, price, productId }) => ({ role, price, productId })),
+      missingRequired,
+      message: advice,
+    },
   };
 };
 
-module.exports = { buildBundle, knapsack, chooseTemplate, TEMPLATES };
+// lightweight listing for the apps: every ready-made goal with a budget that actually covers its essentials
+const listTemplates = async () => {
+  const catalog = await getCatalog();
+  if (!listTemplates.cache || listTemplates.cache.catalog !== catalog) {
+    const rows = Object.entries(TEMPLATES).map(([id, t]) => {
+      const floor = budgetFloor(t, catalog, null);
+      return {
+        id,
+        goal: t.goal,
+        label: t.title,
+        suggestedBudget: floor.suggestedBudget,
+        roles: t.roles.map((role) => ({ role: role.role, required: Boolean(role.required), minPrice: floor.rows.find((r) => r.role === role.role)?.price ?? null })),
+      };
+    });
+    listTemplates.cache = { catalog, rows };
+  }
+  return listTemplates.cache.rows;
+};
+
+module.exports = { buildBundle, listTemplates, knapsack, chooseTemplate, niceCeil, TEMPLATES };

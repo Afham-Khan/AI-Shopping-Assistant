@@ -79,13 +79,13 @@ const noMatchReply = (slots) => {
 };
 
 const greeting = (name, seed) => pick([
-  `Hi${name ? ` ${name}` : ''}! I'm Zelora AI. Tell me what you're shopping for — like *gaming laptop under 300k* or *a gift for my mom*.`,
+  `Hi${name ? ` ${name}` : ''}! I'm Zel, Zelora's shopping assistant. Tell me what you're shopping for — like *gaming laptop under 300k* or *a gift for my mom*.`,
   `Hello${name ? ` ${name}` : ''}! What can I help you find today? I understand budgets, brands and even Roman Urdu.`,
   `Hey${name ? ` ${name}` : ''}! Looking for something specific, or want me to suggest a few things?`,
 ], seed);
 
 const HELP = [
-  "I'm **Zelora AI**, your shopping assistant. I can:",
+  "I'm **Zel**, your Zelora shopping assistant. I can:",
   '• find products from plain language — *red running shoes for women under 15k*',
   '• recommend picks for you and suggest **gifts** by recipient, occasion and budget',
   '• **compare** products and pick the best value',
