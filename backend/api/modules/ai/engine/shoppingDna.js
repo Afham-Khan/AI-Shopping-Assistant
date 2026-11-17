@@ -13,11 +13,12 @@ const DEPT_KEYS = {
 // persona prototypes: weighted trait/department mixes; the best-scoring prototype wins
 const PERSONAS = [
   { title: 'The Tech Enthusiast', score: (t, d) => 1.6 * d.electronics + 0.3 * t.quality, description: 'You gravitate to gadgets and care about specs — so I lead with performance and highlight hardware details.' },
-  { title: 'The Smart Saver', score: (t) => 1.0 * t.price + 0.8 * t.deal, description: 'You hunt for value and discounts — I surface deals, cheaper near-equivalents and coupon tips first.' },
+  { title: 'The Smart Saver', score: (t) => 1.2 * t.price + 0.8 * t.deal, description: 'You hunt for value and discounts — I surface deals, cheaper near-equivalents and coupon tips first.' },
   { title: 'The Brand Loyalist', score: (t, d, x) => (x.branded >= 4 ? 1.4 * t.brand : 0), description: 'You stick with brands you trust — your favourite brands get a boost in your recommendations.' },
   { title: 'The Trendsetter', score: (t, d) => 1.0 * t.trend + 0.6 * d.fashion, description: 'You like what is popular and new — trending and best-selling picks rank higher for you.' },
   { title: 'The Quality Connoisseur', score: (t) => 1.1 * t.quality + 0.6 * (1 - t.price), description: 'You pay for quality — I weigh ratings and reviews heavily and show premium options.' },
-  { title: 'The Curious Explorer', score: (t) => 1.3 * t.breadth, description: 'You shop across many categories — I keep your feed diverse instead of repeating one category.' },
+  // exploring only describes someone when no department dominates their activity
+  { title: 'The Curious Explorer', score: (t, d) => 1.1 * t.breadth * (Math.max(...Object.values(d)) >= 0.45 ? 0.55 : 1), description: 'You shop across many categories — I keep your feed diverse instead of repeating one category.' },
   { title: 'The Style Maven', score: (t, d) => 1.5 * d.fashion + 0.3 * d.beauty, description: 'Fashion is your thing — I focus on looks, colours and occasions when I suggest items.' },
   { title: 'The Beauty Buff', score: (t, d) => 1.6 * d.beauty, description: 'You love beauty and self-care — I pay attention to skin types, scents and review sentiment.' },
   { title: 'The Home Maker', score: (t, d) => 1.5 * (d.home + d.groceries), description: 'You shop for the home — kitchen, decor and essentials lead your recommendations.' },
@@ -95,7 +96,11 @@ const shoppingDna = async (userId) => {
     deal: has ? clamp(0.7 * (acc.discount / W) + 0.3 * couponShare) : 0,
     quality: has ? clamp(0.6 * ((acc.quality / W - 3.4) / 1.2) + 0.4 * (acc.highRated / W)) : 0.5,
     trend: has ? clamp(acc.trend / W) : 0,
-    breadth: clamp(catW.size / Math.min(10, catalog.taxonomy.length || 10)),
+    // how evenly activity spreads over categories (normalized entropy), not just how many were touched once
+    breadth: catW.size > 1
+      ? clamp(([...catW.values()].reduce((h, v) => { const q = v / [...catW.values()].reduce((a, b) => a + b, 0); return h - q * Math.log(q); }, 0)
+        / Math.log(Math.min(10, catalog.taxonomy.length || 10))) * Math.min(1, catW.size / 5))
+      : 0,
     research: clamp(Math.log1p(counts.views + extras.searches.length) / Math.log1p(8 * (counts.purchases + counts.cart + 1))),
   };
   const deptTotal = [...deptW.values()].reduce((a, b) => a + b, 0) || 1;

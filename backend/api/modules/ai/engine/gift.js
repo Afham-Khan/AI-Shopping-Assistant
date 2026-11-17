@@ -4,13 +4,20 @@ const L = require('./nlu/lexicon');
 const { analyze } = require('./nlu');
 const { getCatalog } = require('./retrieval/catalog');
 const { money, shortMoney, stars, plural, list, titleCase } = require('./format');
+const { isKidsItem, kidsGender, isNovelty, accessoryKind, genderOf } = require('./complements');
+
+// never a good blind gift: model-specific accessories, chargers, studio gear, household consumables
+const UNGIFTABLE = /\bcase\b|\bcover\b|charger|battery pack|power ?bank|pedestal|tissue/i;
+// fine for a child: sport and play, tablets, headphones and children's clothing
+const kidFriendly = (p) => isKidsItem(p) || ['sports-accessories', 'tablets'].includes(p.category_slug) || accessoryKind(p) === 'audio';
 
 const AGE_BY_RECIPIENT = {
   kid: 'kid', son: 'kid', daughter: 'kid', nephew: 'kid', niece: 'kid',
   grandma: 'senior', grandmother: 'senior', grandpa: 'senior', grandfather: 'senior',
 };
 
-// interest words -> catalog categories ({ women, men } picks the gendered variant)
+// interest words -> catalog categories ({ women, men } picks the gendered variant); an optional 4th regex says which
+// products really serve the interest (default: the interest regex itself over title, "ideal for", type and tags)
 const INTERESTS = [
   [/\b(?:make ?up|cosmetics?|lipstick|beauty|mascara|nails?)\b/, 'makeup', ['beauty']],
   [/\b(?:skin ?care|skincare|skin|self ?care|spa|pamper)\b/, 'skincare', ['skin-care']],
@@ -22,7 +29,7 @@ const INTERESTS = [
   [/\b(?:fashion|style|clothes|clothing|dress(?:es)?|outfits?|shopping)\b/, 'fashion', [{ women: 'womens-dresses', men: 'mens-shirts' }, { women: 'tops', men: 'mens-shoes' }, 'sunglasses']],
   [/\b(?:sunglasses|shades|eyewear)\b/, 'sunglasses', ['sunglasses']],
   [/\b(?:tech|gadgets?|electronics|phones?|mobiles?|music|headphones|earbuds|apple)\b/, 'tech', ['mobile-accessories', 'tablets', 'smartphones']],
-  [/\b(?:gam(?:ing|es?|er)|playstation|pubg)\b/, 'gaming', ['mobile-accessories', 'tablets', 'laptops']],
+  [/\b(?:gam(?:ing|es?|ers?)|playstation|pubg)\b/, 'gaming', ['mobile-accessories', 'tablets', 'laptops'], /\bgam(?:ing|es?|ers?)\b|headphone|earphone|earbud|airpods|beats|ipad|tablet/],
   [/\b(?:study|studies|student|university|college|coding|programming|work|office)\b/, 'study & work', ['laptops', 'tablets', 'mobile-accessories']],
   [/\b(?:photography|photos?|camera|vlogg?ing)\b/, 'photography', ['smartphones', 'mobile-accessories']],
   [/\b(?:fitness|gym|workout|sports?|cricket|football|tennis|running|yoga|golf|basketball)\b/, 'sports', ['sports-accessories']],
@@ -87,9 +94,9 @@ const mapInterests = (interests, gender) => {
     const text = String(raw || '').toLowerCase();
     if (!text.trim() || /\b(?:surprise|anything|no idea|not sure|koi bhi|whatever)\b/.test(text)) continue;
     let matched = false;
-    for (const [re, label, cats] of INTERESTS) {
+    for (const [re, label, cats, fits] of INTERESTS) {
       if (!re.test(text)) continue;
-      out.push({ label, raw: raw.trim(), categories: cats.flatMap((c) => resolveSlug(c, gender)) });
+      out.push({ label, raw: raw.trim(), categories: cats.flatMap((c) => resolveSlug(c, gender)), re: fits || re });
       matched = true;
     }
     if (!matched) {
@@ -131,20 +138,33 @@ const buildGift = async (args) => {
   const generic = new Set(L.GIFT_CATEGORIES[genericKey] || L.GIFT_CATEGORIES.any);
   const occasionCats = new Set([...(OCCASION_CATEGORIES[occasion] || []), ...(EXTRA_OCCASION[occasion] || [])]);
 
+  // an interest can also be met by what a product is for ("Gigabyte Aorus tee — ideal for gamers")
+  const interestText = (p) => interests.find((i) => i.re && i.re.test(`${p.title} ${p.specs?.['Ideal For'] || ''} ${p.specs?.Type || ''} ${(p.tags || []).join(' ')}`.toLowerCase())) || null;
+
   const semanticText = [args.text, 'gift', occasion, recipient, ...interests.map((i) => i.raw)].filter(Boolean).join(' ');
   const { scores: semantic } = await catalog.semanticScores(semanticText);
   const maxSem = Math.max(1e-6, ...[...semantic.values()]);
 
   const opposite = gender === 'women' ? 'men' : gender === 'men' ? 'women' : null;
+  const wants = (re) => interests.some((i) => re.test(i.label) || re.test(i.raw));
+  const partyish = /party|birthday/.test(rawOccasion || '') || wants(/party|fun|costume/);
   const eligible = (p, strict) => {
     if (p.stock <= 0) return false;
+    if (UNGIFTABLE.test(p.title)) return false;
+    if (isNovelty(p) && !partyish) return false;
+    if (['camera', 'studio'].includes(accessoryKind(p)) && !wants(/photo|travel|tech|vlog|camera|selfie/)) return false;
+    // children get children's things; adults never get children's clothing
+    if (ageBand === 'kid') {
+      if (!kidFriendly(p)) return false;
+      if (isKidsItem(p) && gender && kidsGender(p) && kidsGender(p) !== gender) return false;
+    } else if (isKidsItem(p)) return false;
     if (budget?.max && p.price > budget.max) return false;
     if (budget?.min && p.price < budget.min) return false;
     if (opposite && (p.gender === opposite || p.category_slug.startsWith(`${opposite === 'men' ? 'mens' : 'womens'}-`))) return false;
     if (NEVER_UNLESS_ASKED.has(p.category_slug) && !interestCats.has(p.category_slug)) return false;
     if (!strict) return true;
     // interests lead, but giftable generic picks can fill the rest of the collection
-    return interestCats.has(p.category_slug) || generic.has(p.category_slug) || occasionCats.has(p.category_slug) || (ageBand === 'kid' && KID_CATEGORIES.includes(p.category_slug));
+    return interestCats.has(p.category_slug) || generic.has(p.category_slug) || occasionCats.has(p.category_slug) || interestText(p) || (ageBand === 'kid' && (KID_CATEGORIES.includes(p.category_slug) || isKidsItem(p)));
   };
 
   let pool = catalog.products.filter((p) => eligible(p, true));
@@ -155,14 +175,19 @@ const buildGift = async (args) => {
   }
 
   const scored = pool.map((p) => {
-    const interest = interestCats.has(p.category_slug) ? 1 : 0;
+    const byText = interestText(p);
+    // a product made for the interest beats one that only shares its broad category (a gamer tee vs a smart speaker)
+    const interest = byText ? 1 : interestCats.has(p.category_slug) ? 0.6 : 0;
     const occ = occasionCats.has(p.category_slug) ? 1 : 0;
     const catFit = interest ? 1 : occ ? 0.75 : generic.has(p.category_slug) ? 0.55 : 0.3;
     const sem = (semantic.get(p.id) || 0) / maxSem;
-    const kidFit = ageBand === 'kid' ? (KID_CATEGORIES.includes(p.category_slug) ? 1 : 0.3) : 1;
-    const score = (0.3 * catFit + 0.25 * interest + 0.18 * budgetFit(p.price, budget) + 0.18 * p._quality + 0.08 * p._popularity
-      + 0.1 * (GIFTABILITY[p.category_slug] ?? 0.5) + 0.12 * sem + 0.04 * p._discount) * kidFit;
-    return { p, score, interest, occ };
+    // a child's own things (a girls' dress for a daughter) beat generic sports gear
+    const kidFit = ageBand === 'kid' ? (isKidsItem(p) ? 1.25 : KID_CATEGORIES.includes(p.category_slug) ? 1 : 0.3) : 1;
+    // recipient's gender unknown (boss, friend, colleague): prefer pieces anyone can use
+    const neutral = !gender && genderOf(p) !== 'unisex' ? 0.65 : 1;
+    const score = (0.3 * catFit + 0.25 * interest + 0.12 * occ + 0.24 * budgetFit(p.price, budget) + 0.18 * p._quality + 0.08 * p._popularity
+      + 0.1 * (GIFTABILITY[p.category_slug] ?? 0.5) + 0.12 * sem + 0.04 * p._discount) * kidFit * neutral;
+    return { p, score, interest, occ, interestLabel: interestCats.get(p.category_slug) || byText?.label };
   }).sort((a, b) => b.score - a.score);
 
   // at most 2 per category so the collection feels curated, not a single-category list
@@ -178,6 +203,16 @@ const buildGift = async (args) => {
     picked.push(s);
     if (picked.length >= limit) break;
   }
+  // few suitable categories (a child's gift, a small budget): fill up with the next best rather than show 2 ideas
+  if (picked.length < Math.min(limit, 6)) {
+    for (const s of scored) {
+      if (picked.length >= Math.min(limit, 6)) break;
+      if (!picked.includes(s) && (counts.get(s.p.category_slug) || 0) < capFor(s.p.category_slug) + 2) {
+        counts.set(s.p.category_slug, (counts.get(s.p.category_slug) || 0) + 1);
+        picked.push(s);
+      }
+    }
+  }
 
   const who = recipient && !['her', 'him', 'them'].includes(recipient) ? `your ${recipient}` : pronoun(gender);
   const occasionLabel = occasion ? (occasion === 'eid' ? 'Eid' : titleCase(occasion)) : null;
@@ -185,7 +220,7 @@ const buildGift = async (args) => {
     product: s.p,
     score: +Math.max(0, Math.min(1, s.score)).toFixed(3),
     reasons: [
-      s.interest ? `Matches ${possessive(gender)} love of ${interestCats.get(s.p.category_slug)}` : null,
+      s.interest ? `Matches ${possessive(gender)} love of ${s.interestLabel}` : null,
       occasionLabel && (s.occ || !s.interest) ? `${s.occ ? 'A classic' : 'A thoughtful'} ${occasionLabel === 'Eid' ? 'Eid' : occasionLabel.toLowerCase()} gift` : null,
       budget?.max ? `Within your ${money(budget.max)} budget` : null,
       s.p.sold_count >= catalog.bestsellerCut ? `Popular pick, ${s.p.sold_count} sold` : null,

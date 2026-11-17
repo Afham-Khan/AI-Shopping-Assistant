@@ -6,6 +6,7 @@ const { VectorSpace, cosine } = require('./vectorspace');
 const embeddings = require('./embeddings');
 const { getVocabulary } = require('../nlu/vocab');
 const { baseClean, tokenize } = require('../nlu/normalizer');
+const { attrsOf } = require('../ranking/attributes');
 
 const CHECK_EVERY_MS = 60 * 1000;
 const BAYES_PRIOR_COUNT = 5;
@@ -44,6 +45,7 @@ class Catalog {
       p._quality = Math.min(1, Math.max(0, (p._bayes - 2.5) / 2.5));
       p._popularity = Math.log1p(p.sold_count || 0) / Math.log1p(this.maxSold);
       p._discount = Math.min(1, (p.discount_percent || 0) / 40);
+      attrsOf(p); // attribute tags (shoe/dress type, use-cases, colour family, gender) used by ranking
       p._text = [
         p.title, p.brand_name, p.category_name, p.color, (p.tags || []).join(' '), p.search_keywords,
         (p.highlights || []).join(' '), Object.entries(p.specs || {}).map(([k, v]) => `${k} ${v}`).join(' '), p.description,

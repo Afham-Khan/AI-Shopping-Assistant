@@ -4,3 +4,7 @@ Thumbs.db
 .vscode/*
 !.vscode/launch.json
 *.log
+
+# deploy credentials must never be committed
+*.PublishSettings
+*.publishsettings

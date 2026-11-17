@@ -3,10 +3,11 @@ const raw = {
   5: 'outstanding superb excellent exceptional flawless perfect phenomenal fantastic brilliant masterpiece',
   4: 'amazing awesome love loved loving wonderful incredible impressive impressed delightful stunning gorgeous beautiful lovely terrific',
   3: 'great good nice happy pleased satisfied recommend recommended solid sturdy durable comfortable comfy reliable fast smooth fresh tasty delicious elegant stylish premium worth value bargain crisp vibrant soft cozy quick responsive accurate generous genuine authentic perfectly',
-  2: 'fine decent like liked works working useful handy clean cute pretty easy light lightweight bright clear helpful efficient affordable cheap okay ok fair glad enjoy enjoyed recommendable sharp long-lasting lasting rich fits',
-  1: 'adequate acceptable average standard simple neat',
-  '-1': 'meh slow small tight loose heavy noisy plain basic',
-  '-2': 'gripe struggles struggle grainy mediocre bad poor disappointing disappointed issue issues problem problems flimsy cheaply weak thin dull scratchy itchy greasy sticky cakey fades faded faulty late delay delayed overpriced expensive pricey uncomfortable hard difficult missing smell smells stiff blurry laggy lag dim',
+  2: 'fine decent like liked works working useful handy clean cute pretty easy light lightweight bright clear helpful efficient affordable cheap fair glad enjoy enjoyed recommendable sharp long-lasting lasting rich fits',
+  // lukewarm words: "okay for the price" is not praise
+  1: 'adequate acceptable average standard simple neat okay ok',
+  '-1': 'meh slow small tight loose heavy noisy plain basic shallow synthetic',
+  '-2': 'mushy plasticky crushed disappears gripe struggles struggle grainy mediocre bad poor disappointing disappointed issue issues problem problems flimsy cheaply weak thin dull scratchy itchy greasy sticky cakey fades faded faulty late delay delayed overpriced expensive pricey uncomfortable hard difficult missing smell smells stiff blurry laggy lag dim',
   '-3': 'terrible awful horrible worst broken broke useless defective damaged waste fake unhappy dissatisfied annoying irritation rash leaking leaked cracked stopped rubbish ripped torn smelly stale rotten',
   '-4': 'disgusting pathetic scam fraud hate hated nightmare dangerous',
 };
@@ -23,6 +24,10 @@ const PHRASES = new Map([
   ['too big', -2], ['too thick', -2], ['too expensive', -2], ['better options', -1], ['think twice', -2],
   ['nothing special', -1], ['does the job', 2], ['love it', 4], ['no complaints', 3], ['true to size', 2],
   ['money back', -1], ['exactly as shown', 3], ['as shown', 2], ['as pictured', 2], ['quite different', -2], ['looks different', -2], ['different from the pictures', -2], ['caused irritation', -3], ['on the plus side', 0], ['better than expected', 3], ['expected a lot more', -3],
+  // the review phrasings that were read as neutral or even positive ("feels cheap" is not "affordable")
+  ['not what i expected', -2], ['expected better', -2], ['poor value', -3], ['poor value for money', -3], ['feels cheap', -2],
+  ['looks cheap', -2], ['cheap for the price', -2], ['lasts all day', 3], ['heats up', -2], ['fan noise', -1], ['gets loud', -1],
+  ['too quickly', -1], ['far too quickly', -2],
 ]);
 
 const NEGATORS = new Set(['not', 'no', 'never', 'nothing', 'hardly', 'barely', 'without', 'nor', 'neither', 'cannot', 'dont', 'didnt', 'doesnt', 'isnt', 'wasnt', 'arent', 'wont', 'nahi']);

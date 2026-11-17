@@ -1,6 +1,7 @@
 // template nlg with variation: short, friendly, bold for prices/key facts, explains the top pick
 const L = require('../nlu/lexicon');
 const { money, stars, list, pick, titleCase, truncate } = require('../format');
+const { TYPE_WORDS } = require('../ranking/attributes');
 
 // lowercase only generic sentence starters, never brand or product names
 const GENERIC_START = /^(?:Great|Within|Rated|Comes|Bestseller|Similar|Matches|Suited|Nice|Above|Also|Popular|Trending|Goes|Bought|Reviewers|Related|Close|Top|Based|Because|Highest|Lowest|Cheapest)\b/;
@@ -8,6 +9,10 @@ const lower = (s) => (s && GENERIC_START.test(s) ? s.charAt(0).toLowerCase() + s
 
 const categoryNames = (slots, catalog) =>
   (slots.categories || []).map((c) => catalog?.taxonomy.find((t) => t.slug === c)?.name || L.CATEGORY_NAMES[c] || c);
+
+// plural product-type words the shopper typed ("heels", "sneakers") read better than the category name ("shoes")
+const TYPE_NOUNS = new Set(TYPE_WORDS.flatMap(([words]) => words).filter((w) => /^[a-z]+s$/.test(w)));
+const typeNoun = (slots) => (slots.terms || []).find((t) => TYPE_NOUNS.has(t)) || null;
 
 // "gaming Samsung smartphones in black for women"
 const describe = (slots, catalog, { plural = true } = {}) => {
@@ -17,7 +22,9 @@ const describe = (slots, catalog, { plural = true } = {}) => {
   if (slots.brands?.length) parts.push(list(slots.brands.map((b) => titleCase(b)), 'or'));
   let noun = null;
   const cats = categoryNames(slots, catalog);
-  if (cats.length) noun = cats.length > 2 ? 'items' : list(cats.map((c) => c.replace(/^(Men's|Women's) /, '')), 'or');
+  // men's + women's shoes -> "shoes" (never "shoes or shoes")
+  const nouns = [...new Set(cats.map((c) => c.replace(/^(Men's|Women's) /, '')))];
+  if (cats.length) noun = typeNoun(slots) || (nouns.length > 2 ? 'items' : list(nouns, 'or'));
   else if (slots.department) noun = catalog?.taxonomy.find((t) => t.departmentSlug === slots.department)?.departmentName || 'products';
   else if (slots.keywords?.length) noun = slots.keywords.join(' ');
   noun = noun || (plural ? 'options' : 'option');
@@ -46,30 +53,59 @@ const exclusionPhrase = (slots) => {
   return parts.length ? ` (${parts.join(', ')})` : '';
 };
 
-const topPickLine = (item, seed) => {
+// the reply always describes the FIRST card; `closest` words it honestly when that card only partly matches
+const topPickLine = (item, seed, { closest = null } = {}) => {
   if (!item) return '';
   const p = item.product;
   const why = item.reasons?.find((r) => !/^Within your/.test(r)) || item.reasons?.[0];
-  const opener = pick(['My top pick is', 'Best match:', 'I\'d start with', 'Top of the list is'], seed);
+  const opener = closest ? `The closest ${closest} is` : pick(['My top pick is', 'Best match:', 'I\'d start with', 'Top of the list is'], seed);
   return `${opener} **${p.title}** at **${money(p.price)}**${why ? ` — ${lower(why)}` : ''}.`;
+};
+
+// is a shown item an exact match for the explicit constraints (named type, colour)? null = nothing to check
+const exactFit = (item) => {
+  const f = item.fit;
+  if (!f) return null;
+  return f.typeOk !== false && f.avoidOk !== false && (f.colorTier == null || f.colorTier >= 1);
+};
+
+// honest wording when the catalogue can't fully satisfy the request ("only 2 of these come in red")
+const fitNote = (slots, items) => {
+  const checks = items.map(exactFit);
+  if (!items.length || checks.every((c) => c === null)) return { note: '', closest: null, none: false };
+  const k = checks.filter(Boolean).length;
+  const top = items[0].fit || {};
+  const colorPartial = slots.color && top.colorTier != null && top.colorTier < 3;
+  const closest = slots.color && (k === 0 || colorPartial) ? `in ${slots.color}` : k === 0 ? 'match' : null;
+  if (k === 0) return { note: `I couldn't find an exact match${slots.color ? ` in ${slots.color}` : ''}, so here are the closest options.`, closest, none: true };
+  if (k < items.length) {
+    const what = slots.color ? `${k === 1 ? 'comes' : 'come'} in ${slots.color}` : `${k === 1 ? 'is an exact match' : 'are exact matches'}`;
+    return { note: `${k === 1 ? 'Only one' : `Only ${k}`} of these ${what}; the rest are the closest alternatives.`, closest, none: false };
+  }
+  return { note: '', closest, none: false };
 };
 
 const searchReply = ({ slots, result, catalog, seed, intent, shownFrom = 0 }) => {
   const n = result.items.length;
-  const what = describe(slots, catalog);
+  const fit = fitNote(slots, result.items);
+  // not every card is an exact match: don't promise "5 dresses in red" / "5 running shoes" above cards that aren't
+  const partial = Boolean(fit.note);
+  const what = describe(partial ? { ...slots, color: null, features: [], terms: [] } : slots, catalog);
   const budget = budgetPhrase(slots.budget);
   const lines = [];
   if (result.relaxed.length) lines.push(result.relaxed.map((r) => r.message).join(' '));
+  if (fit.none) lines.push(fit.note);
   const intro = {
     refine_cheaper: pick([`Here are more affordable ${what}`, `Cheaper ${what} coming up`, `Okay, going lower on price — ${what}`], seed),
     refine_premium: pick([`Stepping up to more premium ${what}`, `Here are higher-end ${what}`, `Premium ${what} for you`], seed),
-    show_more: `Here are ${n} more ${what}`,
-    recommendation: pick([`Here's what I'd recommend — ${n} ${what}`, `My recommendations: ${n} ${what}`, `These ${n} ${what} stand out`], seed),
+    show_more: n === 1 ? `Here is one more of the ${what}` : `Here are ${n} more ${what}`,
+    recommendation: n === 1 ? `My recommendation from the ${what}` : pick([`Here's what I'd recommend — ${n} ${what}`, `My recommendations: ${n} ${what}`, `These ${n} ${what} stand out`], seed),
     gift_suggestion: pick([`Here are ${n} gift ideas ${slots.recipient ? `for your ${slots.recipient}` : ''}`, `Some thoughtful gift picks${slots.recipient ? ` for your ${slots.recipient}` : ''}`], seed),
-  }[intent] || (n === 1 ? `Only one match for ${what}` : pick([`Here are ${n} ${what}`, `I found ${result.total} ${what}; here are the top ${n}`, `Take a look at these ${n} ${what}`], seed));
+  }[intent] || (n === 1 ? `Only one match for ${what}` : partial ? `Here are ${n} ${what}` : pick([`Here are ${n} ${what}`, `I found ${result.total} ${what}; here are the top ${n}`, `Take a look at these ${n} ${what}`], seed));
   const sortText = slots.sort ? { price_asc: ', cheapest first', price_desc: ', priciest first', rating: ', best rated first', popular: ', most popular first', newest: ', newest first', discount: ', biggest discounts first' }[slots.sort] || '' : '';
   lines.push(`${intro.replace(/\s+/g, ' ').trim()}${budget && !result.relaxed.some((r) => r.type === 'budget') ? ` ${budget}` : ''}${exclusionPhrase(slots)}${sortText}:`);
-  if (shownFrom === 0 || intent !== 'show_more') lines.push(topPickLine(result.items[0], seed));
+  if (shownFrom === 0 || intent !== 'show_more') lines.push(topPickLine(result.items[0], seed, { closest: fit.closest }));
+  if (!fit.none && fit.note) lines.push(fit.note);
   return lines.filter(Boolean).join(' ');
 };
 
@@ -146,4 +182,5 @@ const productInfoReply = (p, summary, seed) => {
 
 module.exports = {
   describe, budgetPhrase, searchReply, noMatchReply, greeting, HELP, smallTalk, fallback, STATUS_TEXT, fmtDate, productInfoReply, lower, categoryNames,
+  topPickLine, fitNote, exactFit,
 };

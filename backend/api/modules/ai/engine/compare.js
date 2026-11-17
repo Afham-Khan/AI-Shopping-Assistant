@@ -24,6 +24,18 @@ const parseQuantity = (value) => {
   return best;
 };
 
+// the headline figure a shopper reads first: the first unit-tagged number in the value.
+// "64 GB (microSD up to 256 GB)" -> 64 GB, "Up to 5 hours listening, 24 hours with charging case" -> 5 h
+// (parseQuantity's largest number would crown the expandable storage or the charging-case total instead)
+const headlineQuantity = (value) => {
+  const s = String(value ?? '').toLowerCase();
+  for (const m of s.matchAll(/(\d+(?:\.\d+)?)\s*(tb|gb|mb|mah|mp|hz|inch|"|w|kg|g|ml|l|hours?|h|years?|months?|days?)\b/g)) {
+    const [unit, scale] = UNIT_SCALE[m[2]] || [];
+    if (unit) return { unit, value: Number.parseFloat(m[1]) * scale };
+  }
+  return null;
+};
+
 const winner = (values, lowerBetter = false) => {
   const nums = values.map((v) => (Number.isFinite(v) ? v : null));
   const valid = nums.filter((v) => v !== null);
@@ -69,7 +81,7 @@ const buildComparison = (products) => {
     .sort((a, b) => b.coverage - a.coverage)
     .slice(0, 12);
   for (const s of specs) {
-    const qty = s.values.map(parseQuantity);
+    const qty = s.values.map(headlineQuantity);
     const units = new Set(qty.filter(Boolean).map((q) => q.unit));
     const bestIndex = units.size === 1 ? winner(qty.map((q) => q?.value ?? null), LOWER_IS_BETTER.test(s.label)) : null;
     rows.push({ label: s.label, values: s.values.map((v) => v ?? '—'), bestIndex });
@@ -125,8 +137,10 @@ const buildProsCons = (products, rows, explanations, reviews = []) => products.m
   if (distinctPrices && p.price === Math.min(...prices)) pros.push(`Cheapest of the ${products.length} at ${money(p.price)}`);
   if (distinctPrices && p.price === Math.max(...prices)) cons.push(`Most expensive at ${money(p.price)}`);
   const ratingRow = rows.find((r) => r.label === 'Rating');
-  if (ratingRow?.bestIndex === i) pros.push(`Highest rated (${stars(p.rating)})`);
-  if (p.rating_count && p.rating < 3.5) cons.push(`Lower rating (${stars(p.rating)})`);
+  // a 3.4★ product can top a weak group, but "highest rated" next to "lower rating" reads as a contradiction:
+  // below 3.5★ it is only a con, and the pro says it is the best of the group
+  if (p.rating_count && p.rating < 3.5) cons.push(`Lower rating (${stars(p.rating)})${ratingRow?.bestIndex === i ? ', though still the best of this group' : ''}`);
+  else if (ratingRow?.bestIndex === i) pros.push(`Highest rated (${stars(p.rating)})`);
   if (p.stock <= 0) cons.push('Out of stock right now');
   // spec levels from the explainer: great specs are pros, weak ones cons
   const specs = explanations[i]?.specs || [];
@@ -266,4 +280,4 @@ const compareProducts = async (ids, { need = null } = {}) => {
 
 const pickNames = (comparison) => list(comparison.products.map((p) => p.title));
 
-module.exports = { compareProducts, buildComparison, buildProsCons, parseNeed, pickForNeed, parseQuantity, pickNames };
+module.exports = { compareProducts, buildComparison, buildProsCons, parseNeed, pickForNeed, parseQuantity, headlineQuantity, pickNames };

@@ -7,11 +7,16 @@ const { list, truncate } = require('../format');
 
 const cache = new Map(); // productId -> { stamp, result }
 
-const labelFor = (score) => {
-  if (score >= 0.45) return 'Very positive';
-  if (score >= 0.15) return 'Positive';
-  if (score > -0.15) return 'Mixed';
-  return 'Negative';
+const LABELS_ORDER = ['Negative', 'Mixed', 'Positive', 'Very positive'];
+// text sentiment runs warm (reviewers use kind words even at 3★), so the star average caps the label:
+// "Very positive" needs about 4★, "Positive" about 3.2★, and below 2.5★ it is "Negative"
+const labelFor = (score, avgStars = null) => {
+  let label = score >= 0.45 ? 'Very positive' : score >= 0.15 ? 'Positive' : score > -0.15 ? 'Mixed' : 'Negative';
+  if (avgStars !== null && Number.isFinite(avgStars)) {
+    const cap = avgStars >= 3.95 ? 3 : avgStars >= 3.2 ? 2 : avgStars >= 2.5 ? 1 : 0;
+    if (LABELS_ORDER.indexOf(label) > cap) label = LABELS_ORDER[cap];
+  }
+  return label;
 };
 
 // pure function so it can be unit-tested without a database
@@ -33,8 +38,9 @@ const summarizeReviews = (reviews, { categorySlug = null, title = 'this product'
       // neutral wording inherits the review's overall tone
       const polarity = Math.abs(sentence.score) >= 0.1 ? sentence.score : starSignal * 0.5;
       for (const aspect of aspects) {
-        if (!tally.has(aspect)) tally.set(aspect, { pos: 0, neg: 0, sum: 0 });
+        if (!tally.has(aspect)) tally.set(aspect, { pos: 0, neg: 0, sum: 0, best: 0 });
         const t = tally.get(aspect);
+        t.best = Math.max(t.best, polarity);
         if (polarity > 0.05) t.pos += 1;
         else if (polarity < -0.05) t.neg += 1;
         t.sum += polarity;
@@ -45,13 +51,15 @@ const summarizeReviews = (reviews, { categorySlug = null, title = 'this product'
 
   const overall = scoredReviews.reduce((s, r) => s + r.score, 0) / scoredReviews.length;
   const entries = [...tally].map(([aspect, t]) => ({ aspect, label: LABELS[aspect] || aspect, ...t }));
-  const pros = entries.filter((e) => e.pos > e.neg && e.pos >= 1).sort((a, b) => b.pos - a.pos)
+  // a pro needs real praise: one clearly positive remark or several mild ones (not just "okay for the price")
+  const pros = entries.filter((e) => e.pos > e.neg && e.pos >= 1 && (e.best >= 0.4 || e.pos >= 3)).sort((a, b) => b.pos - a.pos)
     .slice(0, 5).map((e) => ({ aspect: e.label, mentions: e.pos }));
   const cons = entries.filter((e) => e.neg >= e.pos && e.neg >= 1).sort((a, b) => b.neg - a.neg)
     .slice(0, 5).map((e) => ({ aspect: e.label, mentions: e.neg }));
 
   const positiveShare = scoredReviews.filter((r) => r.score > 0.1).length / scoredReviews.length;
-  const label = labelFor(overall);
+  const avgStars = reviews.reduce((a, r) => a + (r.rating || 3), 0) / reviews.length;
+  const label = labelFor(overall, avgStars);
   const lead = {
     'Very positive': `Shoppers love ${title}`,
     Positive: `Most shoppers are happy with ${title}`,
