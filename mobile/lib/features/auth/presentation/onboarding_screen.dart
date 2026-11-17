@@ -185,9 +185,12 @@ class _IntroPage extends StatelessWidget {
                     child: DotGridBackground(
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.md),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: SizedBox(width: 300, child: vignette),
+                        // scales down on short phones, up (a little) on big screens
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            child: FittedBox(child: SizedBox(width: 300, child: vignette)),
+                          ),
                         ),
                       ),
                     ),
@@ -407,7 +410,7 @@ class _PickVignette extends StatelessWidget {
                 Text('WHY THIS ONE', style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 9.5)),
                 reason('Inside your budget'),
                 reason('Rated ${Formatters.rating(p?.rating ?? 4.7)} by buyers'),
-                reason('Close to what you browse'),
+                reason('Fits your taste'),
               ],
             ),
           ),

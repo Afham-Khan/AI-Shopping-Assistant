@@ -103,45 +103,126 @@ All paths and location builders are in `core/router/routes.dart` (param conventi
 
 ## Responsive layout
 
-- `context.useBottomNav` (width < 700 & portrait) → bottom bar; otherwise NavigationRail, extended from 1100 px (`context.isDesktop`). `context.isWide` = ≥ 700.
+- `context.useBottomNav` (width < 700 & portrait) → bottom bar; otherwise the storefront top header (`StoreHeader`, see Design system → Shell). No side rail. `context.isWide` = ≥ 700, `context.isDesktop` = ≥ 1100.
 - Wrap page content in `ResponsiveCenter` (max 1200) / `SliverResponsiveCenter` in slivers; forms use `maxWidth: Breakpoints.maxForm` (440).
 - Must not overflow at 320 px wide or text scale 2.0 (app clamps at 2.0). Prefer `Wrap`, `Flexible`, `maxLines + ellipsis`. Grid tiles get their height from `ProductCard.compactHeight`, which scales with text size.
 
-## Design tokens
+## Design system
 
-- Colors: `context.colors` (`AppPalette`) — `background, surface, surfaceVariant, border, text, muted, primary, onPrimary, error, sale, success, warning, star, ai, aiSoft, shadow`. Never hard-code hex in features.
-- AI accent (`AiGradient`, `colors.ai`) **only on AI surfaces**: assistant, AI badges, recommendations, smart search.
-- Spacing `AppSpacing` 4/8/12/16/20/24/32/48 (`AppSpacing.md`, `AppSpacing.gapMd`); page gutter `context.pagePadding`.
-- Radii `AppRadii`: 10 inputs/chips/buttons, 14 cards, 20 sheets, pill. Borders over shadows; soft shadow only on floating things.
-- Type: Inter via `context.textTheme` — display/headline (tight tracking) → title → body → label. `bodySmall` is already muted.
-- Motion `AppDurations` (150/250/400 ms), `AppCurves.standard`. Wrap durations with `context.motion(d)` so reduced-motion users get none. Page transitions are a subtle fade-through (theme-wide).
-- Accessibility: tap targets ≥ 44 px, `tooltip`/semantic labels on icon buttons, `Semantics(header: true)` on titles, keyboard submit on the last field.
+**Identity — "editorial front, ledger precision".** Zelora looks like a well-edited shop, not a dashboard: solid surfaces with hairline borders, real product photos as the hero, a serif for the editorial voice, a mono for facts, and ONE accent. The assistant has a name and a mark: **Zel**, a single four-point spark (`AiSparkleIcon`).
+
+**Never:** gradients (the `aiGradient` / `brandGradient` getters are flat on purpose), glow, blur / glass, spinning or floating decoration, emoji as icons, loud colored fills, more than one accent in a view, hard-coded hex in features.
+
+### Color (`context.colors` → `AppPalette`; dark is the default theme)
+
+| Token | Dark "tide ink" | Light "paper" | Use |
+|---|---|---|---|
+| `background` | `#081719` | `#F4F7F4` | page |
+| `surface` | `#0D2023` | `#FFFFFF` | cards, sheets, inputs, header |
+| `surfaceVariant` | `#13292D` | `#ECF1ED` | hover rows, skeletons, inset panels |
+| `surfaceRaised` | `#1A3439` | `#E0E8E3` | kbd chips, tooltips, slider track |
+| `border` / `borderStrong` | `#1E383D` / `#30535A` | `#D9E3DD` / `#B5C8BE` | hairline · hover and emphasis |
+| `text` / `muted` / `faint` | `#EAF2F0` / `#A4BBB8` / `#6F8A88` | `#10221D` / `#465E56` / `#72887F` | primary · secondary · captions, placeholders |
+| `primary` (`primaryHover`, `onPrimary`, `primarySoft`) | `#3DDBA6` (`#62E5BA`, `#04271B`, `#123531`) | `#0A7F60` (`#086B51`, `#FFFFFF`, `#E1F2EC`) | the one accent: primary buttons, active states, eyebrows |
+| `ai` / `aiSoft` | = `primary` / `primarySoft` | same | AI surfaces only (named for intent) |
+| `sale` (`onSale`, `saleSoft`) | `#F4736C` (`#2B0907`, `#3A2224`) | `#C8372F` (`#FFFFFF`, `#FBE9E7`) | discounts, savings, destructive |
+| `warning` / `star` | `#F0B352` | `#A86A09` / `#E09A14` | low stock, ratings |
+| `success` · `secondary` (info) · `purple` | `#3BD48F` · `#5AB6EE` · `#C4A0FA` | `#0E8F5B` · `#0F6FC0` · `#6F48D6` | status only |
+| `imageWell` / `onImageWell` | `#E7EDEA` / `#10221D` | `#EEF2EF` / `#10221D` | the tile behind product photos |
+| `shadowMd` / `shadowLg` | `0 10 28 -10 #000000B3` | `0 10 28 -10 #10231C24` | hovered cards, menus, dialogs only |
+
+- **Image wells are light in both themes.** The catalog photos are transparent cut-outs and many products are black; on a dark well they vanish. Always put product photos on `colors.imageWell` (the `AppNetworkImage` default) and draw anything on top of the well with `onImageWell` / light-theme ink.
+- **Accent sparingly.** One primary button per view. Selected chips, nav indicators and segmented buttons use `primarySoft` + accent text, never a solid fill. Links are muted at rest and take the accent on hover.
+- **Warm signals:** coral (`sale`) for discount tags, "You save", destructive actions; amber for stars and low stock. Nothing else is warm.
+- **Department hues** (`colors.departmentAccent(slug)`): electronics blue, fashion rose, beauty violet, home amber, groceries green, sports orange, automotive teal. Use them as a 2 px top border (`CategoryTopBorderCard`), a 6 px dot, or a small icon tint — never as a fill or text color for body copy.
+
+### Type (`AppType`, `context.textTheme`)
+
+| Voice | Font | Where |
+|---|---|---|
+| Editorial | **Source Serif 4** — every `display*` and `headline*` style; `AppType.serif(style)` | hero headings, section titles (`SectionHeader`), product name on the detail page, auth titles. Colour one phrase in the accent at most once per screen (`Text.rich`). |
+| Interface | **Inter** — `title*`, `body*`, `label*` | everything else; app-bar titles; prices (`PriceText`, tabular figures, "Rs" set lighter) |
+| Ledger | **JetBrains Mono** — `AppType.eyebrow(context)`, `AppType.data(context)`, `AppType.mono(style)` | eyebrows, order numbers, SKUs, spec values, timestamps, counters ("01 / 03"), kbd chips, status lines |
+
+Scale: display 46/38/32 · headline 28/24/20 · title 18/16/14 · body 16/14/12 (`bodySmall` is muted) · label 14/12/11. Use `fontFeatures: AppType.tabular` on any number that changes or lines up.
+
+**Eyebrows** (`Eyebrow`): 11 px mono caps, accent colour, one per section, above the heading. Sections on a page are numbered (`Eyebrow('Trending', index: 2)` → `02 — TRENDING`; `SectionHeader(index:, eyebrow:)`). Status eyebrows take a dot (`dot: true`).
+
+### Shape, space, motion
+
+- Radii `AppRadii`: 6 tags / kbd chips · 8 inputs and buttons · 12 cards and dialogs · 16 sheets · pill for chips and status badges.
+- Spacing `AppSpacing` 4/8/12/16/20/24/32/48; page gutter `context.pagePadding`; content max 1200 (`ResponsiveCenter`).
+- Borders over shadows. A card is `surface` + 1 px `border`; hover = `borderStrong` + `shadowMd`; never a different fill.
+- Motion `AppDurations`: 150 hover/press · 250 standard · 300 colour and border transitions · 400 emphasis · 450 sheets (ease-out) · dialogs fade 150 ms + rise 20 px (`showAppDialog`). Always `context.motion(d)` so reduced-motion gets none. No looping decoration: `StatusLine` pulses three times and rests.
+- Press feedback: everything tappable settles to ~0.96 (`Pressable`; `AppButton`, `ProductCard`, `CategoryTopBorderCard` already do). Light haptic on commit actions and tab changes.
+- Focus is always visible: 1.5 px accent ring on inputs / outlined buttons, ink ring on filled buttons.
+
+### Component habits (follow these on every screen)
+
+- **Toasts** (`AppSnack`): bottom-centre, one at a time (a new one replaces the old), 3 s, first letter capitalised, radius 8 with a 1 px border. Show the server's `message` for success and for error.
+- **Loading:** first load = skeletons shaped like the final layout (`SkeletonProductCard`, `SkeletonListTile`…). Refetch / paging = keep the content and dim it to 0.7 (`AnimatedOpacity`), never blank the screen. Buttons show a small spinner, dim to 0.55 and ignore taps (`AppButton(loading:)`).
+- **Empty / error** (`EmptyState`, `ErrorState`): soft tinted icon circle, bold title, one muted help line, optional single action. Errors add the technical code small in mono (`HTTP 500`).
+- **Forms:** errors only after a field has been touched (`AppTextField` validates on unfocus). On a failed submit call `validateForm(formKey)` — it scrolls to and focuses the first invalid field — and show `FormErrorBanner(message: kFixFieldsMessage)`. Mark required fields with `required: true` (red asterisk). Password fields warn when Caps Lock is on. Enter submits the last field.
+- **Destructive actions:** always `ConfirmDialog.show(context, title: 'Remove this address?', confirmLabel: 'Remove', onConfirm: () => repo.delete(id))` — error-tinted icon circle, "This action cannot be undone.", outline Cancel + danger confirm that shows loading.
+- **Status badges** (`StatusBadge('Delivered', tone: StatusTone.success)`): soft background, strong text, subtle border, pill.
+- **Stats:** `StatBlock.count(count: n, caption: 'Products')` — the number counts up once (1.2 s ease-out, tabular) over a tiny mono caption.
+- **Success moments:** `SuccessCheck()` draws its ring and check (order placed, password changed).
+- **Avatars:** `AppAvatar(name:, imageUrl:)` — initials on a soft accent tint when there is no photo.
+- **Copy:** anything a person might read back (order number, tracking id, version) is tappable: `copyToClipboard(context, value, label: 'Order number')` confirms with a toast; `KeyValueRow(copyable: true)` does it for you.
+- **Icon buttons** always have a `tooltip`; titles get `Semantics(header: true)`; tap targets ≥ 44 px.
+- **Live data over decoration:** prefer a real number, time or status ("Store online · 38 ms", "Updated just now", "Ends in 02:14:09", "Out for delivery") to an illustration. Use `StatusLine` / `Eyebrow(dot: true)`.
+- **Keyboard** (web / desktop): `/` or Ctrl/⌘ K opens the search palette from anywhere (quick links first, then categories and debounced product results; ↑ ↓ ↵ esc), Alt 1–5 switches tabs. Show shortcuts with `KbdChip` only where they really work.
+
+### Voice
+
+Zelora speaks like a good shop assistant: short, direct, sentence case, friendly, never cute. Say what happened, then what to do. No exclamation marks, no "Oops", no emoji. The assistant is **Zel** ("Ask Zel", "Zel reads the reviews so you don't have to"). Examples: "Nothing saved yet" / "Tap the heart on anything you like. It will wait here." · "Can't reach the store" / "Check the server address in Settings." · "Only 3 left" · "You save Rs 4,100".
+
+### Shell
+
+- Phones in portrait (`context.useBottomNav`: width < 700): bottom navigation bar — Home, Explore, Assistant (Zel's spark), Cart (count badge), Account.
+- Everything wider (tablet, desktop, web): a sticky storefront header (`StoreHeader`, 64 px, `surface` + bottom hairline, content capped at 1200): logo · Home / Explore / Ask Zel / Deals (current link gets a 2 px accent rule) · search field with `Ctrl K` chips (opens the palette; collapses to an icon below 880 px) · wishlist, notifications (dot), cart (count), account avatar menu. **There is no side rail** — pages get the full width, so lay out wide screens as a storefront (centred max-width content, multi-column grids), not as an admin panel.
+- Screens inside a tab must not add their own logo / search / cart app-bar actions on wide layouts (the header has them): gate them with `context.useBottomNav`.
 
 ## Shared widget catalog (`core/widgets/widgets.dart`)
 
 | Widget | Usage |
 |---|---|
 | `AppButton` | `AppButton(label: 'Pay', onPressed: f, loading: busy, expand: true, icon: Icons.lock)`; `.secondary`, `.ghost`, `.destructive`; `size: AppButtonSize.small/large` |
-| `AppTextField` | `AppTextField(label: 'Email', controller: c, prefixIcon: Icons.mail_outline, validator: Validators.email, errorText: e?.fieldError('email'), onSubmitted: (_) => submit())`; `isPassword: true` adds a toggle |
+| `AppTextField` | `AppTextField(label: 'Email', required: true, controller: c, prefixIcon: Icons.mail_outline, validator: Validators.email, errorText: e?.fieldError('email'), onSubmitted: (_) => submit())`; `isPassword: true` adds a toggle |
 | `FormErrorBanner` | `FormErrorBanner(message: error?.message)` — animated inline error |
 | `AppNetworkImage` | `AppNetworkImage(url, width: 64, height: 64, fit: BoxFit.cover, borderRadius: AppRadii.inputAll)` — cached, shimmer, fallback icon, resolves relative URLs. Without `width` it decodes at the laid-out width (memory). `placeholder:` replaces the shimmer (e.g. the thumbnail while a big image loads) |
 | `ProductCard` | `ProductCard(product: p)` (grid tile) / `variant: ProductCardVariant.wide` (list row); heart, discount badge, AI match badge, opens product page. Remembers the product in `ProductPreviewCache` on tap (instant detail page). `hero: true` flies the image into the detail gallery — only where a product appears once per screen |
 | `ProductGrid` / `SliverProductGrid` | `ProductGrid(products: items)`, `.loading()`, `loadingMore: true`; 2/3/4/5 columns by width; tiles use `hero: true` |
 | `ProductRail` | `ProductRail(products: items)` horizontal row, `.loading()` |
-| `PriceText` | `PriceText(price, compareAt: was, size: PriceSize.large, showDiscount: true)` — tabular figures |
+| `PriceText` | `PriceText(price, compareAt: was, size: PriceSize.large, showDiscount: true, showSavings: true)` — tabular figures, lighter "Rs", coral discount tag, optional "You save …" line |
 | `RatingStars` | `RatingStars(4.6, count: 128)` compact · `RatingStars.full(4.6)` five stars |
-| `SectionHeader` | `SectionHeader(title: 'Trending', subtitle: '…', leading: AiSparkleIcon(), onSeeAll: f)` |
-| `EmptyState` | `EmptyState(icon: Icons.favorite_border, title: 'Nothing saved', message: '…', actionLabel: 'Browse', onAction: f)` |
-| `ErrorState` | `ErrorState(error: e, onRetry: f)` — offline errors get a server-address hint |
+| `SectionHeader` | `SectionHeader(title: 'Trending', eyebrow: 'This week', index: 2, subtitle: '…', leading: AiSparkleIcon(), onSeeAll: f)` — serif title; `serif: false` for utility headings in sheets |
+| `EmptyState` | `EmptyState(icon: Icons.favorite_border, title: 'Nothing saved yet', message: '…', actionLabel: 'Browse', onAction: f)`; optional `eyebrow`, `detail` (mono line), `accent` (tints the circle), `compact` |
+| `ErrorState` | `ErrorState(error: e, onRetry: f)` — offline errors get a server-address hint; shows `HTTP 500`-style code in mono |
 | `LoadingView` | centered spinner when no skeleton fits |
 | `Skeleton*` | `Skeleton(width:, height:)`, `Skeleton.circle(size:)`, `SkeletonText(lines: 3)`, `SkeletonProductCard()`, `SkeletonListTile()`, `SkeletonList(count: 6)` |
 | `QuantityStepper` | `QuantityStepper(value: q, onChanged: f, max: 10, loading: busy)`; `min: 0` turns − into delete at 1 |
 | `AppBadge` | `AppBadge(count: n, child: Icon(...))`, `AppBadge.dot(show: unread, child: ...)` |
 | `ResponsiveCenter` / `SliverResponsiveCenter` | cap content width + gutters |
 | `AppSnack` | `AppSnack.success(context, 'Added to cart')`, `.error(context, e)`, `.info(context, 'Removed', actionLabel: 'Undo', onAction: f)` |
-| `AiSparkleIcon` / `AiGradientText` / `AiBadge` / `AiGradientBorder` / `AiGradient.mask` | AI accents: `AiBadge(label: '92% match')`, `AiGradientBorder(child: ...)` for AI cards |
+| `AiSparkleIcon` / `AiGradientText` / `AiBadge` / `AiGradientBorder` / `AiGradient.mask` | Zel's accents, all solid (no gradient despite the legacy names): `AiSparkleIcon(size: 18, filled: false)` four-point spark, `AiBadge(label: '92% match')` (solid over photos, `solid: false` on surfaces), `AiGradientBorder(child: ...)` = 1 px accent border + soft tint for AI cards |
 | `BottomSheetScaffold` + `showAppBottomSheet` | `showAppBottomSheet(context, builder: (_) => BottomSheetScaffold(title: 'Sort by', footer: AppButton(...), child: ...))` |
-| `AppLogo` | brand mark (+ wordmark) |
+| `AppLogo` | brand mark (accent tile with a geometric Z, drawn in code) + serif wordmark; `showWordmark: false`, colour overrides |
+| `Eyebrow` | `Eyebrow('Picked for you')`, `Eyebrow('Trending', index: 2)`, `Eyebrow('Store online', dot: true)`, `leading: AiSparkleIcon(size: 11)` |
+| `StatBlock` | `StatBlock(value: '4.6', caption: 'Avg rating')` · `StatBlock.count(count: 194, caption: 'Products')` (counts up) · `compact: true` |
+| `KeyValueRow` | `KeyValueRow(label: 'Order', value: '#ZL-10482', copyable: true)` — mono value; for order / spec / about tables |
+| `KbdChip` | `KbdChip('Ctrl')`, `KbdChip('K')` — only for shortcuts that work |
+| `StatusLine` | `StatusLine('Out for delivery', color: colors.warning)` — dot pulses three times, then rests |
+| `StatusBadge` | `StatusBadge('Delivered', tone: StatusTone.success, icon: Icons.check_rounded)` — neutral / success / warning / danger / info / accent |
+| `DotGridBackground` | `DotGridBackground(child: hero)` — quiet dot grid behind hero panels (`lines: true` for a line grid) |
+| `CategoryTopBorderCard` | `CategoryTopBorderCard(accent: colors.departmentAccent(slug), onTap: f, child: ...)` — bordered card with a 2 px coloured top edge |
+| `Pressable` | `Pressable(child: card)` — press-scale for custom tappables |
+| `CountUp` | `CountUp(1264, style: t.displaySmall)` — 1.2 s ease-out, tabular |
+| `SuccessCheck` | `SuccessCheck(size: 64)` — ring + check draw themselves |
+| `AppAvatar` | `AppAvatar(name: user.name, imageUrl: user.avatarUrl, size: 40)` — initials fallback |
+| `ConfirmDialog` / `showAppDialog` | `await ConfirmDialog.show(context, title: 'Remove item?', confirmLabel: 'Remove', onConfirm: () async {...})` → `bool`; `showAppDialog` for custom dialogs with the app motion |
+| `copyToClipboard` | `copyToClipboard(context, order.number, label: 'Order number')` |
+| `validateForm` / `kFixFieldsMessage` | `if (!validateForm(_formKey)) { setState(() => _banner = kFixFieldsMessage); return; }` — scrolls to and focuses the first invalid field |
 
 Utilities: `FormReveal.validate(formKey)` (validates, scrolls the first invalid field into view; show `FormReveal.fixFields` in a `FormErrorBanner`), `ProductPreviewCache` (`remember`, `lookup(idOrSlug)`, `heroTag(id)`), `PagedController<T>` / `PagedState<T>` in `core/network/paged_controller.dart` (infinite-scroll base: implement `fetch(page)` + `idOf`, call `loadMore()`; dedupes items; `loadMoreError` for a retry row), `Formatters` (`price`, `priceCompact`, `compact`, `rating`, `discount`, `date`, `dateTime`, `relative`, `plural`), `Validators` (`email`, `password`, `confirmPassword`, `name`, `phone`, `otp`, `required`, `combine`, `strength`), `Debouncer` (search-as-you-type), `CategoryIcons.of(slug)`, extensions (`context.colors/textTheme/isWide/isDesktop/useBottomNav/pagePadding/reduceMotion/motion()`, `'smart-watches'.titleCase`).
 

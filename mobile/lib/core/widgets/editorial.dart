@@ -160,7 +160,6 @@ class KbdChip extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
       padding: const EdgeInsets.symmetric(horizontal: 5),
-      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
         borderRadius: AppRadii.tagAll,
@@ -168,9 +167,14 @@ class KbdChip extends StatelessWidget {
         // a hard (unblurred) lower edge reads as a physical key
         boxShadow: [BoxShadow(color: colors.borderStrong, offset: const Offset(0, 1.5))],
       ),
-      child: Text(
-        label,
-        style: AppType.data(context, color: colors.muted, size: 10.5, weight: FontWeight.w600).copyWith(height: 1),
+      // Center with factors: hug the label instead of filling the parent
+      child: Center(
+        widthFactor: 1,
+        heightFactor: 1,
+        child: Text(
+          label,
+          style: AppType.data(context, color: colors.muted, size: 10.5, weight: FontWeight.w600).copyWith(height: 1),
+        ),
       ),
     );
   }

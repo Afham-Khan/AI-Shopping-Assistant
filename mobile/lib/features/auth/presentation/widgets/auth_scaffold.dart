@@ -6,7 +6,6 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../providers/storefront_provider.dart';
 
@@ -206,7 +205,6 @@ class _BrandPanel extends ConsumerWidget {
     final colors = context.colors;
     final t = context.textTheme;
     final glance = ref.watch(storefrontGlanceProvider).value;
-    String stat(int? n) => n == null ? '—' : Formatters.number(n);
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.md),
@@ -256,9 +254,9 @@ class _BrandPanel extends ConsumerWidget {
                   AppSpacing.gapLg,
                   Row(
                     children: [
-                      Expanded(child: StatBlock(value: stat(glance?.products), caption: 'Products', compact: true)),
-                      Expanded(child: StatBlock(value: stat(glance?.categories), caption: 'Categories', compact: true)),
-                      Expanded(child: StatBlock(value: stat(glance?.departments), caption: 'Departments', compact: true)),
+                      Expanded(child: StatBlock.count(count: glance?.products, caption: 'Products', compact: true)),
+                      Expanded(child: StatBlock.count(count: glance?.categories, caption: 'Categories', compact: true)),
+                      Expanded(child: StatBlock.count(count: glance?.departments, caption: 'Departments', compact: true)),
                       const Expanded(
                         child: StatBlock(value: '0', caption: 'Sponsored picks', compact: true),
                       ),

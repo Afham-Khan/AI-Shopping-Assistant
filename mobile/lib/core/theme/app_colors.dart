@@ -155,7 +155,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     aiSoft: Color(0xFF123531),
     imageWell: Color(0xFFE7EDEA),
     onImageWell: Color(0xFF10221D),
-    grid: Color(0xFF12292D),
+    grid: Color(0xFF1B3439),
     shadow: Color(0xB3000000),
   );
 
@@ -187,7 +187,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     aiSoft: Color(0xFFE1F2EC),
     imageWell: Color(0xFFEEF2EF),
     onImageWell: Color(0xFF10221D),
-    grid: Color(0xFFE3EBE6),
+    grid: Color(0xFFD3DED7),
     shadow: Color(0x2410231C),
   );
 
