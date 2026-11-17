@@ -55,7 +55,7 @@ const FAQ_TOPICS = [
   ['contact', /\b(?:contact|customer (?:care|service|support)|support team|support|helpline|phone number|whatsapp number|email (?:you|support|address)|talk to (?:a |an )?(?:human|person|agent|real person)|complain|complaint|raabta)\b/],
   ['catalog', /\b(?:what (?:do|can) you (?:sell|offer)|what (?:do you|can i) (?:have|buy|get) (?:here|on zelora)|what (?:products|items|things|categories|brands) (?:do )?you (?:have|sell|stock|carry)|what categories|kya (?:bechte|milta)|what is available|what all do you have)\b/],
   ['warranty', /\bwarrant(?:y|ies)\b/],
-  ['cancel', /\bcancel\w*\b/],
+  ['cancel', /\b(?<!noise )(?<!noise-)cancel\w*\b/],
   ['returns', /\b(?:return|returns|refund|refunds|exchange|wapis|wapas)\b/],
 ];
 

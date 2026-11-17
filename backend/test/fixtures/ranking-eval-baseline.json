@@ -1,0 +1,3171 @@
+{
+ "takenAt": "2026-11-17T22:09:38.391Z",
+ "mode": "neural",
+ "summary": {
+  "queries": 138,
+  "passed": 105,
+  "passRate": 0.7608695652173914,
+  "precisionAt3": 0.8309178743961354,
+  "ndcgAt5": 0.8682744685058432,
+  "violations": 28,
+  "violationsByType": {
+   "mustNotMatch": 17,
+   "color": 8,
+   "category": 3
+  },
+  "inconsistentReplies": 0
+ },
+ "results": [
+  {
+   "id": "shoes-running-1",
+   "q": "best running shoes",
+   "group": "use-case: running",
+   "intent": "recommendation",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 0,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 0,
+   "ndcg5": 0.27727342735504823,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 2,
+     "title": "Red Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 3,
+     "title": "Golden Shoes Woman",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/3 relevant in top 3",
+    "#1 mustNotMatch: Calvin Klein Heel Shoes (heel)",
+    "#2 mustNotMatch: Red Shoes (heel)",
+    "#3 mustNotMatch: Golden Shoes Woman (heel)"
+   ]
+  },
+  {
+   "id": "shoes-running-2",
+   "q": "running shoes for men",
+   "group": "use-case: running",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Puma Future Rider Trainers"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 0.9828920819566878,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-running-3",
+   "q": "jogging shoes for women",
+   "group": "use-case: running",
+   "intent": "product_search",
+   "top3": [
+    "Pampi Shoes",
+    "Calvin Klein Heel Shoes",
+    "Red Shoes"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-running-4",
+   "q": "runing shoes",
+   "group": "typo",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 0,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 6,
+   "precision3": 0,
+   "ndcg5": 0.27727342735504823,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 2,
+     "title": "Red Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 3,
+     "title": "Golden Shoes Woman",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/3 relevant in top 3",
+    "#1 mustNotMatch: Calvin Klein Heel Shoes (heel)",
+    "#2 mustNotMatch: Red Shoes (heel)",
+    "#3 mustNotMatch: Golden Shoes Woman (heel)"
+   ]
+  },
+  {
+   "id": "shoes-gym-1",
+   "q": "gym shoes",
+   "group": "use-case: gym",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Nike Baseball Cleats",
+    "Calvin Klein Heel Shoes"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 6,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.8304198973631919,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3",
+    "#3 mustNotMatch: Calvin Klein Heel Shoes (heel)"
+   ]
+  },
+  {
+   "id": "shoes-gym-2",
+   "q": "shoes for workout",
+   "group": "use-case: gym",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Nike Baseball Cleats",
+    "Calvin Klein Heel Shoes"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 6,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.8304198973631919,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3",
+    "#3 mustNotMatch: Calvin Klein Heel Shoes (heel)"
+   ]
+  },
+  {
+   "id": "shoes-sneakers-1",
+   "q": "sneakers for men under 35000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Puma Future Rider Trainers"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-sneakers-2",
+   "q": "white sneakers",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Pampi Shoes"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 4,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.9413045508496032,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-sneakers-3",
+   "q": "snekers",
+   "group": "typo",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 0,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 6,
+   "precision3": 0,
+   "ndcg5": 0.27727342735504823,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 2,
+     "title": "Red Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 3,
+     "title": "Golden Shoes Woman",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/3 relevant in top 3",
+    "#1 mustNotMatch: Calvin Klein Heel Shoes (heel)",
+    "#2 mustNotMatch: Red Shoes (heel)",
+    "#3 mustNotMatch: Golden Shoes Woman (heel)"
+   ]
+  },
+  {
+   "id": "shoes-heels-1",
+   "q": "heels for a wedding",
+   "group": "use-case: wedding",
+   "intent": "bundle",
+   "top3": [],
+   "hits3": 0,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "no products returned",
+    "only 0/2 relevant in top 3"
+   ]
+  },
+  {
+   "id": "shoes-heels-2",
+   "q": "red heels",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Red Shoes",
+    "Sports Sneakers Off White & Red",
+    "Nike Air Jordan 1 Red And Black"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-slippers-1",
+   "q": "comfortable slippers for home",
+   "group": "use-case: home",
+   "intent": "product_search",
+   "top3": [
+    "Black & Brown Slipper",
+    "Puma Future Rider Trainers",
+    "Pampi Shoes"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 7,
+   "precision3": 1,
+   "ndcg5": 0.9129675424759451,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-party-1",
+   "q": "party shoes for women",
+   "group": "use-case: party",
+   "intent": "product_search",
+   "top3": [
+    "Red Shoes",
+    "Golden Shoes Woman",
+    "Calvin Klein Heel Shoes"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-office-1",
+   "q": "office shoes for ladies",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-ru-1",
+   "q": "larkay ke liye joote",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Puma Future Rider Trainers"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-brand-1",
+   "q": "nike shoes",
+   "group": "brand",
+   "intent": "product_search",
+   "top3": [
+    "Nike Baseball Cleats",
+    "Nike Air Jordan 1 Red And Black"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-dad-1",
+   "q": "shoes for my dad",
+   "group": "gift",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Puma Future Rider Trainers"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-red-1",
+   "q": "red shoes for men",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Nike Air Jordan 1 Red And Black"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 0.8145672023038535,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-ru-2",
+   "q": "sasta joota chahiye",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Black & Brown Slipper",
+    "Pampi Shoes",
+    "Red Shoes"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 4,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shoes-sandals-1",
+   "q": "sandals for women",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 4,
+   "precision3": 0.5,
+   "ndcg5": 0.7369302591988794,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3"
+   ]
+  },
+  {
+   "id": "dress-red-1",
+   "q": "Suggest a best red dress for women",
+   "group": "colour",
+   "intent": "recommendation",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 0.5,
+   "ndcg5": 0.6131471927654584,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3",
+    "#2 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "dress-red-2",
+   "q": "red dress",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 0.5,
+   "ndcg5": 0.6131471927654584,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3",
+    "#2 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "dress-red-3",
+   "q": "red dres for women",
+   "group": "typo",
+   "intent": "product_search",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 0.5,
+   "ndcg5": 0.6131471927654584,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3",
+    "#2 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "dress-red-4",
+   "q": "laal dress chahiye",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 0.5,
+   "ndcg5": 0.6131471927654584,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3",
+    "#2 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "dress-black-1",
+   "q": "black dress for a party",
+   "group": "use-case: party",
+   "intent": "product_search",
+   "top3": [
+    "Corset With Black Skirt",
+    "Black Women's Gown",
+    "Corset Leather With Skirt"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-wedding-1",
+   "q": "dress for a wedding",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Marni Red & Black Suit",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 9,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-wedding-2",
+   "q": "shaadi ke liye dress",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Marni Red & Black Suit",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 9,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-summer-1",
+   "q": "summer dress",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Dress Pea",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 1,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 9,
+   "precision3": 0.3333333333333333,
+   "ndcg5": 0.613064960635973,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "dress-blue-1",
+   "q": "blue frock",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Corset With Black Skirt",
+    "Marni Red & Black Suit"
+   ],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/1 relevant in top 3",
+    "#1 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "dress-budget-1",
+   "q": "dress under 15000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Dress Pea"
+   ],
+   "hits3": 1,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 6,
+   "precision3": 0.3333333333333333,
+   "ndcg5": 0.33916020527361607,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "dress-green-1",
+   "q": "green dress",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Dress Pea",
+    "Black Women's Gown",
+    "Marni Red & Black Suit"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-gown-1",
+   "q": "evening gown",
+   "group": "use-case: party",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Corset With Black Skirt",
+    "Corset Leather With Skirt"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 10,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-office-1",
+   "q": "office dress for women",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 4,
+   "availFull": 8,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.7160402767315405,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "dress-casual-1",
+   "q": "casual dress for everyday",
+   "group": "use-case: casual",
+   "intent": "product_search",
+   "top3": [
+    "Dress Pea",
+    "Corset With Black Skirt",
+    "Black Women's Gown"
+   ],
+   "hits3": 1,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 9,
+   "precision3": 0.3333333333333333,
+   "ndcg5": 0.5029134359701414,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "Black Women's Gown",
+     "type": "mustNotMatch",
+     "detail": "gown"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/3 relevant in top 3",
+    "#3 mustNotMatch: Black Women's Gown (gown)"
+   ]
+  },
+  {
+   "id": "shirt-office-1",
+   "q": "formal shirt for office",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Blue & Black Check Shirt",
+    "Men Check Shirt",
+    "Man Short Sleeve Shirt"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-casual-1",
+   "q": "casual t shirt for men",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Man Plaid Shirt",
+    "Man Short Sleeve Shirt",
+    "Men Check Shirt"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-blue-1",
+   "q": "blue shirt",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Blue & Black Check Shirt",
+    "Men Check Shirt",
+    "Gigabyte Aorus Men Tshirt"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-red-1",
+   "q": "red shirt for men",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Man Plaid Shirt",
+    "Gigabyte Aorus Men Tshirt",
+    "Man Short Sleeve Shirt"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-gaming-1",
+   "q": "gaming t-shirt",
+   "group": "use-case: gaming",
+   "intent": "product_search",
+   "top3": [
+    "Gigabyte Aorus Men Tshirt",
+    "Man Plaid Shirt",
+    "Man Short Sleeve Shirt"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-brother-1",
+   "q": "shirt for my brother",
+   "group": "gift",
+   "intent": "product_search",
+   "top3": [
+    "Man Plaid Shirt",
+    "Man Short Sleeve Shirt",
+    "Gigabyte Aorus Men Tshirt"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "shirt-summer-1",
+   "q": "half sleeve shirt for summer",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Man Short Sleeve Shirt",
+    "Gigabyte Aorus Men Tshirt",
+    "Man Plaid Shirt"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 2,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 0.9790187994940358,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "Man Plaid Shirt",
+     "type": "mustNotMatch",
+     "detail": "winter"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "#3 mustNotMatch: Man Plaid Shirt (winter)"
+   ]
+  },
+  {
+   "id": "watch-men-1",
+   "q": "watch for men under 50000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Brown Leather Belt Watch"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-women-1",
+   "q": "luxury watch for women",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Rolex Datejust Women",
+    "Rolex Cellini Moonphase",
+    "IWC Ingenieur Automatic Steel"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-brand-1",
+   "q": "rolex",
+   "group": "brand",
+   "intent": "product_search",
+   "top3": [
+    "Rolex Datejust Women",
+    "Rolex Cellini Moonphase",
+    "Rolex Cellini Date Black Dial"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 6,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-gold-1",
+   "q": "gold watch for my wife",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Rolex Datejust Women",
+    "Rolex Cellini Moonphase",
+    "Women's Wrist Watch"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-ru-1",
+   "q": "abbu ke liye ghari",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Brown Leather Belt Watch",
+    "Longines Master Collection",
+    "Rolex Cellini Date Black Dial"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 6,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-office-1",
+   "q": "watch for office",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Women's Wrist Watch",
+    "Longines Master Collection",
+    "Brown Leather Belt Watch"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 9,
+   "availFull": 10,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-smart-1",
+   "q": "smart watch for running",
+   "group": "use-case: running",
+   "intent": "product_search",
+   "top3": [
+    "Beats Flex Wireless Earphones",
+    "Apple Watch Series 4 Gold",
+    "Apple Airpower Wireless Charger"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 14,
+   "precision3": 1,
+   "ndcg5": 0.850834274847108,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "watch-black-1",
+   "q": "black watch for men",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Rolex Cellini Date Black Dial",
+    "Rolex Submariner Watch",
+    "Brown Leather Belt Watch"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "bag-1",
+   "q": "handbag for women",
+   "group": "fashion",
+   "intent": "product_search",
+   "top3": [
+    "Women Handbag Black",
+    "Blue Women's Handbag",
+    "Heshe Women's Leather Bag"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "bag-black-1",
+   "q": "black handbag",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Women Handbag Black",
+    "Prada Women Bag",
+    "Blue Women's Handbag"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "bag-uni-1",
+   "q": "bag for university",
+   "group": "use-case: university",
+   "intent": "product_search",
+   "top3": [
+    "White Faux Leather Backpack",
+    "Blue Women's Handbag",
+    "Heshe Women's Leather Bag"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "bag-office-1",
+   "q": "leather bag for office",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Heshe Women's Leather Bag",
+    "Women Handbag Black",
+    "Prada Women Bag"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "jewel-wedding-1",
+   "q": "earrings for a wedding",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Green Crystal Earring",
+    "Tropical Earring",
+    "Green Oval Earring"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "jewel-green-1",
+   "q": "green earrings",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Green Crystal Earring",
+    "Green Oval Earring",
+    "Tropical Earring"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "sun-travel-1",
+   "q": "sunglasses for travel",
+   "group": "use-case: travel",
+   "intent": "product_search",
+   "top3": [
+    "Classic Sun Glasses",
+    "Sunglasses",
+    "Black Sun Glasses"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "sun-black-1",
+   "q": "black sunglasses",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Black Sun Glasses",
+    "Green and Black Glasses",
+    "Sunglasses"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 0.9514426589871553,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "perfume-women-1",
+   "q": "perfume for women",
+   "group": "beauty",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein CK One",
+    "Chanel Coco Noir Eau De",
+    "Dolce Shine Eau de"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "perfume-men-1",
+   "q": "perfum for men",
+   "group": "typo",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein CK One"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "perfume-ru-1",
+   "q": "ammi ke liye khushbu",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein CK One",
+    "Chanel Coco Noir Eau De",
+    "Dolce Shine Eau de"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "perfume-office-1",
+   "q": "light perfume for office",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein CK One",
+    "Dolce Shine Eau de",
+    "Chanel Coco Noir Eau De"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "beauty-lipstick-1",
+   "q": "red lipstick",
+   "group": "beauty",
+   "intent": "product_search",
+   "top3": [
+    "Red Lipstick",
+    "Red Nail Polish",
+    "Powder Canister"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "beauty-mascara-1",
+   "q": "mascara",
+   "group": "beauty",
+   "intent": "product_search",
+   "top3": [
+    "Essence Mascara Lash Princess",
+    "Red Lipstick",
+    "Powder Canister"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "beauty-budget-1",
+   "q": "makeup under 5000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Powder Canister",
+    "Red Lipstick",
+    "Essence Mascara Lash Princess"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "beauty-bridal-1",
+   "q": "bridal makeup",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Red Lipstick",
+    "Powder Canister",
+    "Eyeshadow Palette with Mirror"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "skin-dry-1",
+   "q": "moisturizer for dry skin",
+   "group": "beauty",
+   "intent": "product_search",
+   "top3": [
+    "Olay Ultra Moisture Shea Butter Body Wash",
+    "Vaseline Men Body and Face Lotion",
+    "Attitude Super Leaves Hand Soap"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "skin-men-1",
+   "q": "skin care for men",
+   "group": "beauty",
+   "intent": "product_search",
+   "top3": [
+    "Vaseline Men Body and Face Lotion",
+    "Attitude Super Leaves Hand Soap"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-gaming-1",
+   "q": "gaming laptop",
+   "group": "use-case: gaming",
+   "intent": "product_search",
+   "top3": [
+    "Asus Zenbook Pro Dual Screen Laptop",
+    "Huawei Matebook X Pro",
+    "Apple MacBook Pro 14 Inch Space Grey"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.9395225786842205,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-gaming-2",
+   "q": "labtop for gaming",
+   "group": "typo",
+   "intent": "product_search",
+   "top3": [
+    "Asus Zenbook Pro Dual Screen Laptop",
+    "Huawei Matebook X Pro",
+    "Apple MacBook Pro 14 Inch Space Grey"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.9395225786842205,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-prog-1",
+   "q": "laptop for programming",
+   "group": "use-case: programming",
+   "intent": "product_search",
+   "top3": [
+    "Huawei Matebook X Pro",
+    "New DELL XPS 13 9300 Laptop",
+    "Lenovo Yoga 920"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 5,
+   "precision3": 0.5,
+   "ndcg5": 0.8025392158797567,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3"
+   ]
+  },
+  {
+   "id": "laptop-budget-1",
+   "q": "laptop under 400000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Huawei Matebook X Pro",
+    "Lenovo Yoga 920"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-brand-1",
+   "q": "macbook",
+   "group": "brand",
+   "intent": "product_search",
+   "top3": [
+    "Apple MacBook Pro 14 Inch Space Grey"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-travel-1",
+   "q": "lightweight laptop for travel",
+   "group": "use-case: travel",
+   "intent": "product_search",
+   "top3": [
+    "Huawei Matebook X Pro",
+    "New DELL XPS 13 9300 Laptop",
+    "Lenovo Yoga 920"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "laptop-student-1",
+   "q": "laptop for students",
+   "group": "use-case: university",
+   "intent": "product_search",
+   "top3": [
+    "Huawei Matebook X Pro",
+    "New DELL XPS 13 9300 Laptop",
+    "Lenovo Yoga 920"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-budget-1",
+   "q": "best phone under 100000",
+   "group": "budget",
+   "intent": "recommendation",
+   "top3": [
+    "iPhone 5s",
+    "Samsung Galaxy S7",
+    "Oppo K1"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 10,
+   "availFull": 10,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-brand-1",
+   "q": "samsung phone",
+   "group": "brand",
+   "intent": "product_search",
+   "top3": [
+    "Samsung Galaxy S7",
+    "Samsung Galaxy S10"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-camera-1",
+   "q": "phone with a good camera",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Vivo V9",
+    "iPhone 13 Pro",
+    "Oppo F19 Pro Plus"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 11,
+   "availFull": 15,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-ru-1",
+   "q": "sasta mobile chahiye 50k tak",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Realme C35"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-battery-1",
+   "q": "phone with long battery",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Oppo A57",
+    "Realme C35",
+    "iPhone 5s"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 15,
+   "availFull": 15,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-gaming-1",
+   "q": "gaming phone",
+   "group": "use-case: gaming",
+   "intent": "product_search",
+   "top3": [
+    "iPhone 13 Pro",
+    "Realme XT",
+    "Samsung Galaxy S10"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 15,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-black-1",
+   "q": "black phone",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Samsung Galaxy S7",
+    "Oppo A57",
+    "Vivo V9"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 0.8539316501572934,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "phone-blue-1",
+   "q": "blue phone under 100k",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Oppo K1",
+    "Realme XT",
+    "Vivo S1"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "acc-earbuds-1",
+   "q": "wireless earbuds for gym",
+   "group": "use-case: gym",
+   "intent": "product_search",
+   "top3": [
+    "Beats Flex Wireless Earphones",
+    "Apple Airpods",
+    "Apple Watch Series 4 Gold"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 14,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "acc-anc-1",
+   "q": "noise cancelling headphones",
+   "group": "electronics",
+   "intent": "return_policy",
+   "top3": [],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 14,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "no products returned",
+    "only 0/1 relevant in top 3"
+   ]
+  },
+  {
+   "id": "acc-charger-1",
+   "q": "charger for iphone",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "iPhone 12 Silicone Case with MagSafe Plum",
+    "Apple iPhone Charger",
+    "iPhone 13 Pro"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 6,
+   "availFull": 14,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.6018359199557124,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "iPhone 13 Pro",
+     "type": "category",
+     "detail": "smartphones"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "#3 category: iPhone 13 Pro (smartphones)"
+   ]
+  },
+  {
+   "id": "acc-vlog-1",
+   "q": "accessories for vlogging",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Monopod",
+    "Selfie Lamp with iPhone",
+    "Selfie Stick Monopod"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 14,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "tablet-kids-1",
+   "q": "tablet for kids",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Samsung Galaxy Tab S8 Plus Grey",
+    "Samsung Galaxy Tab White",
+    "iPad Mini 2021 Starlight"
+   ],
+   "hits3": 3,
+   "required": 1,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "tablet-brand-1",
+   "q": "samsung tablet",
+   "group": "brand",
+   "intent": "product_search",
+   "top3": [
+    "Samsung Galaxy Tab S8 Plus Grey",
+    "Samsung Galaxy Tab White"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-sofa-1",
+   "q": "sofa for living room",
+   "group": "home",
+   "intent": "product_search",
+   "top3": [
+    "Annibale Colombo Sofa",
+    "Wooden Bathroom Sink With Mirror",
+    "Bedside Table African Cherry"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-chair-1",
+   "q": "office chair",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Knoll Saarinen Executive Conference Chair",
+    "Bedside Table African Cherry",
+    "Wooden Bathroom Sink With Mirror"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-knife-1",
+   "q": "kitchen knife",
+   "group": "home",
+   "intent": "product_search",
+   "top3": [
+    "Chopping Board",
+    "Microwave Oven",
+    "Knife"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 2,
+   "availFull": 30,
+   "precision3": 1,
+   "ndcg5": 0.9578347709816888,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-blender-1",
+   "q": "blender",
+   "group": "home",
+   "intent": "product_search",
+   "top3": [
+    "Boxed Blender",
+    "Hand Blender",
+    "Red Tongs"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 30,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-lamp-1",
+   "q": "lamp for my study table",
+   "group": "home",
+   "intent": "product_search",
+   "top3": [
+    "Table Lamp",
+    "Knoll Saarinen Executive Conference Chair",
+    "House Showpiece Plant"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 0.7854672967601968,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Knoll Saarinen Executive Conference Chair",
+     "type": "category",
+     "detail": "furniture"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "#2 category: Knoll Saarinen Executive Conference Chair (furniture)"
+   ]
+  },
+  {
+   "id": "home-decor-1",
+   "q": "home decor gift",
+   "group": "home",
+   "intent": "gift_suggestion",
+   "top3": [
+    "House Showpiece Plant",
+    "Family Tree Photo Frame",
+    "Table Lamp"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 0.7227265726449517,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-budget-1",
+   "q": "kitchen items under 2000",
+   "group": "budget",
+   "intent": "budget_query",
+   "top3": [
+    "Red Tongs",
+    "Ice Cube Tray",
+    "Glass"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 9,
+   "availFull": 9,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "home-pan-1",
+   "q": "frying pan",
+   "group": "home",
+   "intent": "product_search",
+   "top3": [
+    "Pan",
+    "Carbon Steel Wok",
+    "Slotted Turner"
+   ],
+   "hits3": 3,
+   "required": 1,
+   "availRelevant": 7,
+   "availFull": 30,
+   "precision3": 1,
+   "ndcg5": 0.8151510484299677,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "grocery-fruit-1",
+   "q": "fresh fruits",
+   "group": "groceries",
+   "intent": "product_search",
+   "top3": [
+    "Apple",
+    "Kiwi",
+    "Red Onions"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 6,
+   "availFull": 27,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.7020976466720956,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "grocery-coffee-1",
+   "q": "coffee",
+   "group": "groceries",
+   "intent": "product_search",
+   "top3": [
+    "Nescafe Coffee",
+    "Red Onions",
+    "Apple"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 27,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "grocery-protein-1",
+   "q": "protein for gym",
+   "group": "use-case: gym",
+   "intent": "bundle",
+   "top3": [],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 7,
+   "availFull": 190,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "no products returned",
+    "only 0/1 relevant in top 3"
+   ]
+  },
+  {
+   "id": "grocery-ru-1",
+   "q": "doodh chahiye",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Milk",
+    "Red Onions",
+    "Apple"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 4,
+   "availFull": 27,
+   "precision3": 0.3333333333333333,
+   "ndcg5": 0.613064960635973,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "sport-cricket-1",
+   "q": "cricket bat",
+   "group": "sports",
+   "intent": "product_search",
+   "top3": [
+    "Cricket Bat",
+    "Basketball",
+    "Tennis Racket"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 16,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "sport-cricket-2",
+   "q": "cricket equipment for my son",
+   "group": "sports",
+   "intent": "product_search",
+   "top3": [
+    "Cricket Wicket",
+    "Basketball",
+    "Tennis Racket"
+   ],
+   "hits3": 1,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 16,
+   "precision3": 0.3333333333333333,
+   "ndcg5": 0.7197780609280466,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "sport-football-1",
+   "q": "football",
+   "group": "sports",
+   "intent": "product_search",
+   "top3": [
+    "American Football",
+    "Football",
+    "Tennis Racket"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 2,
+   "availFull": 16,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "sport-tennis-1",
+   "q": "tennis racket",
+   "group": "sports",
+   "intent": "product_search",
+   "top3": [
+    "Tennis Racket",
+    "Tennis Ball",
+    "American Football"
+   ],
+   "hits3": 2,
+   "required": 1,
+   "availRelevant": 3,
+   "availFull": 16,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.8613098738256916,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "auto-bike-1",
+   "q": "motorcycle under 1000000",
+   "group": "budget",
+   "intent": "product_search",
+   "top3": [
+    "Scooter Motorcycle"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "auto-bike-2",
+   "q": "fast sports bike",
+   "group": "automotive",
+   "intent": "product_search",
+   "top3": [
+    "Kawasaki Z800",
+    "Cricket Helmet",
+    "Generic Motorcycle"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 3,
+   "precision3": 0.5,
+   "ndcg5": 0.8885994691336017,
+   "violations": [
+    {
+     "pos": 2,
+     "title": "Cricket Helmet",
+     "type": "category",
+     "detail": "sports-accessories"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3",
+    "#2 category: Cricket Helmet (sports-accessories)"
+   ]
+  },
+  {
+   "id": "auto-car-1",
+   "q": "red car",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Charger SXT RWD",
+    "Pacifica Touring",
+    "Durango SXT RWD"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "auto-car-2",
+   "q": "family car for road trips",
+   "group": "use-case: travel",
+   "intent": "product_search",
+   "top3": [
+    "Pacifica Touring",
+    "Durango SXT RWD",
+    "300 Touring"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 0.989141344633751,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "gift-mom-1",
+   "q": "gift for mom",
+   "group": "gift",
+   "intent": "gift_suggestion",
+   "top3": [
+    "Green Crystal Earring",
+    "Heshe Women's Leather Bag",
+    "Women Handbag Black"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 173,
+   "availFull": 173,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "gift-dad-1",
+   "q": "gift for dad under 30000",
+   "group": "gift",
+   "intent": "gift_suggestion",
+   "top3": [
+    "Apple HomePod Mini Cosmic Grey",
+    "Brown Leather Belt Watch",
+    "Apple MagSafe Battery Pack"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 104,
+   "availFull": 104,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "gift-sister-1",
+   "q": "birthday gift for my sister",
+   "group": "gift",
+   "intent": "gift_suggestion",
+   "top3": [
+    "Chanel Coco Noir Eau De",
+    "Green Crystal Earring",
+    "Party Glasses"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 173,
+   "availFull": 173,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "gift-husband-1",
+   "q": "anniversary gift for my husband",
+   "group": "gift",
+   "intent": "gift_suggestion",
+   "top3": [
+    "Longines Master Collection",
+    "Calvin Klein CK One",
+    "Brown Leather Belt Watch"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 153,
+   "availFull": 153,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "gift-ru-1",
+   "q": "behan ke liye tohfa",
+   "group": "roman-urdu",
+   "intent": "refine_cheaper",
+   "top3": [
+    "Potatoes",
+    "Olay Ultra Moisture Shea Butter Body Wash",
+    "Red Lipstick"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 173,
+   "availFull": 173,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-shoes-1",
+   "q": "running shoes under 30000",
+   "group": "use-case: running",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Red Shoes",
+    "Golden Shoes Woman"
+   ],
+   "hits3": 0,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 3,
+   "precision3": 0,
+   "ndcg5": 0.4547902722234161,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 2,
+     "title": "Red Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    },
+    {
+     "pos": 3,
+     "title": "Golden Shoes Woman",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/2 relevant in top 3",
+    "#1 mustNotMatch: Calvin Klein Heel Shoes (heel)",
+    "#2 mustNotMatch: Red Shoes (heel)",
+    "#3 mustNotMatch: Golden Shoes Woman (heel)"
+   ]
+  },
+  {
+   "id": "ho-shoes-2",
+   "q": "trainers for my brother",
+   "group": "gift",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Sports Sneakers Off White Red",
+    "Puma Future Rider Trainers"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 4,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 0.989141344633751,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-shoes-3",
+   "q": "black heels for office",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Calvin Klein Heel Shoes",
+    "Black & Brown Slipper",
+    "Nike Baseball Cleats"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 2,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-shoes-4",
+   "q": "gold sandals for mehndi",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Golden Shoes Woman",
+    "Calvin Klein Heel Shoes",
+    "Red Shoes"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-shoes-5",
+   "q": "jogging ke liye joote",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Sports Sneakers Off White & Red",
+    "Puma Future Rider Trainers",
+    "Calvin Klein Heel Shoes"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 6,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.8304198973631919,
+   "violations": [
+    {
+     "pos": 3,
+     "title": "Calvin Klein Heel Shoes",
+     "type": "mustNotMatch",
+     "detail": "heel"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3",
+    "#3 mustNotMatch: Calvin Klein Heel Shoes (heel)"
+   ]
+  },
+  {
+   "id": "ho-dress-1",
+   "q": "party dress for my wife",
+   "group": "use-case: party",
+   "intent": "product_search",
+   "top3": [
+    "Corset With Black Skirt",
+    "Black Women's Gown",
+    "Corset Leather With Skirt"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 7,
+   "availFull": 10,
+   "precision3": 1,
+   "ndcg5": 0.8151510484299677,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-dress-2",
+   "q": "pink dress for my daughter",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Marni Red & Black Suit",
+    "Dress Pea"
+   ],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/1 relevant in top 3",
+    "#1 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "ho-dress-3",
+   "q": "yellow frock",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Black Women's Gown",
+    "Corset With Black Skirt",
+    "Corset Leather With Skirt"
+   ],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Black Women's Gown",
+     "type": "color",
+     "detail": "Black"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/1 relevant in top 3",
+    "#1 color: Black Women's Gown (Black)"
+   ]
+  },
+  {
+   "id": "ho-dress-4",
+   "q": "grey dress for office",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Marni Red & Black Suit",
+    "Black Women's Gown",
+    "Corset With Black Skirt"
+   ],
+   "hits3": 0,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 0,
+   "ndcg5": 0,
+   "violations": [
+    {
+     "pos": 1,
+     "title": "Marni Red & Black Suit",
+     "type": "color",
+     "detail": "Red"
+    }
+   ],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 0/1 relevant in top 3",
+    "#1 color: Marni Red & Black Suit (Red)"
+   ]
+  },
+  {
+   "id": "ho-shirt-1",
+   "q": "check shirt for office",
+   "group": "use-case: office",
+   "intent": "product_search",
+   "top3": [
+    "Men Check Shirt",
+    "Blue & Black Check Shirt",
+    "Man Plaid Shirt"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-watch-1",
+   "q": "silver watch for women",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Women's Wrist Watch",
+    "Rolex Cellini Moonphase",
+    "IWC Ingenieur Automatic Steel"
+   ],
+   "hits3": 3,
+   "required": 2,
+   "availRelevant": 3,
+   "availFull": 3,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-watch-2",
+   "q": "brown leather watch",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Brown Leather Belt Watch",
+    "Longines Master Collection",
+    "Rolex Cellini Moonphase"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-watch-3",
+   "q": "sasti ghari for men",
+   "group": "roman-urdu",
+   "intent": "product_search",
+   "top3": [
+    "Brown Leather Belt Watch",
+    "Longines Master Collection",
+    "Rolex Cellini Date Black Dial"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-bag-1",
+   "q": "white backpack",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "White Faux Leather Backpack",
+    "Women Handbag Black",
+    "Blue Women's Handbag"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-perfume-1",
+   "q": "perfume for a wedding",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Chanel Coco Noir Eau De",
+    "Dior J'adore",
+    "Dolce Shine Eau de"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 3,
+   "availFull": 5,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.9807710461847231,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "ho-laptop-1",
+   "q": "laptop for video editing",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Apple MacBook Pro 14 Inch Space Grey",
+    "Asus Zenbook Pro Dual Screen Laptop",
+    "Huawei Matebook X Pro"
+   ],
+   "hits3": 2,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-phone-1",
+   "q": "phone for selfies",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Vivo V9",
+    "iPhone 13 Pro",
+    "Oppo F19 Pro Plus"
+   ],
+   "hits3": 2,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 15,
+   "precision3": 0.6666666666666666,
+   "ndcg5": 0.6724935386069494,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 2/3 relevant in top 3"
+   ]
+  },
+  {
+   "id": "ho-acc-1",
+   "q": "bluetooth speaker",
+   "group": "electronics",
+   "intent": "product_search",
+   "top3": [
+    "Beats Flex Wireless Earphones",
+    "Amazon Echo Plus",
+    "Apple Airpower Wireless Charger"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 14,
+   "precision3": 0.5,
+   "ndcg5": 0.8166524211685232,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3"
+   ]
+  },
+  {
+   "id": "ho-acc-2",
+   "q": "earphones for running",
+   "group": "use-case: running",
+   "intent": "product_search",
+   "top3": [
+    "Beats Flex Wireless Earphones",
+    "Apple Watch Series 4 Gold",
+    "Selfie Lamp with iPhone"
+   ],
+   "hits3": 1,
+   "required": 2,
+   "availRelevant": 2,
+   "availFull": 14,
+   "precision3": 0.5,
+   "ndcg5": 0.9355095261428396,
+   "violations": [],
+   "consistent": true,
+   "pass": false,
+   "reasons": [
+    "only 1/2 relevant in top 3"
+   ]
+  },
+  {
+   "id": "ho-sun-1",
+   "q": "green sunglasses",
+   "group": "colour",
+   "intent": "product_search",
+   "top3": [
+    "Green and Black Glasses",
+    "Classic Sun Glasses",
+    "Party Glasses"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 1,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-beauty-1",
+   "q": "eyeshadow for a wedding",
+   "group": "use-case: wedding",
+   "intent": "product_search",
+   "top3": [
+    "Eyeshadow Palette with Mirror",
+    "Red Lipstick",
+    "Powder Canister"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 5,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-grocery-1",
+   "q": "vegetables",
+   "group": "groceries",
+   "intent": "product_search",
+   "top3": [
+    "Red Onions",
+    "Potatoes",
+    "Cucumber"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 5,
+   "availFull": 26,
+   "precision3": 1,
+   "ndcg5": 0.9125299483251055,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-auto-1",
+   "q": "family suv",
+   "group": "automotive",
+   "intent": "product_search",
+   "top3": [
+    "Durango SXT RWD",
+    "Pacifica Touring",
+    "300 Touring"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 2,
+   "availFull": 5,
+   "precision3": 0.5,
+   "ndcg5": 0.9355095261428396,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-auto-2",
+   "q": "scooty for my sister",
+   "group": "automotive",
+   "intent": "product_search",
+   "top3": [
+    "Scooter Motorcycle",
+    "Generic Motorcycle",
+    "Kawasaki Z800"
+   ],
+   "hits3": 1,
+   "required": 1,
+   "availRelevant": 1,
+   "availFull": 4,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  },
+  {
+   "id": "ho-gift-1",
+   "q": "gift for my girlfriend under 20000",
+   "group": "gift",
+   "intent": "gift_suggestion",
+   "top3": [
+    "Green Crystal Earring",
+    "Dolce Shine Eau de",
+    "Calvin Klein CK One"
+   ],
+   "hits3": 3,
+   "required": 3,
+   "availRelevant": 113,
+   "availFull": 113,
+   "precision3": 1,
+   "ndcg5": 1,
+   "violations": [],
+   "consistent": true,
+   "pass": true,
+   "reasons": []
+  }
+ ]
+}

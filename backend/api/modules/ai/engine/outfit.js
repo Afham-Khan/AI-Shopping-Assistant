@@ -3,6 +3,7 @@
 // similarity (embeddings of style/occasion keywords). non-fashion items fall back to bought-together.
 const { getCatalog } = require('./retrieval/catalog');
 const { boughtTogether } = require('./ranking/recommender');
+const { isKidsItem, complementaryFor } = require('./complements');
 const { money, stars, plural, list } = require('./format');
 
 const FASHION = new Set(['mens-shirts', 'mens-shoes', 'mens-watches', 'tops', 'womens-dresses', 'womens-shoes', 'womens-bags', 'womens-jewellery', 'womens-watches', 'sunglasses']);
@@ -145,7 +146,9 @@ const completeLook = async (productId, { limit = 8 } = {}) => {
   if (!base) return null;
 
   if (!FASHION.has(base.category_slug)) {
-    const items = (await boughtTogether(base.id, limit)) || [];
+    // association rules first, but only picks that genuinely go with the item (compatible, not a substitute)
+    const seed = (await boughtTogether(base.id, Math.max(limit, 12))) || [];
+    const items = complementaryFor(base, catalog, { limit, seed });
     return { base, kind: 'complementary', title: `Goes well with ${base.title}`, look: [], items, palette: null };
   }
 
@@ -156,8 +159,17 @@ const completeLook = async (productId, { limit = 8 } = {}) => {
   const { scores: semantic } = await catalog.semanticScores(`${query} outfit accessories`);
   const maxSem = Math.max(1e-6, ...[...semantic.values()]);
 
-  const scored = catalog.products
-    .filter((p) => p.id !== base.id && p.stock > 0 && slots.includes(p.category_slug))
+  // children's pieces only go with children's pieces; a child's outfit gets simple, inexpensive add-ons
+  // (flat shoes, a bag, sunglasses), never fragrance, fine watches, jewellery or heels
+  const kidsBase = isKidsItem(base);
+  const fitsAudience = (p) => {
+    if (!kidsBase) return !isKidsItem(p);
+    if (isKidsItem(p)) return true;
+    if (['fragrances', 'womens-watches', 'mens-watches', 'womens-jewellery'].includes(p.category_slug) || p.specs?.['Heel Height']) return false;
+    return p.price <= base.price * 2.5;
+  };
+  let scored = catalog.products
+    .filter((p) => p.id !== base.id && p.stock > 0 && slots.includes(p.category_slug) && fitsAudience(p))
     .map((p) => {
       const gender = genderFit(base, p);
       if (gender === 0) return null;
@@ -171,6 +183,11 @@ const completeLook = async (productId, { limit = 8 } = {}) => {
     })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score);
+  // a unisex piece (sunglasses) still needs a coherent look: follow the best-matching gendered piece
+  if (genderOf(base) === 'unisex') {
+    const lead = scored.find((s) => genderOf(s.p) !== 'unisex');
+    if (lead) scored = scored.filter((s) => genderOf(s.p) === 'unisex' || genderOf(s.p) === genderOf(lead.p));
+  }
 
   const bySlot = new Map();
   for (const s of scored) {

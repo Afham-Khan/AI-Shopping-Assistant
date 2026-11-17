@@ -200,6 +200,15 @@ const extractEntities = (norm, vocab) => {
     return after === 'not' && (!after2 || ['want', 'please', 'show', 'i'].includes(after2));
   };
   const hasFruitCue = tokens.some((t) => FRUIT_CUES.has(t));
+  const catSpans = [];
+  // a category phrase can carry a use-case: "running shoes" -> feature running
+  const featuresInside = (text) => {
+    for (const w of text.split(' ')) {
+      for (const key of ['running', 'gaming']) {
+        if (L.FEATURES[key].triggers.includes(w) && !e.features.includes(key)) e.features.push(key);
+      }
+    }
+  };
 
   for (const match of vocab.spot(tokens)) {
     let used = false;
@@ -216,10 +225,16 @@ const extractEntities = (norm, vocab) => {
           if (!e.categories.includes(a.value)) e.categories.push(a.value);
           // specific words ("mascara", "earbuds") still help lexical ranking inside the category
           for (const t of match.text.split(' ')) if (!e.terms.includes(t)) e.terms.push(t);
+          catSpans.push({ family: a.value.replace(/^(?:mens|womens)-/, ''), slugs: [a.value], start: match.start, end: match.end });
+          featuresInside(match.text);
           used = true;
           break;
         case 'generic':
           generics.push(a.value);
+          // "heels", "sneakers", "running shoes": the exact word tells ranking which kind of shoe
+          for (const t of match.text.split(' ')) if (!e.terms.includes(t)) e.terms.push(t);
+          catSpans.push({ family: a.value, generic: a.value, start: match.start, end: match.end });
+          featuresInside(match.text);
           used = true;
           break;
         case 'department':
@@ -234,10 +249,13 @@ const extractEntities = (norm, vocab) => {
           break;
         case 'feature':
           if (!e.features.includes(a.value)) e.features.push(a.value);
+          // keep the exact word: "programming" and "office" both map to the work feature but want different laptops
+          if (!e.terms.includes(match.text)) e.terms.push(match.text);
           used = true;
           break;
         case 'occasion':
           if (!e.occasion) e.occasion = a.value;
+          if (!e.terms.includes(match.text)) e.terms.push(match.text);
           used = true;
           break;
         case 'recipient':
@@ -267,6 +285,25 @@ const extractEntities = (norm, vocab) => {
     const map = L.GENDERED[g];
     const resolved = e.gender ? map[e.gender] : map.any;
     for (const slug of [].concat(resolved)) if (!e.categories.includes(slug)) e.categories.push(slug);
+  }
+  // one product named with two category words: the head noun wins.
+  // "sports bike" / "basketball shoes" -> the last word; "charger for iphone" / "lamp for my study table" -> the part before "for"
+  const familyOf = (slug) => slug.replace(/^(?:mens|womens)-/, '');
+  const families = [...new Set(catSpans.map((s) => s.family))];
+  if (families.length >= 2 && !tokens.some((t) => ['and', 'or', 'vs', 'versus', 'plus', 'with', '&'].includes(t))) {
+    const drop = new Set();
+    const forIdx = tokens.indexOf('for');
+    const before = catSpans.filter((s) => forIdx >= 0 && s.end <= forIdx);
+    const after = catSpans.filter((s) => forIdx >= 0 && s.start > forIdx);
+    if (before.length && after.length) {
+      for (const s of after) if (!before.some((b) => b.family === s.family)) drop.add(s.family);
+    } else {
+      const spans = catSpans.slice().sort((a, b) => a.start - b.start);
+      for (let i = 0; i + 1 < spans.length; i += 1) {
+        if (spans[i + 1].start === spans[i].end && spans[i + 1].family !== spans[i].family) drop.add(spans[i].family);
+      }
+    }
+    if (drop.size && drop.size < families.length) e.categories = e.categories.filter((c) => !drop.has(familyOf(c)));
   }
   // "shirt for my sister" -> tops
   if (e.gender === 'women' && e.categories.includes('mens-shirts')) {

@@ -1,10 +1,11 @@
 // recommendations: personalized "picked for you", content-based similar items, association-rule bought-together
 const models = require('../../models/ai.models');
-const L = require('../nlu/lexicon');
 const { getCatalog } = require('../retrieval/catalog');
 const { getProfile, aversion } = require('./personalization');
 const { mmr } = require('./ranker');
 const { money, stars, plural, list } = require('../format');
+const { attrsOf } = require('./attributes');
+const { genderOf, wrongGender, isKidsItem, sameSubtype, complementaryFor } = require('../complements');
 
 const COOC_TTL_MS = 10 * 60 * 1000;
 let cooc = null;
@@ -92,22 +93,48 @@ const recommendations = async (userId, limit = 10) => {
   };
 };
 
+// how close a candidate is to the base as a *kind* of product: 0 same category, 1 same department and the same
+// product type (shared tag or derived type: sneaker/sneaker, sofa/bed both "furniture" tags), 2 same department only
+// when the embeddings say it is very close, null otherwise (a kitchen tray is never "similar" to an office chair)
+const SIMILAR_CROSS_CATEGORY_SIM = 0.6;
+const similarTier = (base, p, sim) => {
+  if (p.category_slug === base.category_slug) return 0;
+  if (!base.department_slug || p.department_slug !== base.department_slug) return null;
+  const baseTypes = attrsOf(base).types;
+  if (sameSubtype(base, p) || [...attrsOf(p).types].some((t) => t !== 'kids' && baseTypes.has(t))) return 1;
+  return sim >= SIMILAR_CROSS_CATEGORY_SIM ? 2 : null;
+};
+
 const similar = async (productId, limit = 8) => {
   const catalog = await getCatalog();
   const base = catalog.byId.get(Number(productId));
   if (!base) return null;
+  const gender = genderOf(base);
+  const kidsBase = isKidsItem(base);
   const ranked = catalog.products
     .filter((p) => p.id !== base.id && p.stock > 0)
+    // the same audience: a men's watch never gets a women's watch, an adult item never a child's
+    .filter((p) => !(gender !== 'unisex' && wrongGender(p, gender)) && isKidsItem(p) === kidsBase)
     .map((p) => {
       const sim = Math.max(0, catalog.similarity(base.id, p.id));
-      const sameCat = p.category_slug === base.category_slug ? 1 : 0;
-      const sameDept = p.department_slug === base.department_slug ? 1 : 0;
+      const tier = similarTier(base, p, sim);
+      if (tier === null) return null;
+      const sameCat = tier === 0 ? 1 : 0;
       const priceProx = Math.max(0, 1 - Math.abs(Math.log((p.price + 1) / (base.price + 1))) / 1.5);
-      const score = 0.55 * sim + 0.17 * sameCat + 0.12 * sameDept + 0.1 * priceProx + 0.06 * p._quality;
-      return { p, score, sim, sameCat, priceProx };
+      const score = 0.55 * sim + 0.17 * sameCat + 0.12 + 0.1 * priceProx + 0.06 * p._quality;
+      return { p, score, sim, sameCat, priceProx, tier };
     })
+    .filter(Boolean)
     .sort((a, b) => b.score - a.score);
-  return mmr(ranked, Math.min(limit, ranked.length), catalog, 0.85, 20).map((r) => card(r.p, r.score, [
+  // embedding similarity orders each tier (with MMR for variety); a closer tier always comes first, and an
+  // honest short list beats padding it with other kinds of products
+  const picked = [];
+  for (const tier of [0, 1, 2]) {
+    const pool = ranked.filter((r) => r.tier === tier);
+    const k = Math.min(limit - picked.length, pool.length);
+    if (k > 0) picked.push(...mmr(pool, k, catalog, 0.85, 20));
+  }
+  return picked.map((r) => card(r.p, r.score, [
     r.sim > 0.5 ? `Similar to ${base.title}` : null,
     r.sameCat ? `Also in ${r.p.category_name}` : `Related ${r.p.category_name}`,
     r.priceProx > 0.75 ? `Similar price (${money(r.p.price)})` : r.p.price < base.price ? `${money(base.price - r.p.price)} cheaper` : null,
@@ -154,10 +181,9 @@ const getCooccurrence = async () => {
   return cooc;
 };
 
-const boughtTogether = async (productId, limit = 6) => {
-  const catalog = await getCatalog();
-  const base = catalog.byId.get(Number(productId));
-  if (!base) return null;
+// raw association rules for the base item (support/confidence/lift over weighted baskets), best first.
+// the baskets are noisy, so these are only a signal: boughtTogether filters them through goesWith.
+const associationRules = async (base, catalog) => {
   const co = await getCooccurrence();
   const row = co.pairCount.get(base.id) || new Map();
   const countA = co.itemCount.get(base.id) || 0;
@@ -167,35 +193,26 @@ const boughtTogether = async (productId, limit = 6) => {
     if (!p || p.stock <= 0 || together < 0.8) continue;
     const confidence = countA ? together / countA : 0;
     const lift = confidence / ((co.itemCount.get(b) || 1) / co.total);
-    const sameCatPenalty = p.category_slug === base.category_slug ? 0.7 : 1;
-    const score = Math.min(1, (0.6 * confidence + 0.25 * Math.min(1, Math.log1p(lift) / 3) + 0.15 * p._quality) * sameCatPenalty);
-    rules.push({ p, score, together, confidence, lift });
+    const score = Math.min(1, 0.6 * confidence + 0.25 * Math.min(1, Math.log1p(lift) / 3) + 0.15 * p._quality);
+    rules.push(card(p, score, [
+      `Bought together by ${plural(Math.round(together), 'shopper')}`,
+      lift >= 1.5 ? `${lift.toFixed(1)}× more likely together (lift)` : null,
+      `${Math.round(confidence * 100)}% of buyers also picked this`,
+      qualityReason(p),
+    ].filter(Boolean)));
   }
-  rules.sort((a, b) => b.score - a.score);
-  const picked = rules.slice(0, limit).map((r) => card(r.p, r.score, [
-    `Bought together by ${plural(Math.round(r.together), 'shopper')}`,
-    r.lift >= 1.5 ? `${r.lift.toFixed(1)}× more likely together (lift)` : null,
-    `${Math.round(r.confidence * 100)}% of buyers also picked this`,
-    qualityReason(r.p),
-  ].filter(Boolean)));
-
-  // cold items: complementary categories, preferring accessories cheaper than the base item
-  if (picked.length < limit) {
-    const have = new Set([base.id, ...picked.map((x) => x.product.id)]);
-    const complements = L.COMPLEMENTS[base.category_slug] || [];
-    const fill = catalog.products
-      .filter((p) => !have.has(p.id) && p.stock > 0 && complements.includes(p.category_slug))
-      .map((p) => {
-        const rank = complements.indexOf(p.category_slug);
-        const cheaper = p.price <= base.price ? 1 : 0.4;
-        return { p, score: 0.35 * (1 - rank * 0.2) + 0.3 * p._quality + 0.2 * p._popularity + 0.15 * cheaper };
-      })
-      .sort((a, b) => b.score - a.score);
-    for (const f of capPerCategory(fill, limit - picked.length, 2)) {
-      picked.push(card(f.p, f.score * 0.8, [`Goes well with ${base.category_name.toLowerCase()}`, qualityReason(f.p), discountReason(f.p)].filter(Boolean)));
-    }
-  }
-  return picked;
+  return rules.sort((a, b) => b.score - a.score);
 };
 
-module.exports = { recommendations, similar, boughtTogether, trending, getCooccurrence };
+// items that genuinely go with the base: co-purchase picks that pass goesWith (compatible, right audience, not a
+// substitute such as another phone or pair of sneakers), then the best complementary products. When nothing in the
+// catalog really goes with it the list is empty, so the rail is hidden instead of showing unrelated items.
+const boughtTogether = async (productId, limit = 6) => {
+  const catalog = await getCatalog();
+  const base = catalog.byId.get(Number(productId));
+  if (!base) return null;
+  const seed = await associationRules(base, catalog);
+  return complementaryFor(base, catalog, { limit, seed });
+};
+
+module.exports = { recommendations, similar, boughtTogether, associationRules, trending, getCooccurrence };

@@ -15,6 +15,7 @@ const SYSTEM = [
   'Rewrite the DRAFT reply so it sounds natural, warm and concise (max 70 words).',
   'Strict rules: use ONLY the facts given. Never invent products, prices, specs, discounts or policies.',
   'Keep every price exactly as written (e.g. "Rs 45,999") and keep **bold** markdown on prices and product names.',
+  'Keep the draft\'s top pick as the first product you mention; never swap in another product as the top pick.',
   'Do not list products the draft does not mention. Do not add greetings if the draft has none. Reply with the rewritten text only.',
 ].join(' ');
 
@@ -51,6 +52,28 @@ const grounded = (rewrite, draft, context) => {
   const allowed = new Set([...numbersIn(draft), ...numbersIn(context)]);
   for (const n of numbersIn(rewrite)) if (!allowed.has(n) && n > 10) return false;
   return true;
+};
+
+// earliest product title mentioned in a text (longest title wins on a tie, "Rolex Datejust Women" over "Rolex Datejust")
+const firstTitle = (text, titles) => {
+  const t = String(text || '').toLowerCase();
+  let best = null;
+  let at = Infinity;
+  for (const title of titles) {
+    const i = t.indexOf(title.toLowerCase());
+    if (i >= 0 && (i < at || (i === at && title.length > best.length))) {
+      at = i;
+      best = title;
+    }
+  }
+  return best;
+};
+
+// card order is the truth: a rewrite may not promote another product to "top pick" (the first card)
+const keepsTopPick = (rewrite, draft, products = []) => {
+  const titles = products.map((p) => p.title).filter(Boolean);
+  const draftFirst = titles.length ? firstTitle(draft, titles) : null;
+  return !draftFirst || firstTitle(rewrite, titles) === draftFirst;
 };
 
 // ---------------------------------------------------------------- general (out-of-scope) answers
@@ -105,11 +128,11 @@ const enhance = async (payload, options = {}) => {
     const result = await guard.run([provider.name, provider.model?.(), SYSTEM, user], async () =>
       (await provider.complete({ system: SYSTEM, user })).replace(/^["']|["']$/g, '').trim());
     if (result.skipped) return { content: payload.draft, source: 'local', skipped: result.skipped };
-    if (grounded(result.value, payload.draft, user)) return { content: result.value, source: provider.name, cached: result.from === 'cache' };
+    if (grounded(result.value, payload.draft, user) && keepsTopPick(result.value, payload.draft, payload.products)) return { content: result.value, source: provider.name, cached: result.from === 'cache' };
   } catch {
     // timeout, quota or network: the template reply is always good enough
   }
   return { content: payload.draft, source: 'local' };
 };
 
-module.exports = { enhance, general, generalOk, info, active, grounded, buildPrompt, resetGuard, PERSONA };
+module.exports = { enhance, general, generalOk, info, active, grounded, keepsTopPick, buildPrompt, resetGuard, PERSONA };
