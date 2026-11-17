@@ -517,6 +517,7 @@ class BundleResult {
     this.explanation = '',
     this.savingsTips = const [],
     this.skippedRoles = const [],
+    this.budgetAdvice = const BudgetAdvice(),
   });
 
   factory BundleResult.fromJson(Object? data) {
@@ -528,6 +529,7 @@ class BundleResult {
       explanation: JsonX.asString(j['explanation']),
       savingsTips: JsonX.asStringList(j['savingsTips']),
       skippedRoles: JsonX.asStringList(j['skippedRoles']),
+      budgetAdvice: BudgetAdvice.fromJson(j['budgetAdvice']),
     );
   }
 
@@ -539,6 +541,17 @@ class BundleResult {
 
   /// Roles the budget couldn't cover.
   final List<String> skippedRoles;
+
+  /// What the set costs at its cheapest, and the budget worth trying instead.
+  final BudgetAdvice budgetAdvice;
+
+  /// [explanation] without the budget-advice sentences, for screens that show
+  /// [budgetAdvice] in its own notice.
+  String get explanationBody {
+    final m = budgetAdvice.message;
+    if (m.isEmpty || !explanation.contains(m)) return explanation;
+    return explanation.replaceFirst(m, '').replaceAll(RegExp(r' {2,}'), ' ').trim();
+  }
 
   /// Recomputed locally so swaps update it.
   double get total => items.fold(0, (sum, i) => sum + i.product.price);
@@ -552,7 +565,119 @@ class BundleResult {
     explanation: explanation,
     savingsTips: savingsTips,
     skippedRoles: skippedRoles,
+    budgetAdvice: budgetAdvice,
   );
+}
+
+/// The cheapest in-stock pick for one role of a bundle.
+@immutable
+class RoleMinimum {
+  const RoleMinimum({required this.role, required this.price, this.productId});
+
+  factory RoleMinimum.fromJson(JsonMap j) => RoleMinimum(
+    role: JsonX.asString(j['role']),
+    price: JsonX.asDouble(j['price']),
+    productId: JsonX.asIntOrNull(j['productId']),
+  );
+
+  final String role;
+  final double price;
+  final int? productId;
+}
+
+/// `budgetAdvice` on `POST /ai/bundle`: what the set costs at its cheapest
+/// and an honest note when the budget can't cover the essentials.
+@immutable
+class BudgetAdvice {
+  const BudgetAdvice({
+    this.minimumForAll = 0,
+    this.minimumForRequired = 0,
+    this.suggestedBudget = 0,
+    this.cheapestByRole = const [],
+    this.missingRequired = const [],
+    this.message = '',
+  });
+
+  factory BudgetAdvice.fromJson(Object? data) {
+    final j = JsonX.asMap(data);
+    return BudgetAdvice(
+      minimumForAll: JsonX.asDouble(j['minimumForAll']),
+      minimumForRequired: JsonX.asDouble(j['minimumForRequired']),
+      suggestedBudget: JsonX.asDouble(j['suggestedBudget']),
+      cheapestByRole: JsonX.asList(j['cheapestByRole'], RoleMinimum.fromJson),
+      missingRequired: JsonX.asStringList(j['missingRequired']),
+      message: JsonX.asString(j['message']),
+    );
+  }
+
+  final double minimumForAll;
+  final double minimumForRequired;
+
+  /// [minimumForRequired] plus headroom, rounded up to a round figure.
+  final double suggestedBudget;
+  final List<RoleMinimum> cheapestByRole;
+
+  /// Required roles the budget couldn't cover (also in `skippedRoles`).
+  final List<String> missingRequired;
+  final String message;
+
+  /// The budget couldn't cover the pieces the set is built around.
+  bool get missesEssentials => missingRequired.isNotEmpty;
+
+  /// The budget to offer a one-tap retry with, when it is actually higher than [budget].
+  double? suggestionAbove(double budget) => suggestedBudget > budget ? suggestedBudget : null;
+}
+
+/// One role of a ready-made goal (`GET /ai/bundle/templates`).
+@immutable
+class BundleTemplateRole {
+  const BundleTemplateRole({required this.role, this.required = false, this.minPrice});
+
+  factory BundleTemplateRole.fromJson(JsonMap j) => BundleTemplateRole(
+    role: JsonX.asString(j['role']),
+    required: JsonX.asBool(j['required']),
+    minPrice: JsonX.asDoubleOrNull(j['minPrice']),
+  );
+
+  final String role;
+  final bool required;
+  final double? minPrice;
+}
+
+/// A ready-made bundle goal with the budget that actually covers its essentials.
+@immutable
+class BundleTemplate {
+  const BundleTemplate({
+    required this.id,
+    required this.goal,
+    required this.label,
+    required this.suggestedBudget,
+    this.roles = const [],
+  });
+
+  factory BundleTemplate.fromJson(JsonMap j) => BundleTemplate(
+    id: JsonX.asString(j['id']),
+    goal: JsonX.asString(j['goal']),
+    label: JsonX.asString(j['label']),
+    suggestedBudget: JsonX.asDouble(j['suggestedBudget']),
+    roles: JsonX.asList(j['roles'], BundleTemplateRole.fromJson),
+  );
+
+  final String id;
+  final String goal;
+  final String label;
+  final double suggestedBudget;
+  final List<BundleTemplateRole> roles;
+}
+
+extension BundleTemplates on List<BundleTemplate> {
+  /// The server's suggested budget for template [id], or null when unknown.
+  double? suggestedFor(String id) {
+    for (final t in this) {
+      if (t.id == id && t.suggestedBudget > 0) return t.suggestedBudget;
+    }
+    return null;
+  }
 }
 
 @immutable

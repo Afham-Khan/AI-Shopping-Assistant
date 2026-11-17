@@ -15,7 +15,7 @@ const S = require('./dialogue/state');
 const nlg = require('./dialogue/nlg');
 const L = require('./nlu/lexicon');
 const { recommended, recommendedList, serializeBundle, toCard } = require('./serialize');
-const { buildBundle } = require('./bundle');
+const { buildBundle, listTemplates: bundleTemplates } = require('./bundle');
 const qa = require('./qa');
 const { cartInsights: computeCartInsights } = require('./cartInsights');
 const { shoppingDna } = require('./shoppingDna');
@@ -237,7 +237,7 @@ const warmup = () => {
 
 module.exports = {
   respond, recommendations, similar, boughtTogether, compare: compareProducts, reviewSummary, smartSearch, nluPlayground,
-  finderFlows, finder: runFinder, insights, warmup, peek, bundle, serializeBundle, askProduct, cartInsights,
+  finderFlows, finder: runFinder, insights, warmup, peek, bundle, bundleTemplates, serializeBundle, askProduct, cartInsights,
   profile: shoppingDna, visualSearch, visualTextSearch, VisualUnavailable: visual.VisualUnavailable,
   completeLook, explain, gift, discoverDeck, discoverReels, discoverTaste: discover.tasteFrom, roomScene,
 };

@@ -525,12 +525,13 @@ const handleBundle = async (t) => {
   ctx.lastProducts = b.items.map((it) => it.product.product.id);
   ctx.slots = S.EMPTY_SLOTS();
   const lines = b.items.map((it) => `${it.role}: **${it.product.product.title}** (${money(it.product.product.price)})`);
+  const needsMore = b.budgetAdvice.missingRequired.length > 0;
   return {
-    content: `Here's your **${b.title}** for **${money(b.total)}** of your ${money(b.budget)} budget (${money(b.remaining)} left): ${lines.join('; ')}. ${b.savingsTips[0] || ''}`.trim(),
+    content: `Here's your **${b.title}** for **${money(b.total)}** of your ${money(b.budget)} budget (${money(b.remaining)} left): ${lines.join('; ')}. ${needsMore ? b.budgetAdvice.message : b.savingsTips[0] || ''}`.trim(),
     products: b.items.map((it) => it.product),
     bundle: b,
     actions: b.items.length ? [{ type: 'add_bundle_to_cart', label: `Add all ${b.items.length} to cart`, productIds: ctx.lastProducts }] : [],
-    suggestions: ['Tell me more about the first one', 'Compare the first two', `Build it for ${shortMoney(Math.round(b.budget * 0.7 / 1000) * 1000)}`],
+    suggestions: ['Tell me more about the first one', 'Compare the first two', `Build it for ${shortMoney(needsMore ? b.budgetAdvice.suggestedBudget : Math.round(b.budget * 0.7 / 1000) * 1000)}`],
     title: b.title,
   };
 };

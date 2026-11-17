@@ -22,6 +22,7 @@ router.get('/finder', controller.finderFlows);
 router.post('/finder', optionalAuth, v.finder, controller.finder);
 router.get('/insights', controller.insights);
 
+router.get('/bundle/templates', controller.bundleTemplates);
 router.post('/bundle', optionalAuth, v.bundle, controller.bundle);
 router.post('/products/:id/ask', optionalAuth, v.ask, controller.askProduct);
 router.get('/cart-insights', requireAuth, controller.cartInsights);

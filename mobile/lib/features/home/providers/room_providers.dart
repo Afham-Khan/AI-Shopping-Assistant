@@ -40,6 +40,29 @@ class RoomExploredController extends Notifier<Set<String>> {
   }
 }
 
+/// A goal chip of the "Build my setup" sheet and the server template
+/// (`GET /ai/bundle/templates`) whose suggested budget it starts at.
+@immutable
+class SetupGoal {
+  const SetupGoal(this.label, this.templateId);
+
+  final String label;
+  final String templateId;
+}
+
+const kSetupGoals = [
+  SetupGoal('Gaming setup', 'gaming_setup'),
+  SetupGoal('Home office', 'home_office'),
+  SetupGoal('Skincare routine', 'skincare_routine'),
+  SetupGoal('Gym starter kit', 'gym_starter'),
+  SetupGoal('Kitchen basics', 'kitchen_starter'),
+  SetupGoal('Date night outfit', 'party_outfit'),
+  SetupGoal('Road trip ready', 'travel_kit'),
+];
+
+/// Budget the sheet starts at when the server's suggestions aren't available.
+const kSetupFallbackBudget = 150000.0;
+
 /// A product placed in the room by "Build my setup".
 @immutable
 class PlacedItem {

@@ -19,6 +19,7 @@ const serializeBundle = (b) => ({
   skippedRoles: b.skippedRoles,
   explanation: b.explanation,
   savingsTips: b.savingsTips,
+  budgetAdvice: b.budgetAdvice,
 });
 
 module.exports = { recommended, recommendedList, serializeBundle, toCard };
