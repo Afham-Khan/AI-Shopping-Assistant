@@ -29,10 +29,10 @@ enum ProductCardVariant {
   wide,
 }
 
-/// Product tile: a bordered card whose top is a light "studio" image well
-/// (wishlist heart, discount tag, AI match badge), then brand eyebrow, 2-line
-/// title, rating and price. Hover lifts the border and nudges the photo.
-/// Taps open the product page.
+/// Product tile: a white rounded card (soft shadow) holding an inset, very
+/// light image tile (white wishlist circle, red discount pill, AI match
+/// badge), then brand, 2-line title, rating and a bold price. Hover deepens
+/// the shadow and nudges the photo. Taps open the product page.
 ///
 /// ```dart
 /// ProductCard(product: p)                                   // grid tile
@@ -71,7 +71,7 @@ class ProductCard extends StatefulWidget {
   // text block height at 1.0 text scale: brand + 2-line title + rating + price + gaps
   static const double _infoTextHeight = 90;
   // card border + paddings + gaps between the text rows
-  static const double _infoGaps = 40;
+  static const double _infoGaps = 44;
 
   /// Total tile height for a compact card of [width] at the current text scale.
   static double compactHeight(BuildContext context, double width) =>
@@ -122,45 +122,45 @@ class _ProductCardState extends State<ProductCard> {
     return Pressable(
       scale: 0.98,
       child: AnimatedContainer(
-      duration: context.motion(AppDurations.color),
-      decoration: BoxDecoration(
-        borderRadius: AppRadii.cardAll,
-        boxShadow: _hovered ? colors.shadowMd : const [],
-      ),
-      child: Material(
-        color: colors.surface,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
+        duration: context.motion(AppDurations.color),
+        curve: AppCurves.standard,
+        decoration: BoxDecoration(
           borderRadius: AppRadii.cardAll,
-          side: BorderSide(color: _hovered ? colors.borderStrong : colors.border),
+          boxShadow: _hovered ? colors.shadowMd : colors.shadowSm,
         ),
-        child: InkWell(
-          onTap: _open,
-          child: Padding(
-            // keeps the content inside the 1 px border
-            padding: const EdgeInsets.all(1),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: _ImageTile(
-                    product: p,
-                    hovered: _hovered,
-                    showWishlist: widget.showWishlist,
-                    hero: widget.hero,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadii.card - 1)),
+        child: Material(
+          color: colors.surface,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadii.cardAll,
+            side: BorderSide(color: context.isDark ? colors.border : colors.border.withValues(alpha: 0.6)),
+          ),
+          child: InkWell(
+            onTap: _open,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: _ImageTile(
+                      product: p,
+                      hovered: _hovered,
+                      showWishlist: widget.showWishlist,
+                      hero: widget.hero,
+                      borderRadius: AppRadii.inputAll,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  child: _Info(product: p),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
+                    child: _Info(product: p),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -179,7 +179,7 @@ class _ProductCardState extends State<ProductCard> {
             SizedBox(
               width: width,
               height: width,
-              child: _ImageTile(product: p, hovered: _hovered, showWishlist: false, compactBadges: true),
+              child: _ImageTile(product: p, hovered: _hovered, showWishlist: false, compactBadges: true, borderRadius: AppRadii.inputAll),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(child: _Info(product: p, wide: true)),
@@ -192,7 +192,7 @@ class _ProductCardState extends State<ProductCard> {
   }
 }
 
-/// The light "studio" well. It is light in both themes on purpose: the
+/// The very light image tile. It is light in both themes on purpose: the
 /// catalog photos are cut-outs and many products are black.
 class _ImageTile extends StatelessWidget {
   const _ImageTile({
@@ -231,7 +231,7 @@ class _ImageTile extends StatelessWidget {
               child: Opacity(
                 opacity: p.inStock ? 1 : 0.4,
                 child: Padding(
-                  padding: EdgeInsets.all(compactBadges ? AppSpacing.xs : AppSpacing.md),
+                  padding: EdgeInsets.all(compactBadges ? AppSpacing.xs : AppSpacing.lg),
                   child: _maybeHero(
                     AppNetworkImage(
                       p.thumbnail,
@@ -269,7 +269,7 @@ class _ImageTile extends StatelessWidget {
                   child: AiBadge(label: '${Formatters.percentFromRatio(p.match!.score)} match'),
                 ),
               ),
-            if (showWishlist) Positioned(top: 0, right: 0, child: _WishlistButton(productId: p.id)),
+            if (showWishlist) Positioned(top: 2, right: 2, child: _WishlistButton(productId: p.id)),
           ],
         ),
       ),
@@ -301,12 +301,10 @@ class _Info extends StatelessWidget {
       children: [
         // keep the line even when empty so tiles in a row align
         Text(
-          eyebrow.isEmpty ? ' ' : eyebrow.toUpperCase(),
+          eyebrow.isEmpty ? ' ' : eyebrow,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: AppType.mono(
-            TextStyle(fontSize: 10, height: 1.3, fontWeight: FontWeight.w500, letterSpacing: 0.9, color: colors.faint),
-          ),
+          style: t.bodySmall!.copyWith(fontSize: 11.5, height: 1.3, fontWeight: FontWeight.w500, color: colors.faint),
         ),
         const SizedBox(height: 3),
         SizedBox(
@@ -316,7 +314,7 @@ class _Info extends StatelessWidget {
             p.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: t.bodyMedium!.copyWith(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.35, letterSpacing: -0.1),
+            style: t.bodyMedium!.copyWith(fontSize: 13.5, fontWeight: FontWeight.w600, height: 1.35, letterSpacing: -0.1),
           ),
         ),
         const SizedBox(height: 6),
@@ -345,8 +343,8 @@ class _Tag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(color: color, borderRadius: AppRadii.tagAll),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: color, borderRadius: AppRadii.pillAll),
       child: Text(
         label,
         style: context.textTheme.labelSmall!.copyWith(
@@ -406,13 +404,13 @@ class _WishlistButton extends ConsumerWidget {
         style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
         icon: floating
             ? Container(
-                width: 30,
-                height: 30,
+                width: 32,
+                height: 32,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(color: colors.onImageWell.withValues(alpha: 0.10)),
+                  boxShadow: AppPalette.light.shadowSm,
                 ),
                 child: icon,
               )

@@ -60,7 +60,7 @@ class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProv
     final status = TypingIndicator.statuses[_status];
     return Semantics(
       liveRegion: true,
-      label: '${AppConfig.appName} AI is thinking: $status',
+      label: '${AppConfig.assistantName} is thinking: $status',
       excludeSemantics: true,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

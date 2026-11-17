@@ -37,6 +37,18 @@ class _ChatInputBarState extends State<ChatInputBar> {
   static final SpeechToText _speech = SpeechToText();
   static bool? _speechReady;
 
+  /// This browser or device has no speech recognition (permanent, unlike a
+  /// denied permission): the mic says so instead of failing on every tap.
+  static bool _speechUnsupported = false;
+
+  // the recognizer is initialised once with these callbacks, so they forward
+  // to whichever composer is currently on screen
+  static _ChatInputBarState? _current;
+  static void _forwardStatus(String status) => _current?._onSpeechStatus(status);
+  static void _forwardError(SpeechRecognitionError error) => _current?._onSpeechError(error);
+
+  static const _unsupportedMessage = "Voice input isn't supported in this browser. Try Chrome or Edge, or type your message.";
+
   bool _listening = false;
   double _level = 0;
   String _prefix = '';
@@ -44,6 +56,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
   @override
   void initState() {
     super.initState();
+    _current = this;
     _text.addListener(_onText);
   }
 
@@ -51,6 +64,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
   void dispose() {
     _text.removeListener(_onText);
     if (_listening) _speech.cancel();
+    if (identical(_current, this)) _current = null;
     if (widget.controller == null) _text.dispose();
     _focus.dispose();
     super.dispose();
@@ -84,18 +98,24 @@ class _ChatInputBarState extends State<ChatInputBar> {
       return;
     }
     HapticFeedback.selectionClick();
+    if (_speechUnsupported) {
+      AppSnack.info(context, _unsupportedMessage);
+      return;
+    }
     try {
-      _speechReady ??= await _speech.initialize(onError: _onSpeechError, onStatus: _onSpeechStatus);
+      _speechReady ??= await _speech.initialize(onError: _forwardError, onStatus: _forwardStatus);
     } catch (_) {
       _speechReady = false;
     }
     if (!mounted) return;
     if (_speechReady != true) {
       _speechReady = null; // let the user try again after granting permission
-      AppSnack.error(
-        context,
-        "Voice input isn't available. Allow microphone access, or use a browser/device with speech recognition.",
-      );
+      if (_speechUnsupported) {
+        setState(() {});
+        AppSnack.info(context, _unsupportedMessage);
+      } else {
+        AppSnack.error(context, "Voice input isn't available. Allow microphone access and try again.");
+      }
       return;
     }
     _prefix = _text.text.trim().isEmpty ? '' : '${_text.text.trim()} ';
@@ -144,8 +164,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   void _onSpeechError(SpeechRecognitionError error) {
     if (!mounted) return;
-    setState(() => _listening = false);
     final msg = error.errorMsg;
+    // browsers without the Web Speech API (Firefox, some in-app browsers)
+    if (msg.contains('not supported') || msg.contains('not_supported')) {
+      _speechUnsupported = true;
+      setState(() => _listening = false);
+      return;
+    }
+    setState(() => _listening = false);
     if (msg.contains('permission') || msg.contains('not-allowed')) {
       AppSnack.error(context, 'Microphone permission was denied. Enable it in settings to use voice input.');
     } else if (msg != 'error_no_match' && msg != 'error_speech_timeout' && msg != 'no-speech') {
@@ -224,7 +250,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                               textCapitalization: TextCapitalization.sentences,
                               style: t.bodyLarge,
                               decoration: InputDecoration(
-                                hintText: 'Ask ${AppConfig.appName} AI anything…',
+                                hintText: 'Ask ${AppConfig.assistantName} anything…',
                                 counterText: '',
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
@@ -236,7 +262,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                             ),
                           ),
                         ),
-                        _MicButton(listening: _listening, level: _level, onTap: _toggleVoice),
+                        _MicButton(listening: _listening, level: _level, unsupported: _speechUnsupported, onTap: _toggleVoice),
                         const SizedBox(width: 4),
                         _SendButton(enabled: _canSend, busy: widget.sending, onTap: _send),
                       ],
@@ -253,11 +279,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
 }
 
 class _MicButton extends StatelessWidget {
-  const _MicButton({required this.listening, required this.level, required this.onTap});
+  const _MicButton({required this.listening, required this.level, required this.onTap, this.unsupported = false});
 
   final bool listening;
   final double level;
   final VoidCallback onTap;
+
+  /// No speech recognition here: the icon is struck through and says why.
+  final bool unsupported;
 
   @override
   Widget build(BuildContext context) {
@@ -278,9 +307,14 @@ class _MicButton extends StatelessWidget {
                 decoration: BoxDecoration(shape: BoxShape.circle, color: colors.ai.withValues(alpha: 0.18)),
               ),
             IconButton(
-              tooltip: listening ? 'Stop listening' : 'Voice input',
+              tooltip: listening
+                  ? 'Stop listening'
+                  : (unsupported ? "Voice input isn't supported in this browser" : 'Voice input'),
               onPressed: onTap,
-              icon: Icon(listening ? Icons.stop_rounded : Icons.mic_none_rounded, color: listening ? colors.ai : colors.muted),
+              icon: Icon(
+                listening ? Icons.stop_rounded : (unsupported ? Icons.mic_off_outlined : Icons.mic_none_rounded),
+                color: listening ? colors.ai : (unsupported ? colors.faint : colors.muted),
+              ),
               style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
             ),
           ],

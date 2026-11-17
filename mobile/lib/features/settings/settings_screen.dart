@@ -6,13 +6,12 @@ import '../../core/config/app_config.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
-import '../../core/theme/app_typography.dart';
 import '../../core/theme/theme_controller.dart';
 import '../../core/utils/extensions.dart';
 import '../../core/widgets/widgets.dart';
 
 /// Appearance, server address (for emulator/LAN testing), keyboard
-/// shortcuts and app info. Sections are numbered like the rest of the app.
+/// shortcuts and app info, as white grouped cards on the page wash.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -23,8 +22,6 @@ class SettingsScreen extends ConsumerWidget {
         defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.macOS ||
         defaultTargetPlatform == TargetPlatform.linux;
-    var n = 0;
-
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -35,17 +32,14 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Section(index: ++n, eyebrow: 'Display', title: 'Appearance', child: const _ThemePicker()),
-                _Section(
-                  index: ++n,
-                  eyebrow: 'Connection',
+                const _Section(title: 'Appearance', child: _ThemePicker()),
+                const _Section(
                   title: 'Server address',
                   subtitle: 'Where the app finds the Zelora API. Change it when testing on a device or another network.',
-                  child: const _ServerAddress(),
+                  child: _ServerAddress(),
                 ),
-                if (keyboard && context.isWide)
-                  _Section(index: ++n, eyebrow: 'Keyboard', title: 'Shortcuts', child: const _Shortcuts()),
-                _Section(index: ++n, eyebrow: 'Colophon', title: 'About', child: const _About()),
+                if (keyboard) const _Section(title: 'Keyboard shortcuts', child: _Shortcuts()),
+                const _Section(title: 'About', child: _About()),
               ],
             ),
           ),
@@ -56,10 +50,8 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 class _Section extends StatelessWidget {
-  const _Section({required this.index, required this.eyebrow, required this.title, required this.child, this.subtitle});
+  const _Section({required this.title, required this.child, this.subtitle});
 
-  final int index;
-  final String eyebrow;
   final String title;
   final String? subtitle;
   final Widget child;
@@ -68,18 +60,16 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.textTheme;
     return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.xxl),
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(alignment: Alignment.centerLeft, child: Eyebrow(eyebrow, index: index)),
-          AppSpacing.gapXs,
-          Semantics(header: true, child: Text(title, style: t.headlineSmall!.copyWith(fontSize: 22))),
+          Semantics(header: true, child: Text(title, style: t.titleMedium!.copyWith(fontWeight: FontWeight.w800))),
           if (subtitle != null) ...[
             AppSpacing.gapXxs,
             Text(subtitle!, style: t.bodySmall!.copyWith(fontSize: 13)),
           ],
-          AppSpacing.gapMd,
+          AppSpacing.gapSm,
           child,
         ],
       ),
@@ -100,21 +90,21 @@ class _ThemePicker extends ConsumerWidget {
       children: [
         Expanded(
           child: _ThemeOption(
-            label: 'Dark',
-            caption: 'Tide ink',
-            palettes: const [AppPalette.dark],
-            selected: mode == ThemeMode.dark,
-            onTap: () => pick(ThemeMode.dark),
+            label: 'Light',
+            caption: 'Airy blue',
+            palettes: const [AppPalette.light],
+            selected: mode == ThemeMode.light,
+            onTap: () => pick(ThemeMode.light),
           ),
         ),
         AppSpacing.gapSm,
         Expanded(
           child: _ThemeOption(
-            label: 'Light',
-            caption: 'Paper',
-            palettes: const [AppPalette.light],
-            selected: mode == ThemeMode.light,
-            onTap: () => pick(ThemeMode.light),
+            label: 'Dark',
+            caption: 'Deep navy',
+            palettes: const [AppPalette.dark],
+            selected: mode == ThemeMode.dark,
+            onTap: () => pick(ThemeMode.dark),
           ),
         ),
         AppSpacing.gapSm,
@@ -156,13 +146,10 @@ class _ThemeOption extends StatelessWidget {
       selected: selected,
       label: '$label theme',
       excludeSemantics: true,
-      child: Material(
-        color: colors.surface,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadii.cardAll,
-          side: BorderSide(color: selected ? colors.primary : colors.border, width: selected ? 1.5 : 1),
-        ),
+      child: AppCard(
+        padding: EdgeInsets.zero,
+        selected: selected,
+        color: selected ? colors.primarySoft : null,
         child: InkWell(
           onTap: onTap,
           child: Padding(
@@ -171,7 +158,7 @@ class _ThemeOption extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ClipRRect(
-                  borderRadius: AppRadii.tagAll,
+                  borderRadius: AppRadii.inputAll,
                   child: SizedBox(
                     height: 64,
                     child: Row(children: [for (final p in palettes) Expanded(child: _MiniPreview(palette: p))]),
@@ -227,15 +214,14 @@ class _MiniPreview extends StatelessWidget {
       margin: const EdgeInsets.only(top: 4),
       decoration: BoxDecoration(color: c, borderRadius: AppRadii.pillAll),
     );
-    return ColoredBox(
-      color: p.background,
+    return DecoratedBox(
+      decoration: BoxDecoration(gradient: p.backgroundWash),
       child: Padding(
         padding: const EdgeInsets.all(7),
         child: Container(
           decoration: BoxDecoration(
             color: p.surface,
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            border: Border.all(color: p.border),
+            borderRadius: const BorderRadius.all(Radius.circular(7)),
           ),
           padding: const EdgeInsets.all(5),
           // stacked so it holds up even when two palettes share one tile
@@ -254,10 +240,10 @@ class _MiniPreview extends StatelessWidget {
                   Expanded(child: line(double.infinity, p.faint)),
                   const SizedBox(width: 6),
                   Container(
-                    width: 12,
-                    height: 5,
+                    width: 14,
+                    height: 6,
                     margin: const EdgeInsets.only(top: 4),
-                    decoration: BoxDecoration(color: p.primary, borderRadius: const BorderRadius.all(Radius.circular(2))),
+                    decoration: BoxDecoration(color: p.primary, borderRadius: AppRadii.pillAll),
                   ),
                 ],
               ),
@@ -460,14 +446,8 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    // a Material (not a DecoratedBox) so list tiles keep their ink
-    return Material(
-      color: colors.surface,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: AppRadii.cardAll, side: BorderSide(color: colors.border)),
-      child: child,
-    );
+    // AppCard is a Material inside, so list tiles keep their ink
+    return AppCard(padding: EdgeInsets.zero, child: child);
   }
 }
 
@@ -498,9 +478,9 @@ class _About extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(AppConfig.appName, style: AppType.serif(t.titleLarge!.copyWith(fontWeight: FontWeight.w700))),
-                          const SizedBox(height: 2),
-                          Text('AI shopping assistant', style: t.bodySmall),
+                          ZeloraWordmark(size: 20, color: colors.text),
+                          const SizedBox(height: 4),
+                          Text('Your AI shopping assistant', style: t.bodySmall),
                         ],
                       ),
                     ),
@@ -531,8 +511,8 @@ class _About extends ConsumerWidget {
         AppSpacing.gapLg,
         Center(
           child: Text(
-            'ZEL IS CODE. THE PRICES ARE REAL.',
-            style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 10),
+            '${AppConfig.assistantName} is code. The prices are real.',
+            style: t.bodySmall!.copyWith(color: colors.faint),
           ),
         ),
       ],

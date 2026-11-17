@@ -20,7 +20,7 @@ class ForYouRail extends ConsumerWidget {
     return AiRailSection(
       value: async.whenData((r) => r.products),
       title: data?.title ?? 'Picked for you',
-      subtitle: data?.subtitle ?? 'Curated by ${AppConfig.appName} AI',
+      subtitle: data?.subtitle ?? 'Curated by ${AppConfig.assistantName}',
       source: 'for_you',
       padding: padding,
       onRetry: () => ref.invalidate(recommendationsProvider),

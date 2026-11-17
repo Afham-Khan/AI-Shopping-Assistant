@@ -86,18 +86,57 @@ class ReviewSummary {
 
 @immutable
 class CompareRow {
-  const CompareRow({required this.label, required this.values, this.bestIndex});
+  const CompareRow({required this.label, required this.values, this.bestIndex, this.differs});
 
   factory CompareRow.fromJson(JsonMap j) => CompareRow(
     label: JsonX.asString(j['label']),
     values: JsonX.asStringList(j['values']),
     bestIndex: JsonX.asIntOrNull(j['bestIndex']),
+    differs: j['differs'] == null ? null : JsonX.asBool(j['differs']),
   );
 
   final String label;
   final List<String> values;
   final int? bestIndex;
+
+  /// From the server; null on older backends (then it is worked out from [values]).
+  final bool? differs;
+
+  /// Whether the products differ on this row (drives "Only show differences").
+  bool get isDifferent {
+    final known = differs;
+    if (known != null) return known;
+    return {for (final v in values) v.trim().toLowerCase()}.length > 1;
+  }
 }
+
+/// Pros and cons of one compared product.
+@immutable
+class ProductProsCons {
+  const ProductProsCons({this.pros = const [], this.cons = const []});
+
+  final List<String> pros;
+  final List<String> cons;
+
+  bool get isEmpty => pros.isEmpty && cons.isEmpty;
+}
+
+/// "Best for you": the product that fits the shopper's stated need.
+@immutable
+class ForYouPick {
+  const ForYouPick({required this.productId, this.reason = ''});
+
+  final int productId;
+  final String reason;
+}
+
+/// Strings from `["Great battery", ...]` or `[{ text | label | aspect }]`.
+List<String> _texts(Object? v) => v is! List
+    ? const []
+    : [
+        for (final e in v)
+          if (e is Map) JsonX.asString(e['text'] ?? e['label'] ?? e['aspect']) else JsonX.asString(e),
+      ].where((s) => s.trim().isNotEmpty).toList();
 
 @immutable
 class VerdictPick {
@@ -117,23 +156,71 @@ class VerdictPick {
 /// `POST /ai/compare` (also `meta.comparison` in chat replies).
 @immutable
 class CompareResult {
-  const CompareResult({required this.products, this.rows = const [], this.summary = '', this.picks = const []});
+  const CompareResult({
+    required this.products,
+    this.rows = const [],
+    this.summary = '',
+    this.picks = const [],
+    this.prosCons = const {},
+    this.forYou,
+  });
 
   factory CompareResult.fromJson(Object? data) {
     final j = JsonX.asMap(data);
     final verdict = JsonX.asMap(j['verdict']);
+    final forYou = JsonX.asMapOrNull(j['forYou'] ?? verdict['forYou'] ?? j['bestForYou']);
+    final forYouId = forYou == null ? 0 : JsonX.asInt(forYou['productId'] ?? forYou['id']);
     return CompareResult(
       products: _products(j['products']),
       rows: JsonX.asList(j['rows'], CompareRow.fromJson),
       summary: JsonX.asString(verdict['summary'] ?? j['summary']),
       picks: JsonX.asList(verdict['picks'], VerdictPick.fromJson),
+      prosCons: _prosCons(j),
+      forYou: forYou == null || forYouId == 0 ? null : ForYouPick(productId: forYouId, reason: JsonX.asString(forYou['reason'])),
     );
+  }
+
+  /// Per-product pros/cons: inside each `products[]` entry, or a separate
+  /// `prosCons` list/map keyed by product id.
+  static Map<int, ProductProsCons> _prosCons(JsonMap j) {
+    final out = <int, ProductProsCons>{};
+    void add(int id, Map<dynamic, dynamic> m) {
+      final pc = ProductProsCons(pros: _texts(m['pros']), cons: _texts(m['cons']));
+      if (id != 0 && !pc.isEmpty) out[id] = pc;
+    }
+
+    final products = j['products'];
+    if (products is List) {
+      for (final p in products) {
+        if (p is Map) add(JsonX.asInt(p['id'] ?? p['productId']), p);
+      }
+    }
+    final extra = j['prosCons'] ?? j['proscons'] ?? j['pros_cons'] ?? j['insights'];
+    if (extra is List) {
+      for (final e in extra) {
+        if (e is Map) add(JsonX.asInt(e['productId'] ?? e['id']), e);
+      }
+    } else if (extra is Map) {
+      extra.forEach((k, v) {
+        if (v is Map) add(int.tryParse('$k') ?? 0, v);
+      });
+    }
+    return out;
   }
 
   final List<ProductSummary> products;
   final List<CompareRow> rows;
   final String summary;
   final List<VerdictPick> picks;
+
+  /// Product id → pros/cons (only products the server had something to say about).
+  final Map<int, ProductProsCons> prosCons;
+
+  /// Set when the request carried a `need` and the server picked a winner.
+  final ForYouPick? forYou;
+
+  /// Rows where the products actually differ.
+  List<CompareRow> get differingRows => rows.where((r) => r.isDifferent).toList();
 
   ProductSummary? productById(int id) {
     for (final p in products) {

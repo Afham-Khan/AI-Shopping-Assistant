@@ -16,7 +16,10 @@ abstract final class StorageKeys {
   static const cachedUser = 'auth.user';
   static const guestChosen = 'auth.guestChosen';
   static const onboardingDone = 'app.onboardingDone';
-  static const themeMode = 'app.themeMode';
+  // v2: the light theme became the default with the re-theme, so earlier
+  // saved choices (from the old dark-first design) start fresh
+  static const themeMode = 'app.themeMode.v2';
   static const serverUrl = 'app.serverUrl';
   static const aiShowReasoning = 'ai.showReasoning';
+  static const aiReadAloud = 'ai.readAloud';
 }

@@ -6,6 +6,7 @@ import 'core/config/app_config.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'core/widgets/app_frame.dart';
 
 class ZeloraApp extends ConsumerWidget {
   const ZeloraApp({super.key});
@@ -24,10 +25,11 @@ class ZeloraApp extends ConsumerWidget {
       routerConfig: router,
       scrollBehavior: const _AppScrollBehavior(),
       builder: (context, child) {
-        // honour large text, but cap it where layouts stop making sense
+        // honour large text, but cap it where layouts stop making sense;
+        // on tablet / desktop / web the app lives in a phone-width column
         return MediaQuery.withClampedTextScaling(
           maxScaleFactor: 2.0,
-          child: child ?? const SizedBox.shrink(),
+          child: AppFrame(child: child ?? const SizedBox.shrink()),
         );
       },
     );

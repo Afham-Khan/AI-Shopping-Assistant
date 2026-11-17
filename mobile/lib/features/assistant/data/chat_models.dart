@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/models/json_utils.dart';
 import '../../../core/models/product.dart';
 import '../../ai/data/models/ai_models.dart';
+import '../../ai/data/models/shopping_models.dart';
 
 /// An action button attached to an assistant reply.
 ///
@@ -61,6 +62,7 @@ class ChatMeta {
     this.comparison,
     this.clarify,
     this.bundle,
+    this.explain,
     this.source,
     this.latencyMs,
     this.fallback = false,
@@ -72,8 +74,10 @@ class ChatMeta {
     final clarify = JsonX.asMapOrNull(j['clarify']);
     final comparison = JsonX.asMapOrNull(j['comparison']);
     final bundle = JsonX.asMapOrNull(j['bundle']);
+    final explainJson = JsonX.asMapOrNull(j['explain'] ?? j['explainer'] ?? j['specExplainer']);
     final compare = comparison == null ? null : CompareResult.fromJson(comparison);
     final b = bundle == null ? null : BundleResult.fromJson(bundle);
+    final explain = explainJson == null ? null : SpecExplainer.fromJson(explainJson);
     final nlu = JsonX.asMap(j['nlu']);
     return ChatMeta(
       intent: JsonX.asStringOrNull(j['intent']),
@@ -87,6 +91,7 @@ class ChatMeta {
           ? null
           : ChatClarify(question: JsonX.asString(clarify['question']), options: JsonX.asStringList(clarify['options'])),
       bundle: b == null || b.items.isEmpty ? null : b,
+      explain: explain == null || explain.isEmpty ? null : explain,
       source: JsonX.asStringOrNull(j['source']),
       latencyMs: JsonX.asIntOrNull(j['latencyMs']),
       fallback: JsonX.asBool(j['fallback']),
@@ -104,6 +109,9 @@ class ChatMeta {
   final CompareResult? comparison;
   final ChatClarify? clarify;
   final BundleResult? bundle;
+
+  /// Plain-language spec explanation, when the assistant returns one.
+  final SpecExplainer? explain;
 
   /// `local` | `gemini` | `groq`
   final String? source;

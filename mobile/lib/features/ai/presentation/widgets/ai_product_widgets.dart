@@ -66,7 +66,7 @@ class WhyThisChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.auto_awesome, size: 14, color: colors.ai),
+                AiSparkleIcon(size: 14, color: colors.ai),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -147,7 +147,7 @@ class _WhyThisSheet extends ConsumerWidget {
             AiConfidenceBar(value: match.score, height: 8, semanticLabel: 'Match score'),
           ],
           AppSpacing.gapLg,
-          Text('What ${AppConfig.appName} AI considered', style: t.labelLarge),
+          Text('What ${AppConfig.assistantName} considered', style: t.labelLarge),
           AppSpacing.gapSm,
           if (reasons.isEmpty)
             Text('Popular with shoppers and highly rated in this category.', style: t.bodyMedium)

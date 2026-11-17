@@ -3,10 +3,10 @@
     "short_name": "Zelora",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#081719",
-    "theme_color": "#081719",
-    "description": "Your AI shopping assistant: personal picks, smart search and product comparisons.",
-    "orientation": "any",
+    "background_color": "#EEF1FB",
+    "theme_color": "#EEF1FB",
+    "description": "Your AI shopping assistant: ask Zel in plain words, snap a photo to find it, and build bundles under budget.",
+    "orientation": "portrait",
     "prefer_related_applications": false,
     "icons": [
         {

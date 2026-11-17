@@ -42,6 +42,7 @@ abstract final class Routes {
   static const addresses = '/account/addresses';
   static const addressForm = '/account/addresses/form';
   static const changePassword = '/account/password';
+  static const memory = '/account/memory';
 
   // full-screen
   static const products = '/products';
@@ -61,6 +62,9 @@ abstract final class Routes {
   static const bundleBuilder = '/bundle-builder';
   static const productAsk = '/product/:id/ask';
   static const shoppingDna = '/shopping-dna';
+  static const discover = '/discover';
+  static const giftFinder = '/gift-finder';
+  static const priceAlerts = '/price-alerts';
 
   /// Screens that need a signed-in user (prefix match).
   static const protected = <String>[
@@ -76,6 +80,8 @@ abstract final class Routes {
     '/order-success',
     notifications,
     shoppingDna,
+    priceAlerts,
+    memory,
   ];
 
   /// Auth screens a signed-in user is bounced away from.

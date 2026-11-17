@@ -4,14 +4,14 @@ import '../theme/app_spacing.dart';
 import '../utils/extensions.dart';
 import 'editorial.dart';
 
-/// Section title in the editorial serif, with an optional mono eyebrow,
-/// subtitle, leading widget and "See all" action.
+/// Section title row: bold title on the left, a blue "See all" link on the
+/// right (the reference's "Popular Products ··· See All"), with an optional
+/// eyebrow, subtitle and leading widget.
 ///
 /// ```dart
-/// SectionHeader(title: 'Trending now', eyebrow: 'This week', index: 2,
-///     onSeeAll: () => context.push(Routes.productList(sort: 'popular')))
+/// SectionHeader(title: 'Trending now', onSeeAll: () => context.push(Routes.productList(sort: 'popular')))
 /// SectionHeader(title: 'Picked for you', leading: AiSparkleIcon(), subtitle: 'Based on your interests')
-/// SectionHeader(title: 'Filters', serif: false)   // plain UI heading
+/// SectionHeader(title: 'Filters', serif: false)   // smaller utility heading (sheets, forms)
 /// ```
 class SectionHeader extends StatelessWidget {
   const SectionHeader({
@@ -34,33 +34,34 @@ class SectionHeader extends StatelessWidget {
   final String actionLabel;
   final EdgeInsetsGeometry padding;
 
-  /// Small uppercase label above the title ("THIS WEEK", "FOR YOU").
+  /// Optional small uppercase label above the title. Use sparingly.
   final String? eyebrow;
 
-  /// Section number shown before the eyebrow ("02 — THIS WEEK").
+  /// Legacy section number (no longer drawn).
   final int? index;
 
-  /// Serif display title (default). Use false for utility headings inside
-  /// sheets and forms.
+  /// Section-size title (default, 19 px bold). False = utility heading
+  /// (16 px) for sheets and forms. (Named for the old serif voice.)
   final bool serif;
 
   @override
   Widget build(BuildContext context) {
     final t = context.textTheme;
     final colors = context.colors;
+    final hasEyebrow = eyebrow != null && eyebrow!.isNotEmpty;
     return Padding(
       padding: padding,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: hasEyebrow || subtitle != null ? CrossAxisAlignment.end : CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (eyebrow != null || index != null) ...[
-                  Eyebrow(eyebrow ?? '', index: index),
-                  const SizedBox(height: 6),
+                if (hasEyebrow) ...[
+                  Eyebrow(eyebrow!),
+                  const SizedBox(height: 4),
                 ],
                 Row(
                   children: [
@@ -70,7 +71,7 @@ class SectionHeader extends StatelessWidget {
                         header: true,
                         child: Text(
                           title,
-                          style: serif ? t.headlineSmall!.copyWith(fontSize: 21) : t.titleLarge,
+                          style: serif ? t.titleLarge!.copyWith(fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3) : t.titleMedium,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -79,10 +80,10 @@ class SectionHeader extends StatelessWidget {
                   ],
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: t.bodySmall!.copyWith(fontSize: 13),
+                    style: t.bodySmall!.copyWith(fontSize: 13, color: colors.muted),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -94,22 +95,14 @@ class SectionHeader extends StatelessWidget {
             TextButton(
               onPressed: onSeeAll,
               style: ButtonStyle(
-                // muted at rest, accent on hover: the link earns its color
                 foregroundColor: WidgetStateProperty.resolveWith(
-                  (s) => s.contains(WidgetState.hovered) || s.contains(WidgetState.focused) ? colors.primary : colors.muted,
+                  (s) => s.contains(WidgetState.hovered) || s.contains(WidgetState.pressed) ? colors.primaryHover : colors.primary,
                 ),
                 padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: AppSpacing.xs)),
                 minimumSize: const WidgetStatePropertyAll(Size(44, 36)),
-                textStyle: WidgetStatePropertyAll(t.labelLarge!.copyWith(fontSize: 13)),
+                textStyle: WidgetStatePropertyAll(t.labelLarge!.copyWith(fontSize: 13.5, fontWeight: FontWeight.w700)),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(actionLabel, semanticsLabel: '$actionLabel $title'),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.arrow_forward_rounded, size: 15),
-                ],
-              ),
+              child: Text(actionLabel, semanticsLabel: '$actionLabel $title'),
             ),
         ],
       ),

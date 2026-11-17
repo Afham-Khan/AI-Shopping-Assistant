@@ -57,13 +57,33 @@ final onboardingProductsProvider = FutureProvider<List<ProductSummary>>((ref) as
   try {
     final page = await ref.watch(apiClientProvider).getPage(
       '/products',
-      query: {'limit': 6, 'sort': 'rating'},
+      query: {'limit': 10, 'sort': 'rating'},
       item: ProductSummary.fromJson,
     );
     return page.items;
   } on Object {
     return const [];
   }
+});
+
+/// Snap & Find vignette: a real product plus three look-alikes from the same
+/// category (target first). Prefers categories whose products look alike in
+/// a photo (watches, sunglasses, shoes); empty when offline.
+final onboardingSnapProvider = FutureProvider<List<ProductSummary>>((ref) async {
+  final api = ref.watch(apiClientProvider);
+  for (final slug in const ['mens-watches', 'sunglasses', 'womens-watches', 'mens-shoes']) {
+    try {
+      final page = await api.getPage(
+        '/products',
+        query: {'category': slug, 'limit': 4, 'sort': 'rating'},
+        item: ProductSummary.fromJson,
+      );
+      if (page.items.length >= 4) return page.items;
+    } on Object {
+      return const [];
+    }
+  }
+  return const [];
 });
 
 enum StoreStatus { checking, online, offline }

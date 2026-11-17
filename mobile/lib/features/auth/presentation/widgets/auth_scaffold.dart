@@ -9,10 +9,12 @@ import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../providers/storefront_provider.dart';
 
-/// Shared layout for auth screens: a form column on phones/tablets, a split
-/// view with the storefront panel on desktop. The footer carries a live
-/// "store online" line (and a shortcut to the server address when it isn't),
-/// so a connection problem is visible before anyone types a password.
+/// Shared layout for auth screens (mobile everywhere): a top row with a
+/// circular back button (or the logo) and a circular settings button, then
+/// a bold title, a muted subtitle and the form on the page wash. The footer
+/// carries a live "store online" line (and a shortcut to the server address
+/// when it isn't), so a connection problem is visible before anyone types a
+/// password.
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
     super.key,
@@ -41,7 +43,7 @@ class AuthScaffold extends StatelessWidget {
   /// Small uppercase label above the title.
   final String? eyebrow;
 
-  /// Progress through a multi-step flow (1-based), drawn as thin segments.
+  /// Progress through a multi-step flow (1-based), drawn as rounded segments.
   final int? step;
   final int? steps;
 
@@ -49,83 +51,74 @@ class AuthScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.textTheme;
     final colors = context.colors;
-    final desktop = context.isDesktop;
 
-    final form = SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs),
-            child: Row(
-              children: [
-                if (onBack != null)
-                  IconButton(onPressed: onBack, icon: const Icon(Icons.arrow_back_rounded), tooltip: 'Back')
-                else if (showLogo && !desktop)
-                  const Padding(padding: EdgeInsets.only(left: AppSpacing.xs), child: AppLogo(size: 26)),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => context.push(Routes.settings),
-                  icon: Icon(Icons.tune_rounded, color: colors.muted, size: 20),
-                  tooltip: 'Settings',
-                ),
-              ],
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.sm, 0),
+              child: Row(
+                children: [
+                  if (onBack != null)
+                    CircleIconButton(icon: Icons.arrow_back_ios_new_rounded, iconSize: 17, tooltip: 'Back', onPressed: onBack)
+                  else if (showLogo)
+                    const Padding(padding: EdgeInsets.only(left: AppSpacing.xs), child: AppLogo(size: 30)),
+                  const Spacer(),
+                  CircleIconButton(
+                    icon: Icons.tune_rounded,
+                    iconSize: 19,
+                    tooltip: 'Settings',
+                    onPressed: () => context.push(Routes.settings),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Center(
+            Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(context.pagePadding, AppSpacing.md, context.pagePadding, AppSpacing.xl),
+                padding: EdgeInsets.fromLTRB(context.pagePadding, AppSpacing.lg, context.pagePadding, AppSpacing.xl),
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: Breakpoints.maxForm),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (step != null && steps != null) ...[
-                        _StepBar(step: step!, steps: steps!),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: Breakpoints.maxForm),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (step != null && steps != null) ...[
+                          _StepBar(step: step!, steps: steps!),
+                          AppSpacing.gapLg,
+                        ],
+                        if (eyebrow != null) ...[
+                          Align(alignment: Alignment.centerLeft, child: Eyebrow(eyebrow!)),
+                          AppSpacing.gapXs,
+                        ],
+                        Semantics(
+                          header: true,
+                          child: Text(title, style: t.displaySmall!.copyWith(fontSize: 28)),
+                        ),
+                        if (subtitle != null) ...[
+                          AppSpacing.gapXs,
+                          Text(subtitle!, style: t.bodyLarge!.copyWith(color: colors.muted, fontSize: 15)),
+                        ],
+                        AppSpacing.gapXl,
+                        child,
+                        if (footer != null) ...[AppSpacing.gapMd, footer!],
                         AppSpacing.gapLg,
+                        const Center(child: StoreStatusLine()),
                       ],
-                      if (eyebrow != null) ...[
-                        Align(alignment: Alignment.centerLeft, child: Eyebrow(eyebrow!, dot: true)),
-                        AppSpacing.gapSm,
-                      ],
-                      Semantics(
-                        header: true,
-                        child: Text(title, style: t.displaySmall!.copyWith(fontSize: context.isWide ? 34 : 30)),
-                      ),
-                      if (subtitle != null) ...[
-                        AppSpacing.gapXs,
-                        Text(subtitle!, style: t.bodyLarge!.copyWith(color: colors.muted, fontSize: 15)),
-                      ],
-                      AppSpacing.gapXl,
-                      child,
-                      if (footer != null) ...[AppSpacing.gapLg, footer!],
-                      AppSpacing.gapXl,
-                      const Center(child: StoreStatusLine()),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-
-    return Scaffold(
-      body: desktop
-          ? Row(
-              children: [
-                const Expanded(flex: 11, child: _BrandPanel()),
-                Expanded(flex: 10, child: form),
-              ],
-            )
-          : form,
     );
   }
 }
 
-/// Thin segmented progress for multi-step flows ("step 2 of 3").
+/// Rounded segmented progress for multi-step flows ("Step 2 of 3").
 class _StepBar extends StatelessWidget {
   const _StepBar({required this.step, required this.steps});
 
@@ -145,7 +138,7 @@ class _StepBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: context.motion(AppDurations.normal),
                 curve: AppCurves.standard,
-                height: 3,
+                height: 5,
                 decoration: BoxDecoration(
                   color: i <= step ? colors.primary : colors.surfaceRaised,
                   borderRadius: AppRadii.pillAll,
@@ -155,8 +148,8 @@ class _StepBar extends StatelessWidget {
           ],
           const SizedBox(width: AppSpacing.sm),
           Text(
-            '${step.toString().padLeft(2, '0')} / ${steps.toString().padLeft(2, '0')}',
-            style: AppType.data(context, color: colors.faint, size: 11),
+            'Step $step of $steps',
+            style: AppType.data(context, color: colors.muted, size: 12, weight: FontWeight.w600),
           ),
         ],
       ),
@@ -186,131 +179,10 @@ class StoreStatusLine extends ConsumerWidget {
     }
     return InkWell(
       onTap: () => context.push(Routes.settings),
-      borderRadius: AppRadii.tagAll,
+      borderRadius: AppRadii.pillAll,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: StatusLine("Can't reach the store · check server address", color: colors.warning, textColor: colors.warning),
-      ),
-    );
-  }
-}
-
-/// Desktop-only left panel: the store itself. Serif headline, real cover
-/// photos and live catalog numbers on a quiet dot grid.
-class _BrandPanel extends ConsumerWidget {
-  const _BrandPanel();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.colors;
-    final t = context.textTheme;
-    final glance = ref.watch(storefrontGlanceProvider).value;
-
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.md),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: AppRadii.sheetAll,
-        border: Border.all(color: colors.border),
-      ),
-      child: DotGridBackground(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxxl),
-          child: LayoutBuilder(
-            builder: (context, box) {
-              final roomy = box.maxHeight > 560;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppLogo(size: 30),
-                  const Spacer(),
-                  const Eyebrow('AI shopping assistant', dot: true),
-                  AppSpacing.gapMd,
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(text: 'Shop like you have\n'),
-                        TextSpan(text: 'a buyer on call.', style: TextStyle(color: colors.primary)),
-                      ],
-                    ),
-                    style: t.displayLarge,
-                  ),
-                  AppSpacing.gapMd,
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 460),
-                    child: Text(
-                      'Tell Zel what you need in plain words. It reads the reviews, weighs the '
-                      'trade-offs and shows its reasoning. You make the call.',
-                      style: t.bodyLarge!.copyWith(color: colors.muted, height: 1.55),
-                    ),
-                  ),
-                  if (roomy) ...[
-                    AppSpacing.gapXxl,
-                    _CoverStrip(images: glance?.images ?? const []),
-                  ],
-                  AppSpacing.gapXxl,
-                  Container(height: 1, color: colors.border),
-                  AppSpacing.gapLg,
-                  Row(
-                    children: [
-                      Expanded(child: StatBlock.count(count: glance?.products, caption: 'Products', compact: true)),
-                      Expanded(child: StatBlock.count(count: glance?.categories, caption: 'Categories', compact: true)),
-                      Expanded(child: StatBlock.count(count: glance?.departments, caption: 'Departments', compact: true)),
-                      const Expanded(
-                        child: StatBlock(value: '0', caption: 'Sponsored picks', compact: true),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A row of real department cover photos in studio wells.
-class _CoverStrip extends StatelessWidget {
-  const _CoverStrip({required this.images});
-
-  final List<String> images;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    const count = 5;
-    return ExcludeSemantics(
-      child: LayoutBuilder(
-        builder: (context, box) {
-          const gap = 10.0;
-          final size = ((box.maxWidth - gap * (count - 1)) / count).clamp(48.0, 112.0);
-          return Row(
-            children: [
-              for (var i = 0; i < count; i++) ...[
-                if (i > 0) const SizedBox(width: gap),
-                Container(
-                  width: size,
-                  height: size,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: colors.imageWell,
-                    borderRadius: AppRadii.cardAll,
-                    border: Border.all(color: colors.border),
-                  ),
-                  child: i < images.length
-                      ? Padding(
-                          padding: EdgeInsets.all(size * 0.1),
-                          child: AppNetworkImage(images[i], fit: BoxFit.contain, backgroundColor: Colors.transparent),
-                        )
-                      : null,
-                ),
-              ],
-            ],
-          );
-        },
       ),
     );
   }
@@ -325,20 +197,29 @@ class OrDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final line = Expanded(child: Divider(color: colors.borderStrong.withValues(alpha: 0.7)));
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-      child: Row(
-        children: [
-          const Expanded(child: Divider()),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            child: Text(
-              label.toUpperCase(),
-              style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 10, letterSpacing: 1.1),
+      child: LayoutBuilder(
+        builder: (context, box) => Row(
+          children: [
+            line,
+            ConstrainedBox(
+              // the label never pushes the lines off a narrow screen
+              constraints: BoxConstraints(maxWidth: box.maxWidth * 0.7),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodySmall!.copyWith(color: colors.muted, fontWeight: FontWeight.w500),
+                ),
+              ),
             ),
-          ),
-          const Expanded(child: Divider()),
-        ],
+            line,
+          ],
+        ),
       ),
     );
   }
@@ -365,7 +246,7 @@ class AuthFooterLink extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: colors.primary,
             padding: const EdgeInsets.symmetric(horizontal: 6),
-            textStyle: context.textTheme.labelLarge,
+            textStyle: context.textTheme.labelLarge!.copyWith(fontWeight: FontWeight.w700),
           ),
           child: Text(action),
         ),

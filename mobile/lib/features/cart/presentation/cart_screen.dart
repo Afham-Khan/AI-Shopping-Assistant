@@ -398,7 +398,7 @@ class _EmptyCart extends StatelessWidget {
           ),
           AppButton.ghost(
             label: 'Ask Zel for ideas',
-            icon: Icons.auto_awesome_outlined,
+            icon: Icons.savings_outlined,
             onPressed: () => context.go(Routes.assistantWith(prompt: 'Suggest something I might like')),
           ),
         ],

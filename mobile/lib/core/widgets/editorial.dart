@@ -5,21 +5,23 @@ import '../theme/app_typography.dart';
 import '../utils/extensions.dart';
 import 'feedback.dart';
 
-/// Small uppercase mono label that sits above a heading.
+/// Small uppercase label that sits above a heading: 11.5 px bold, lightly
+/// tracked, brand blue.
 ///
 /// ```dart
 /// Eyebrow('Picked for you')                       // PICKED FOR YOU
-/// Eyebrow('Trending', index: 2)                   // 02 — TRENDING
 /// Eyebrow('Store online · 38 ms', dot: true)      // ● STORE ONLINE · 38 MS
 /// Eyebrow('Ends in 02:14:09', color: colors.sale)
 /// ```
-/// One per section, never two stacked. Keep it under ~32 characters.
+/// One per section, never two stacked, and only where it adds information.
+/// Keep it under ~32 characters. (`index:` is accepted for older call sites
+/// but no longer drawn — v2 doesn't number sections.)
 class Eyebrow extends StatelessWidget {
   const Eyebrow(this.label, {super.key, this.index, this.dot = false, this.color, this.leading, this.textAlign});
 
   final String label;
 
-  /// Section number, rendered as a two-digit prefix ("01 —").
+  /// Legacy section number (no longer drawn).
   final int? index;
 
   /// A small filled dot before the label (status / "live" lines).
@@ -42,15 +44,7 @@ class Eyebrow extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (index != null) ...[
-            Text(index!.toString().padLeft(2, '0'), style: style.copyWith(color: colors.faint)),
-            Container(
-              width: 14,
-              height: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: colors.borderStrong,
-            ),
-          ] else if (leading != null) ...[
+          if (leading != null) ...[
             leading!,
             const SizedBox(width: 6),
           ] else if (dot) ...[
@@ -121,7 +115,7 @@ class StatBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final t = context.textTheme;
-    final number = (compact ? t.headlineMedium! : t.displaySmall!).copyWith(
+    final number = (compact ? t.headlineSmall! : t.headlineLarge!).copyWith(
       color: valueColor ?? colors.text,
       fontFeatures: AppType.tabular,
       height: 1.05,
@@ -134,10 +128,10 @@ class StatBlock extends StatelessWidget {
         crossAxisAlignment: crossAxisAlignment,
         children: [
           if (count != null) CountUp(count!, style: number) else Text(value, style: number, maxLines: 1),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
-            caption.toUpperCase(),
-            style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 10, letterSpacing: 1.1),
+            caption,
+            style: context.textTheme.bodySmall!.copyWith(color: colors.muted, fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -161,11 +155,11 @@ class KbdChip extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
       padding: const EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
-        color: colors.surfaceRaised,
-        borderRadius: AppRadii.tagAll,
-        border: Border.all(color: colors.borderStrong.withValues(alpha: 0.7)),
+        color: colors.surface,
+        borderRadius: const BorderRadius.all(Radius.circular(6)),
+        border: Border.all(color: colors.border),
         // a hard (unblurred) lower edge reads as a physical key
-        boxShadow: [BoxShadow(color: colors.borderStrong, offset: const Offset(0, 1.5))],
+        boxShadow: [BoxShadow(color: colors.borderStrong.withValues(alpha: 0.8), offset: const Offset(0, 1.5))],
       ),
       // Center with factors: hug the label instead of filling the parent
       child: Center(
@@ -295,8 +289,9 @@ class _GridPainter extends CustomPainter {
       old.color != color || old.spacing != spacing || old.radius != radius || old.lines != lines;
 }
 
-/// Solid card with a hairline border and a thin colored top edge — the
-/// department / category card. Hover lifts the border, never the fill.
+/// White rounded category card with the soft resting shadow. v2 drops the
+/// colored top edge by default (pass `topBorderWidth: 2` to bring it back);
+/// [accent] still tints the edge when one is drawn. Hover deepens the shadow.
 ///
 /// ```dart
 /// CategoryTopBorderCard(
@@ -312,7 +307,7 @@ class CategoryTopBorderCard extends StatefulWidget {
     this.accent,
     this.onTap,
     this.padding = const EdgeInsets.all(AppSpacing.md),
-    this.topBorderWidth = 2,
+    this.topBorderWidth = 0,
     this.semanticLabel,
   });
 
@@ -348,14 +343,14 @@ class _CategoryTopBorderCardState extends State<CategoryTopBorderCard> {
         duration: context.motion(AppDurations.color),
         decoration: BoxDecoration(
           borderRadius: AppRadii.cardAll,
-          boxShadow: lifted ? colors.shadowMd : const [],
+          boxShadow: lifted ? colors.shadowMd : colors.shadowSm,
         ),
         child: Material(
           color: colors.surface,
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: AppRadii.cardAll,
-            side: BorderSide(color: lifted ? colors.borderStrong : colors.border),
+            side: BorderSide(color: context.isDark ? colors.border : colors.border.withValues(alpha: 0.6)),
           ),
           child: InkWell(
             onTap: widget.onTap,
@@ -366,13 +361,14 @@ class _CategoryTopBorderCardState extends State<CategoryTopBorderCard> {
                   padding: EdgeInsets.only(top: widget.topBorderWidth),
                   child: Padding(padding: widget.padding, child: widget.child),
                 ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: widget.topBorderWidth,
-                  child: ColoredBox(color: widget.accent ?? colors.primary),
-                ),
+                if (widget.topBorderWidth > 0)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: widget.topBorderWidth,
+                    child: ColoredBox(color: widget.accent ?? colors.primary),
+                  ),
               ],
             ),
           ),

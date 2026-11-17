@@ -101,77 +101,100 @@ All paths and location builders are in `core/router/routes.dart` (param conventi
 - Protected paths are listed in `Routes.protected` → guests are redirected to `/login?from=…` and sent back after sign-in. Sign-in screens never navigate themselves — the router redirects (new users with `isOnboarded == false` go to `/interests` first).
 - **Add a screen:** create it in `features/<f>/presentation/`, add a constant (+ builder if it has params) to `Routes`, add a `GoRoute` in `app_router.dart` (inside a branch only if it belongs to that tab), add to `Routes.protected` if it needs auth.
 
-## Responsive layout
+## Responsive layout — mobile app everywhere
 
-- `context.useBottomNav` (width < 700 & portrait) → bottom bar; otherwise the storefront top header (`StoreHeader`, see Design system → Shell). No side rail. `context.isWide` = ≥ 700, `context.isDesktop` = ≥ 1100.
-- Wrap page content in `ResponsiveCenter` (max 1200) / `SliverResponsiveCenter` in slivers; forms use `maxWidth: Breakpoints.maxForm` (440).
+- Zelora is a **mobile app on every screen**. Phones get the app full-screen. Anything ≥ 600 px wide (tablet, desktop, web) renders the whole app — every route, dialog, sheet and snackbar — inside a centred **phone-width column (460 px)** with 36 px rounded corners and a soft shadow, floating over the page wash (`AppFrame`, installed once in `MaterialApp.builder`). Inside the column `MediaQuery` reports the column's size, so **every screen lays out exactly as on a phone**: `context.isWide` / `isDesktop` are false, `useBottomNav` is true.
+- **Never build a website layout**: no top navbar, no side rail / sidebar, no multi-column storefront. Design every screen for 360–460 px wide; the frame takes care of big screens.
+- Wrap page content in `ResponsiveCenter` / `SliverResponsiveCenter` as before (gutter 16 px); forms use `maxWidth: Breakpoints.maxForm`.
 - Must not overflow at 320 px wide or text scale 2.0 (app clamps at 2.0). Prefer `Wrap`, `Flexible`, `maxLines + ellipsis`. Grid tiles get their height from `ProductCard.compactHeight`, which scales with text size.
 
 ## Design system
 
-**Identity — "editorial front, ledger precision".** Zelora looks like a well-edited shop, not a dashboard: solid surfaces with hairline borders, real product photos as the hero, a serif for the editorial voice, a mono for facts, and ONE accent. The assistant has a name and a mark: **Zel**, a single four-point spark (`AiSparkleIcon`).
+**Identity v2 — "airy royal".** A clean, modern, minimal light shopping app: a soft lavender-blue page with a very subtle wash of light from the top, pure white rounded cards with very soft shadows, one confident **royal blue**, dark navy text, slate secondary text, pill buttons and chips, circular white icon buttons, product photos on very light tiles, discounts in a calm red, amber rating stars. Light is the primary theme; dark (Settings → Appearance) is derived from the same hues. The assistant is **Zel** — always written via `AppConfig.assistantName`, never hard-coded — and its mark is the **bag mascot** (`AiMascot`; `AiSparkleIcon` renders it at icon size). No four-point sparkle / star anywhere (it reads as another company's AI).
 
-**Never:** gradients (the `aiGradient` / `brandGradient` getters are flat on purpose), glow, blur / glass, spinning or floating decoration, emoji as icons, loud colored fills, more than one accent in a view, hard-coded hex in features.
+**Never:** mint / teal (the old palette is gone — legacy `AppColors.mint*` names now point at blue), black-and-white monochrome, glow / neon / glassmorphism / blur, loud gradients, emoji as icons, a website-style top navbar, a side rail or sidebar, hard-coded hex in features, serif or monospace fonts.
 
-### Color (`context.colors` → `AppPalette`; dark is the default theme)
+### Color (`context.colors` → `AppPalette`; light is the default theme)
 
-| Token | Dark "tide ink" | Light "paper" | Use |
+| Token | Light (default) | Dark | Use |
 |---|---|---|---|
-| `background` | `#081719` | `#F4F7F4` | page |
-| `surface` | `#0D2023` | `#FFFFFF` | cards, sheets, inputs, header |
-| `surfaceVariant` | `#13292D` | `#ECF1ED` | hover rows, skeletons, inset panels |
-| `surfaceRaised` | `#1A3439` | `#E0E8E3` | kbd chips, tooltips, slider track |
-| `border` / `borderStrong` | `#1E383D` / `#30535A` | `#D9E3DD` / `#B5C8BE` | hairline · hover and emphasis |
-| `text` / `muted` / `faint` | `#EAF2F0` / `#A4BBB8` / `#6F8A88` | `#10221D` / `#465E56` / `#72887F` | primary · secondary · captions, placeholders |
-| `primary` (`primaryHover`, `onPrimary`, `primarySoft`) | `#3DDBA6` (`#62E5BA`, `#04271B`, `#123531`) | `#0A7F60` (`#086B51`, `#FFFFFF`, `#E1F2EC`) | the one accent: primary buttons, active states, eyebrows |
-| `ai` / `aiSoft` | = `primary` / `primarySoft` | same | AI surfaces only (named for intent) |
-| `sale` (`onSale`, `saleSoft`) | `#F4736C` (`#2B0907`, `#3A2224`) | `#C8372F` (`#FFFFFF`, `#FBE9E7`) | discounts, savings, destructive |
-| `warning` / `star` | `#F0B352` | `#A86A09` / `#E09A14` | low stock, ratings |
-| `success` · `secondary` (info) · `purple` | `#3BD48F` · `#5AB6EE` · `#C4A0FA` | `#0E8F5B` · `#0F6FC0` · `#6F48D6` | status only |
-| `imageWell` / `onImageWell` | `#E7EDEA` / `#10221D` | `#EEF2EF` / `#10221D` | the tile behind product photos |
-| `shadowMd` / `shadowLg` | `0 10 28 -10 #000000B3` | `0 10 28 -10 #10231C24` | hovered cards, menus, dialogs only |
+| `background` · `backgroundTop` / `backgroundBottom` | `#EEF1FB` · `#F3F5FD` / `#E6EAF8` | `#0B1020` · `#10172C` / `#0A0E1C` | page wash (`AppBackground`, `colors.backgroundWash`); flat `background` = scrolled-under app bar |
+| `surface` | `#FFFFFF` | `#141B2E` | cards, sheets, inputs, bottom bar, circular icon buttons |
+| `surfaceVariant` | `#F4F6FC` | `#1A2238` | quiet fills, skeletons, pressed rows, inset panels |
+| `surfaceRaised` | `#E9EDF8` | `#222B44` | tracks (slider, progress, step bars), unselected dots |
+| `border` / `borderStrong` | `#E3E8F4` / `#C9D2E6` | `#252E47` / `#36415F` | light grey-blue hairline · hover and emphasis |
+| `text` / `muted` / `faint` | `#0F172A` / `#5B6478` / `#6B7489` | `#E8ECF6` / `#A3ADC4` / `#8790AB` | navy primary · slate secondary (5.9:1) · captions, placeholders (4.7:1) |
+| `primary` (`primaryHover`, `onPrimary`, `primarySoft`) | **`#2563EB`** (`#1D4ED8`, `#FFFFFF`, `#EDF2FE`) | `#7AA2FF` (`#94B4FF`, `#0A1A3F`, `#1C2850`) | royal blue: primary buttons, active nav, selected chips, links, "See all" |
+| `ai` / `aiSoft` | = `primary` / `primarySoft` | same | AI surfaces (named for intent) |
+| `sale` (`onSale`, `saleSoft`) | `#DC2626` (`#FFFFFF`, `#FDECEC`) | `#FF7A7A` | discount pills, "You save", destructive, cart badge |
+| `star` · `warning` · `success` · `secondary` (info) | `#F59E0B` · `#B45309` · `#15803D` · `#0369A1` | `#FBBF24` · `#FBBF24` · `#4ADE80` · `#38BDF8` | ratings · low stock · status · info |
+| `imageWell` / `onImageWell` | `#F3F5FA` / `#0F172A` | `#EEF1F8` / `#0F172A` | the very light tile behind product photos (light in both themes) |
 
-- **Image wells are light in both themes.** The catalog photos are transparent cut-outs and many products are black; on a dark well they vanish. Always put product photos on `colors.imageWell` (the `AppNetworkImage` default) and draw anything on top of the well with `onImageWell` / light-theme ink.
-- **Accent sparingly.** One primary button per view. Selected chips, nav indicators and segmented buttons use `primarySoft` + accent text, never a solid fill. Links are muted at rest and take the accent on hover.
-- **Warm signals:** coral (`sale`) for discount tags, "You save", destructive actions; amber for stars and low stock. Nothing else is warm.
-- **Department hues** (`colors.departmentAccent(slug)`): electronics blue, fashion rose, beauty violet, home amber, groceries green, sports orange, automotive teal. Use them as a 2 px top border (`CategoryTopBorderCard`), a 6 px dot, or a small icon tint — never as a fill or text color for body copy.
+Primary `#2563EB` was picked for accessibility: 5.17:1 with white text and 4.58:1 as text on the page wash (WCAG AA). Department hues (`colors.departmentAccent(slug)`) are calm mid-tones for small icon tints, 6 px dots or a 10 % tile behind an icon — never fills or body text.
 
-### Type (`AppType`, `context.textTheme`)
+**Shadows** (always via tokens, never hand-rolled): `colors.shadowSm` resting cards (product cards, `AppCard`, search bar, circle buttons) · `colors.shadowMd` hover / floating (menus, floating bars, photos' controls) · `colors.shadowLg` dialogs and the desktop app frame. All navy-tinted and very soft.
 
-| Voice | Font | Where |
+### Type (`context.textTheme`, `AppType`) — one family: **Plus Jakarta Sans**
+
+Chosen with the ui-ux-pro-max font database: a geometric sans with soft, rounded-feeling bowls (the reference's look), popularity rank #13 on Google Fonts, variable 200–800 so one family carries display → caption, and a tall x-height that stays legible at 11–13 px. (Urbanist is classified *Display* — weak for small body text; Outfit is paired with a separate body font in the database; Lexend reads wider and more "educational".)
+
+| Role | Style | Weight |
 |---|---|---|
-| Editorial | **Source Serif 4** — every `display*` and `headline*` style; `AppType.serif(style)` | hero headings, section titles (`SectionHeader`), product name on the detail page, auth titles. Colour one phrase in the accent at most once per screen (`Text.rich`). |
-| Interface | **Inter** — `title*`, `body*`, `label*` | everything else; app-bar titles; prices (`PriceText`, tabular figures, "Rs" set lighter) |
-| Ledger | **JetBrains Mono** — `AppType.eyebrow(context)`, `AppType.data(context)`, `AppType.mono(style)` | eyebrows, order numbers, SKUs, spec values, timestamps, counters ("01 / 03"), kbd chips, status lines |
+| Screen / hero titles | `displaySmall` 29 · `headlineLarge` 26 | 800 |
+| Section titles (`SectionHeader`) | 19 | 800 |
+| App-bar titles | `titleMedium` 17 (centred) | 700 |
+| Card titles, list titles | `titleSmall` 14 / `bodyMedium` 13.5 | 600 |
+| Body | `bodyLarge` 16 · `bodyMedium` 14 · `bodySmall` 12.5 (muted) | 400 |
+| Labels, chips, buttons, nav | `labelLarge` 14 · `labelMedium` 12 · `labelSmall` 11 · buttons 15 | 600–700 |
+| Prices (`PriceText`) | bold, **tabular figures**, lighter "Rs" | 700 |
 
-Scale: display 46/38/32 · headline 28/24/20 · title 18/16/14 · body 16/14/12 (`bodySmall` is muted) · label 14/12/11. Use `fontFeatures: AppType.tabular` on any number that changes or lines up.
-
-**Eyebrows** (`Eyebrow`): 11 px mono caps, accent colour, one per section, above the heading. Sections on a page are numbered (`Eyebrow('Trending', index: 2)` → `02 — TRENDING`; `SectionHeader(index:, eyebrow:)`). Status eyebrows take a dot (`dot: true`).
+- Use `fontFeatures: AppType.tabular` on every number that changes or lines up (prices, counts, order numbers, timers). `AppType.data(context)` is the tabular style for order numbers / SKUs / timestamps.
+- `AppType.serif()` / `AppType.mono()` still compile but return Plus Jakarta Sans (heavier / tabular). Don't use them in new code.
+- **Eyebrows** (`Eyebrow`): optional 11.5 px bold uppercase blue label above a heading — at most one per section, only when it adds information. No section numbering.
 
 ### Shape, space, motion
 
-- Radii `AppRadii`: 6 tags / kbd chips · 8 inputs and buttons · 12 cards and dialogs · 16 sheets · pill for chips and status badges.
-- Spacing `AppSpacing` 4/8/12/16/20/24/32/48; page gutter `context.pagePadding`; content max 1200 (`ResponsiveCenter`).
-- Borders over shadows. A card is `surface` + 1 px `border`; hover = `borderStrong` + `shadowMd`; never a different fill.
-- Motion `AppDurations`: 150 hover/press · 250 standard · 300 colour and border transitions · 400 emphasis · 450 sheets (ease-out) · dialogs fade 150 ms + rise 20 px (`showAppDialog`). Always `context.motion(d)` so reduced-motion gets none. No looping decoration: `StatusLine` pulses three times and rests.
-- Press feedback: everything tappable settles to ~0.96 (`Pressable`; `AppButton`, `ProductCard`, `CategoryTopBorderCard` already do). Light haptic on commit actions and tab changes.
-- Focus is always visible: 1.5 px accent ring on inputs / outlined buttons, ink ring on filled buttons.
+- Radii `AppRadii`: **8** tags / kbd chips · **14** inputs and small image tiles (`inputAll`) · **18** cards and dialogs (`cardAll`) · **24** sheets (`sheetTop`/`sheetAll`) · **36** desktop app frame · **pill** for every button, chip, badge, search bar and segmented control.
+- Spacing `AppSpacing` 4/8/12/16/20/24/32/48; **page gutter 16** (`context.pagePadding`).
+- **Cards**: white `surface`, radius 18, `shadowSm`, a barely-there border (`border` at 60 % in light). Hover → `shadowMd`. Never a tinted fill unless selected (`primarySoft` + 1.5 px `primary` border).
+- **Product photos** sit on an inset `imageWell` tile (radius 14) inside the white card, with padding around the cut-out.
+- Motion `AppDurations`: 150 hover/press · 250 standard · 300 colour/border · 400 emphasis · 450 sheets. Always `context.motion(d)`. Press feedback: `Pressable` (0.96–0.98). No looping decoration.
+- Focus is always visible: 1.6 px blue ring on inputs, 2 px ring on buttons.
+
+### Components (theme defaults — just use the Material widget or the app wrapper)
+
+- **Buttons** (`AppButton`): pill, 50 px tall (40 small / 56 large), 15 px bold. Primary = filled royal blue ("Buy now"); `.secondary` = white with a 1.5 px blue outline and blue label ("Add to cart"); `.ghost` = blue text; `.destructive` = red fill. One filled primary per view.
+- **Chips** (`ChoiceChip`/`FilterChip`): white pills with a grey-blue hairline; selected = light-blue tint, 1.5 px blue outline, blue label (the reference's colour/storage chips). No checkmarks.
+- **Inputs** (`AppTextField`): white, radius 14, hairline border, blue focus ring, muted prefix icons. **Search** = `AppSearchBar` (white pill, search icon, soft shadow; button mode opens search, field mode types).
+- **App bars**: transparent over the wash at rest, solid `background` once content scrolls under, centred bold title. The automatic back / close buttons render as **white circles** (theme `actionIconTheme`). For your own actions use `CircleIconButton` (white circle + `shadowSm`, ≥ 44 px target, badge/dot support).
+- **Bottom bar** (`ZeloraNavBar` in the shell): white, 26 px rounded top corners, soft upward shadow; Home · Explore · **Zel** (centre: raised blue circle holding the white bag mascot, happy eyes while open) · Cart (red count badge) · Profile. Active tab = blue icon + bold blue label on a light-blue pill.
+- **Badges**: count badges are `sale` red with white text; status badges (`StatusBadge`) are soft-tinted pills.
+- **Dialogs / sheets**: white, radius 24 / 24-top, navy-tinted scrim. Toasts (`AppSnack`): navy pill-ish bar (radius 14), white text.
+- **Lists in cards**: `AppCard(padding: EdgeInsets.zero, child: Column(children: [ListTile(...), Divider(), ...]))`.
 
 ### Component habits (follow these on every screen)
 
-- **Toasts** (`AppSnack`): bottom-centre, one at a time (a new one replaces the old), 3 s, first letter capitalised, radius 8 with a 1 px border. Show the server's `message` for success and for error.
-- **Loading:** first load = skeletons shaped like the final layout (`SkeletonProductCard`, `SkeletonListTile`…). Refetch / paging = keep the content and dim it to 0.7 (`AnimatedOpacity`), never blank the screen. Buttons show a small spinner, dim to 0.55 and ignore taps (`AppButton(loading:)`).
-- **Empty / error** (`EmptyState`, `ErrorState`): soft tinted icon circle, bold title, one muted help line, optional single action. Errors add the technical code small in mono (`HTTP 500`).
-- **Forms:** errors only after a field has been touched (`AppTextField` validates on unfocus). On a failed submit call `validateForm(formKey)` — it scrolls to and focuses the first invalid field — and show `FormErrorBanner(message: kFixFieldsMessage)`. Mark required fields with `required: true` (red asterisk). Password fields warn when Caps Lock is on. Enter submits the last field.
-- **Destructive actions:** always `ConfirmDialog.show(context, title: 'Remove this address?', confirmLabel: 'Remove', onConfirm: () => repo.delete(id))` — error-tinted icon circle, "This action cannot be undone.", outline Cancel + danger confirm that shows loading.
-- **Status badges** (`StatusBadge('Delivered', tone: StatusTone.success)`): soft background, strong text, subtle border, pill.
-- **Stats:** `StatBlock.count(count: n, caption: 'Products')` — the number counts up once (1.2 s ease-out, tabular) over a tiny mono caption.
-- **Success moments:** `SuccessCheck()` draws its ring and check (order placed, password changed).
-- **Avatars:** `AppAvatar(name:, imageUrl:)` — initials on a soft accent tint when there is no photo.
-- **Copy:** anything a person might read back (order number, tracking id, version) is tappable: `copyToClipboard(context, value, label: 'Order number')` confirms with a toast; `KeyValueRow(copyable: true)` does it for you.
-- **Icon buttons** always have a `tooltip`; titles get `Semantics(header: true)`; tap targets ≥ 44 px.
-- **Live data over decoration:** prefer a real number, time or status ("Store online · 38 ms", "Updated just now", "Ends in 02:14:09", "Out for delivery") to an illustration. Use `StatusLine` / `Eyebrow(dot: true)`.
-- **Keyboard** (web / desktop): `/` or Ctrl/⌘ K opens the search palette from anywhere (quick links first, then categories and debounced product results; ↑ ↓ ↵ esc), Alt 1–5 switches tabs. Show shortcuts with `KbdChip` only where they really work.
+- **Scaffolds are transparent** — the page route paints `AppBackground`. Don't set `backgroundColor` on a `Scaffold` (it would hide the wash); only custom overlays / full-bleed panels outside a page need `AppBackground(child: …)`.
+- **Toasts** (`AppSnack`): bottom-centre, one at a time, 3 s, first letter capitalised. Show the server's `message` for success and for error.
+- **Loading:** first load = skeletons shaped like the final layout. Refetch / paging = keep content and dim to 0.7. Buttons show a spinner (`AppButton(loading:)`).
+- **Empty / error** (`EmptyState`, `ErrorState`): soft tinted icon circle, bold title, one muted help line, optional single action.
+- **Stats:** `StatBlock.count(count: n, caption: 'Products')` — the number counts up once (tabular) over a small muted caption.
+- **Status badges** (`StatusBadge('Delivered', tone: StatusTone.success)`), **avatars** (`AppAvatar`), **copy** (`copyToClipboard` / `KeyValueRow(copyable: true)`) and **success moments** (`SuccessCheck()`) work as before.
+- **Forms:** errors only after a field has been touched; on a failed submit `validateForm(formKey)` + `FormErrorBanner(message: kFixFieldsMessage)`. Required fields `required: true`. Enter submits the last field.
+- **Destructive actions:** `ConfirmDialog.show(...)`.
+- **Icon buttons** always have a `tooltip`; titles get `Semantics(header: true)`; tap targets ≥ 44 px; icons are Material Rounded/Outlined — never emoji.
+- **Keyboard** (web / desktop, a hidden extra): `/` or Ctrl/⌘ K opens the command palette from anywhere, Alt 1–5 switches tabs. Settings lists them; the desktop frame shows a small "Ctrl K to search" hint outside the column.
+
+### Logo (`AppLogo`, `ZeloraWordmark`, `ZeloraMarkPainter`)
+
+- **The Z-bag mark**: a bold geometric white "Z" whose top bar is the rim of a shopping bag, with a rounded bag handle rising from it, on a royal-blue rounded tile (radius 30 %, a whisper of top light). No spark or star. Legible from a 16 px favicon up.
+- **Wordmark**: "Zelora" in Plus Jakarta Sans ExtraBold (800), tracking −3.5 %, navy (`colors.text`) or white on blue.
+- Usage: `AppLogo(size: 30)` (mark + wordmark) in auth headers / onboarding; `AppLogo(size: 40, showWordmark: false)` for the mark alone; `ZeloraWordmark(size: 20)` for the name alone. Don't recolor the tile except white-on-blue inversion (`tileColor: Colors.white, glyphColor: AppColors.blue`); never stretch, outline, add effects, or place it on a busy photo.
+- Icons are generated from the same painter: `flutter test tool/generate_app_icons.dart` writes `web/favicon.png`, `web/icons/*` (incl. maskable + apple-touch) and Android `mipmap-*/ic_launcher*.png` + the adaptive icon XML. Re-run it after changing the mark.
+
+### Assistant name
+
+`AppConfig.assistantName` (currently **"Zel"**) is the only place the name lives. Write `'Ask ${AppConfig.assistantName}'`, never `'Ask Zel'` or `'Zelora AI'` (Zelora is the store; the assistant is Zel). Don't use `Icons.auto_awesome` (sparkle) for AI actions — use `AiSparkleIcon` (the mascot) as the leading widget instead.
 
 ### Voice
 
@@ -179,43 +202,49 @@ Zelora speaks like a good shop assistant: short, direct, sentence case, friendly
 
 ### Shell
 
-- Phones in portrait (`context.useBottomNav`: width < 700): bottom navigation bar — Home, Explore, Assistant (Zel's spark), Cart (count badge), Account.
-- Everything wider (tablet, desktop, web): a sticky storefront header (`StoreHeader`, 64 px, `surface` + bottom hairline, content capped at 1200): logo · Home / Explore / Ask Zel / Deals (current link gets a 2 px accent rule) · search field with `Ctrl K` chips (opens the palette; collapses to an icon below 880 px) · wishlist, notifications (dot), cart (count), account avatar menu. **There is no side rail** — pages get the full width, so lay out wide screens as a storefront (centred max-width content, multi-column grids), not as an admin panel.
-- Screens inside a tab must not add their own logo / search / cart app-bar actions on wide layouts (the header has them): gate them with `context.useBottomNav`.
+- One shell for every screen size: `AppShell` = `Scaffold(body: navigationShell, bottomNavigationBar: ZeloraNavBar(...))`. Tabs: Home (`/`), Explore (`/explore`), Zel (`/assistant`), Cart (`/cart`), Profile (`/account`); each tab keeps its own stack (route paths unchanged).
+- There is **no** `StoreHeader`, top navbar or rail any more. Screens own their headers: Home should show the greeting / logo, an `AppSearchBar` and `CircleIconButton`s (notifications, wishlist); other tab roots use the transparent `AppBar` with a centred title. Don't gate header actions on `context.useBottomNav` any more (it is always true).
+- On-screen search entry points push `Routes.search`; the keyboard shortcut opens the command palette.
 
 ## Shared widget catalog (`core/widgets/widgets.dart`)
 
 | Widget | Usage |
 |---|---|
-| `AppButton` | `AppButton(label: 'Pay', onPressed: f, loading: busy, expand: true, icon: Icons.lock)`; `.secondary`, `.ghost`, `.destructive`; `size: AppButtonSize.small/large` |
+| `AppButton` | `AppButton(label: 'Pay', onPressed: f, loading: busy, expand: true, icon: Icons.lock)` (filled blue pill); `.secondary` (blue outline pill), `.ghost` (blue text), `.destructive`; `size: AppButtonSize.small/large` |
+| `AppCard` | `AppCard(child: ...)` white radius-18 card with `shadowSm`; `onTap:` adds press + hover lift; `selected: true` = blue outline (pair with `color: colors.primarySoft`); `padding: EdgeInsets.zero` for list groups |
+| `CircleIconButton` | `CircleIconButton(icon: Icons.favorite_border_rounded, tooltip: 'Save', onPressed: f)` white circle + soft shadow (app bars, over photos); `badgeCount:`, `dot:`, `filled: false` (quiet tint on white cards), `size:` |
+| `AppSearchBar` | `AppSearchBar(onTap: () => context.push(Routes.search))` (button mode) · `AppSearchBar(controller: c, autofocus: true, onChanged: f, onSubmitted: g)` (field) · `trailing: CircleIconButton(...)` |
+| `AppBackground` | the page wash; routes already paint it — use only for custom overlays / panels outside a page |
+| `AppFrame` | installed in `app.dart`; frames the app in a 460 px column on screens ≥ 600 px (`AppFrame.framed(size)`) |
 | `AppTextField` | `AppTextField(label: 'Email', required: true, controller: c, prefixIcon: Icons.mail_outline, validator: Validators.email, errorText: e?.fieldError('email'), onSubmitted: (_) => submit())`; `isPassword: true` adds a toggle |
 | `FormErrorBanner` | `FormErrorBanner(message: error?.message)` — animated inline error |
 | `AppNetworkImage` | `AppNetworkImage(url, width: 64, height: 64, fit: BoxFit.cover, borderRadius: AppRadii.inputAll)` — cached, shimmer, fallback icon, resolves relative URLs. Without `width` it decodes at the laid-out width (memory). `placeholder:` replaces the shimmer (e.g. the thumbnail while a big image loads) |
-| `ProductCard` | `ProductCard(product: p)` (grid tile) / `variant: ProductCardVariant.wide` (list row); heart, discount badge, AI match badge, opens product page. Remembers the product in `ProductPreviewCache` on tap (instant detail page). `hero: true` flies the image into the detail gallery — only where a product appears once per screen |
+| `ProductCard` | `ProductCard(product: p)` (grid tile: white card, inset light image tile, white heart circle, red discount pill, brand · 2-line title · rating · bold price) / `variant: ProductCardVariant.wide` (list row); AI match badge, opens product page. Remembers the product in `ProductPreviewCache` on tap (instant detail page). `hero: true` flies the image into the detail gallery — only where a product appears once per screen |
 | `ProductGrid` / `SliverProductGrid` | `ProductGrid(products: items)`, `.loading()`, `loadingMore: true`; 2/3/4/5 columns by width; tiles use `hero: true` |
 | `ProductRail` | `ProductRail(products: items)` horizontal row, `.loading()` |
-| `PriceText` | `PriceText(price, compareAt: was, size: PriceSize.large, showDiscount: true, showSavings: true)` — tabular figures, lighter "Rs", coral discount tag, optional "You save …" line |
+| `PriceText` | `PriceText(price, compareAt: was, size: PriceSize.large, showDiscount: true, showSavings: true)` — bold tabular figures, lighter "Rs", red discount tag, optional "You save …" line |
 | `RatingStars` | `RatingStars(4.6, count: 128)` compact · `RatingStars.full(4.6)` five stars |
-| `SectionHeader` | `SectionHeader(title: 'Trending', eyebrow: 'This week', index: 2, subtitle: '…', leading: AiSparkleIcon(), onSeeAll: f)` — serif title; `serif: false` for utility headings in sheets |
-| `EmptyState` | `EmptyState(icon: Icons.favorite_border, title: 'Nothing saved yet', message: '…', actionLabel: 'Browse', onAction: f)`; optional `eyebrow`, `detail` (mono line), `accent` (tints the circle), `compact` |
-| `ErrorState` | `ErrorState(error: e, onRetry: f)` — offline errors get a server-address hint; shows `HTTP 500`-style code in mono |
+| `SectionHeader` | `SectionHeader(title: 'Trending', subtitle: '…', leading: AiSparkleIcon(), onSeeAll: f)` — 19 px ExtraBold title, blue "See all"; optional `eyebrow:`; `serif: false` = smaller utility heading for sheets (`index:` is ignored) |
+| `EmptyState` | `EmptyState(icon: Icons.favorite_border, title: 'Nothing saved yet', message: '…', actionLabel: 'Browse', onAction: f)`; optional `eyebrow`, `detail` (small tabular line), `accent` (tints the circle), `compact` |
+| `ErrorState` | `ErrorState(error: e, onRetry: f)` — offline errors get a server-address hint; shows the `HTTP 500`-style code small |
 | `LoadingView` | centered spinner when no skeleton fits |
 | `Skeleton*` | `Skeleton(width:, height:)`, `Skeleton.circle(size:)`, `SkeletonText(lines: 3)`, `SkeletonProductCard()`, `SkeletonListTile()`, `SkeletonList(count: 6)` |
 | `QuantityStepper` | `QuantityStepper(value: q, onChanged: f, max: 10, loading: busy)`; `min: 0` turns − into delete at 1 |
 | `AppBadge` | `AppBadge(count: n, child: Icon(...))`, `AppBadge.dot(show: unread, child: ...)` |
 | `ResponsiveCenter` / `SliverResponsiveCenter` | cap content width + gutters |
 | `AppSnack` | `AppSnack.success(context, 'Added to cart')`, `.error(context, e)`, `.info(context, 'Removed', actionLabel: 'Undo', onAction: f)` |
-| `AiSparkleIcon` / `AiGradientText` / `AiBadge` / `AiGradientBorder` / `AiGradient.mask` | Zel's accents, all solid (no gradient despite the legacy names): `AiSparkleIcon(size: 18, filled: false)` four-point spark, `AiBadge(label: '92% match')` (solid over photos, `solid: false` on surfaces), `AiGradientBorder(child: ...)` = 1 px accent border + soft tint for AI cards |
+| `AiMascot` | the assistant mascot: `AiMascot(size: 56)` (idle, blinks now and then) · `mood: AiMood.thinking` (eyes glance side to side, small bob — use while an answer streams) · `mood: AiMood.happy` (arc eyes, bigger smile, one hop) · `color: Colors.white` on blue fills (eyes turn blue) · `outline: true` · `animate: false`. Below 28 px it draws a simplified static version; reduced motion = static |
+| `AiSparkleIcon` / `AiGradientText` / `AiBadge` / `AiGradientBorder` / `AiGradient.mask` | the assistant's accents, all solid blue (no gradient despite the legacy names): `AiSparkleIcon(size: 18, filled: false, color:)` = the static bag mascot at icon size (name kept for old call sites), `AiBadge(label: '92% match')` pill (solid over photos, `solid: false` on surfaces), `AiGradientBorder(child: ...)` = soft blue border + light tint for AI cards |
 | `BottomSheetScaffold` + `showAppBottomSheet` | `showAppBottomSheet(context, builder: (_) => BottomSheetScaffold(title: 'Sort by', footer: AppButton(...), child: ...))` |
-| `AppLogo` | brand mark (accent tile with a geometric Z, drawn in code) + serif wordmark; `showWordmark: false`, colour overrides |
-| `Eyebrow` | `Eyebrow('Picked for you')`, `Eyebrow('Trending', index: 2)`, `Eyebrow('Store online', dot: true)`, `leading: AiSparkleIcon(size: 11)` |
+| `AppLogo` / `ZeloraWordmark` | the Z-bag mark on a royal-blue tile + "Zelora" wordmark (Plus Jakarta Sans 800); `showWordmark: false`; `ZeloraWordmark(size: 20)` alone; see Design system → Logo |
+| `Eyebrow` | `Eyebrow('Picked for you')`, `Eyebrow('Store online', dot: true)`, `leading: AiSparkleIcon(size: 11)` — 11.5 px bold uppercase blue (no numbering) |
 | `StatBlock` | `StatBlock(value: '4.6', caption: 'Avg rating')` · `StatBlock.count(count: 194, caption: 'Products')` (counts up) · `compact: true` |
-| `KeyValueRow` | `KeyValueRow(label: 'Order', value: '#ZL-10482', copyable: true)` — mono value; for order / spec / about tables |
+| `KeyValueRow` | `KeyValueRow(label: 'Order', value: '#ZL-10482', copyable: true)` — tabular value; for order / spec / about tables |
 | `KbdChip` | `KbdChip('Ctrl')`, `KbdChip('K')` — only for shortcuts that work |
 | `StatusLine` | `StatusLine('Out for delivery', color: colors.warning)` — dot pulses three times, then rests |
 | `StatusBadge` | `StatusBadge('Delivered', tone: StatusTone.success, icon: Icons.check_rounded)` — neutral / success / warning / danger / info / accent |
-| `DotGridBackground` | `DotGridBackground(child: hero)` — quiet dot grid behind hero panels (`lines: true` for a line grid) |
-| `CategoryTopBorderCard` | `CategoryTopBorderCard(accent: colors.departmentAccent(slug), onTap: f, child: ...)` — bordered card with a 2 px coloured top edge |
+| `DotGridBackground` | legacy (v1 editorial); avoid in new screens — v2 surfaces are plain white cards on the wash |
+| `CategoryTopBorderCard` | `CategoryTopBorderCard(onTap: f, child: ...)` — white soft-shadow card (v2 draws no top edge unless `topBorderWidth: 2`); prefer `AppCard` in new code |
 | `Pressable` | `Pressable(child: card)` — press-scale for custom tappables |
 | `CountUp` | `CountUp(1264, style: t.displaySmall)` — 1.2 s ease-out, tabular |
 | `SuccessCheck` | `SuccessCheck(size: 64)` — ring + check draw themselves |
@@ -243,7 +272,7 @@ Screens: home, explore, product list, product detail (+ reviews), search, wishli
 
 ## AI features (`features/ai`, `features/assistant`)
 
-All AI surfaces render the assistant identity only through the shared `AiSparkleIcon` (wrapped by `AiMark` / `AiAvatar` in `features/ai/presentation/widgets/ai_ui.dart`), so a new mark in `core/widgets` flows everywhere. Solid theme tokens only, no gradients/glows.
+All AI surfaces render the assistant identity only through the shared mascot (`AiMascot` / `AiSparkleIcon`) (wrapped by `AiMark` / `AiAvatar` in `features/ai/presentation/widgets/ai_ui.dart`), so a new mark in `core/widgets` flows everywhere. Solid theme tokens only, no gradients/glows.
 
 **Data**: `AiRepository` (`aiRepositoryProvider`) covers every `/ai/*` endpoint except chat, plus `addToCart`/`removeFromCart`/`cartQuantity` (return the new `itemCount`) and fire-and-forget `track(productId, source:)` (`ai_click`). `AssistantRepository` covers `/ai/chat`, conversations and feedback. Models live in `ai/data/models/ai_models.dart` and `assistant/data/chat_models.dart`; all parse leniently and tolerate extra fields.
 
@@ -270,6 +299,50 @@ Helpers (`ai/presentation/ai_actions.dart`): `openAiProduct(context, ref, id, so
 **Screens**: `AssistantScreen` (tab; `?c=` conversation, `?prompt=`/`?q=` auto-send; two panes ≥ 1000 px; guests get an in-tab sign-in prompt, so `/assistant` is no longer in `Routes.protected`), `ConversationsScreen`, `CompareScreen`, `SmartSearchScreen`, `FinderScreen`, `AiLabScreen`, `VisualSearchScreen` (Snap & Find, `image_picker`), `BundleBuilderScreen`, `ProductAskScreen`, `ShoppingDnaScreen`.
 
 Chat action types handled: `view_all` (all query keys passed to `/products`, incl. `minPrice/maxPrice/minRating/gender`), `compare`, `add_to_cart` (confirm), `open_product`, `view_order`, `open_cart`; unknown types are hidden.
+
+### Smart shopping features (price watch, outfit, specs, gifts, memory)
+
+| Feature | Where | Notes |
+|---|---|---|
+| **Price watch / smart wishlist** | `features/wishlist` (data: `price_watch_models/repository`, `providers/price_watch_providers.dart`) | `GET/POST/DELETE /alerts/price-watch`. `priceWatchesProvider` (shared list, empty for guests) and `priceWatchForProvider(productId)`. `showWatchPriceSheet(context, ref, product:)` = target chips (any drop / 5% / 10% / custom, always below today's price) + back-in-stock switch, edit and stop (ConfirmDialog). `PriceWatchBadge` on wishlist tiles ("Watching · target Rs X"). |
+| **Price alerts** | `PriceAlertsScreen` at `Routes.priceAlerts` (`/price-alerts`, protected) | Lists watches with the server's status line, edit, "Stop watching" (ConfirmDialog). Entries: Account → Price alerts, wishlist app bar, wishlist note, assistant welcome. |
+| **Price history** | `features/product` (`priceHistoryProvider(id)`, `PriceHistoryCard`, `PriceHistoryChart`) | `GET /products/:id/price-history`. Step-line chart you can scrub. Only real recorded changes are drawn; with none it says "Tracking started today" / "Tracking since …" instead of faking a line. |
+| **Alert notifications** | `features/notifications` | `price_drop` / `restock` tiles show the product photo and `Rs old → Rs new  -11%`; tap opens the product. `AppNotification.oldPrice/newPrice/dropPercent/thumbnail`. |
+| **Complete the look** | `CompleteTheLookSection(product:, departmentSlug:)` (product page) | `GET /ai/complete-look/:id` (`completeLookProvider`). Shown for fashion only (`isFashionProduct`) and only when `kind == "outfit"`; role labels, reasons, add one piece (`quickAddToCart`) or "Add the look" (`addAllToCart`, includes the viewed item). |
+| **Spec explainer** | `showSpecExplainerSheet(context, productId:, productTitle:, preloaded:)`, `SpecExplainerBody`, `SpecExplainerCard` (chat) | `GET /ai/explain/:id` (`specExplainerProvider`). "Who it's for" + each spec with plain meaning and a 1–5 `SpecLevelBar`. The chat renders `meta.explain` when present. Product page: "Explain these specs" in the Specifications header and an "Explain specs" chip. |
+| **Compare v2** | `CompareScreen` + `widgets/compare_extras.dart` | "Only show differences" (client-side on `row.differs`), "What do you need it for?" re-queries with `need` (`compareKey(ids, need:)`) and highlights **Best for you** (`forYou`) in the header, a card and the pros/cons. Pros and cons per product from `prosCons`. The previous table stays on screen (dimmed) while a new need loads. |
+| **Gift Finder** | `GiftFinderScreen` at `Routes.giftFinder` (`/gift-finder`), controller `giftFinderProvider` | Steps who → occasion → budget → interests with smart defaults (budget per recipient, suggested interests first); `POST /ai/gift`; results = note + cards with reasons. "Ask Zel instead" → `Routes.assistantWith(prompt: giftPrompt(...))`. Entries: assistant welcome, Account → Gift finder. |
+| **Snap & Find crop** | `VisualSearchScreen` + `widgets/image_cropper.dart` | After picking a photo the user drags a box ("Select the item") before searching. `cropToPng` cuts the region with `dart:ui` (`PictureRecorder`, max 1024 px side, PNG) so it works on web; "Whole photo" skips the crop; "Adjust selection" returns to it. The 503 `VISUAL_UNAVAILABLE` handling and the describe-it fallback are unchanged. |
+| **Shopping memory** | `ShoppingMemoryScreen` at `Routes.memory` (`/account/memory`, protected), `shoppingMemoryProvider` | `GET/PUT/DELETE /users/me/memory`: consent switch (optimistic, rolls back), what Zel learned (server summary lines, categories, brands, price range, recent searches), "Forget everything" (ConfirmDialog → DELETE, then Shopping DNA and picks are refreshed). |
+| **Voice** | `chat_input_bar.dart`, `assistant/data/speech_out*.dart`, `readAloudProvider` | The mic detects browsers without speech recognition (shows a struck-through mic and says so once, no repeated errors); recognizer callbacks forward to the live composer. **Read replies aloud** is web only (browser `speechSynthesis` via `package:web`, no plugin): the speaker toggle in the assistant app bar only appears where supported; replies are spoken once when they arrive (`speechTextFromMarkdown` strips formatting). |
+
+Tests: `test/shopping_models_test.dart` (parsing, targets, crop math, gift controller), `test/shopping_widgets_test.dart` (sheets, cards, screens at 320–400 px and text scale 2.0), `test/api_contract_test.dart` (parsers against real responses saved in `test/fixtures/api/`).
+
+## Signature experiences (Home room, scroll story, Discover)
+
+**Home** (`features/home/presentation/home_screen.dart`) reads top to bottom: greeting + `AskBar` → **Room** (hero) → **ScrollStory** (pick of the week) → Flash deals (`ParallaxDealsRail` + countdown) → `ForYouRail` → `DiscoverEntryCard` → Trending → "More from Zel" (`QuickActions`). The banner carousel and department tiles are no longer on Home (the room's zones are the departments; Explore still lists them).
+
+**Room** (`features/home/presentation/room/`, data in `features/home/data/room_repository.dart`, providers in `features/home/providers/room_providers.dart`)
+- `RoomSection` — illustrated room painted in code (`RoomPainter`, colours from `RoomPalette.of(context.colors)`, tokens only). Seven zones (`RoomLayout.zones`, design space 1000 × 880): wardrobe (fashion), desk (electronics), window/driveway (`garage`, automotive), vanity (beauty), shelf (home), kitchen (groceries), gym corner (sports). Featured cut-outs stand on each zone's `slot`.
+- Tap a zone or its numbered hotspot → camera glides in (`RoomLayout.viewportFor`), the rest dims (`RoomFocusPainter`), and `RoomTray` slides up (save / add / open, "See all" → `/products?department=`). Hotspots pulse five times then rest; explored zones are persisted (`roomExploredProvider`, "3/7 explored").
+- "Build my setup" → `showSetupSheet` (goal + budget) → `POST /ai/bundle` → `roomSetupProvider.place(...)` maps each piece to a zone by category (`RoomLayout.zoneForProduct`, rug if none) and the pieces fly in on staggered arcs while the budget meter fills; "Add all to cart" uses `addAllToCart`.
+- Wall clock and day/night light follow the local time (`RoomLayout.nightFactor`, refreshed every 30 s).
+- Data: `GET /catalog/room`; on 404 it falls back to `/catalog/departments` + `/products?department=` per zone.
+
+**Scroll story + parallax** (`features/home/presentation/widgets/scroll_story.dart`, `parallax_deals_rail.dart`)
+- `ScrollStory(product:)` — the featured cut-out turns (−16° → +9°), lifts and settles as the card crosses the viewport. `ParallaxImage(child:)` drifts an image against the horizontal rail and the page scroll. `viewportProgress(context, scrollable)` gives 0 → 1 across the viewport.
+
+**Discover** (`/discover`, `Routes.discover`; `features/discover/**`; entry cards on Home and Explore)
+- `DiscoverScreen`: reels row → `TasteStrip` → `SwipeDeck` → Pass / Bag / Like buttons. Drag (tilts with the drag and the grab point), fling or pass 30 % width (22 % height for up) to commit, otherwise it springs back. Stamps LIKE / PASS / BAG fade in with the drag. Keyboard: ← pass, → like, ↑ bag, Backspace or Ctrl Z undo. Haptics: tick when a drag arms, light impact on commit.
+- Like → `POST /discover/swipe` + saved to the wishlist (signed in). Bag → the server adds one to the cart (badge refreshed; falls back to `POST /cart/items` if the endpoint is missing). Pass → negative signal. Undo puts the card back and reverses the wishlist/cart effect.
+- Likes/bags inject up to three "Because you liked X" / "Goes with X" cards from the swipe's `next` (fallback `/ai/similar`). The deck refills below five cards.
+- Taste: `TasteStrip` (stacked category bar + confidence) and `TastePanel` sheet (shares, price appetite, confidence ticks, signals, counts). Server taste (`GET /discover/taste` on open, then each swipe) wins over the local estimate (`DeckLogic.localTaste`) used for guests.
+- Reels: `ReelsRow` circles → `openReels(context, reels, i)` → `ReelsViewer` (segment bars, tap right/left, hold to pause, swipe sideways between departments, drag down or Esc to close, View / Add to cart).
+- Pure logic, unit-tested: `DeckLogic` (`swipe`, `undo`, `inject`, `append`, `decide`, `stamp`, `localTaste`), `ReelsCursor` (`next`, `previous`) in `features/discover/data/deck_model.dart`. Shared one-tap actions: `quickAddToCart`, `quickToggleSave`, `openProduct` (`features/discover/presentation/shop_actions.dart`).
+
+**Motion and performance rules used here**
+- Scroll-linked motion is paint-only: `Flow` delegates repaint from `ScrollPosition` (no widget rebuilds while scrolling). Camera zoom, deck drag and story progress use `Transform` inside `AnimatedBuilder` / `ValueListenableBuilder`, with the expensive content passed as `child` and wrapped in `RepaintBoundary`. The room illustration repaints only when the minute or theme changes.
+- Reduced motion (`context.reduceMotion`): camera and tray jump, no fly-in, no hotspot pulse, no scroll story / parallax transforms, cards leave without the fly animation, reels keep their timer but drop the slow zoom.
 
 ## Running
 

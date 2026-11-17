@@ -14,6 +14,7 @@ import '../../../ai/presentation/widgets/ai_product_widgets.dart';
 import '../../../ai/presentation/widgets/ai_ui.dart';
 import '../../../ai/presentation/widgets/bundle_view.dart';
 import '../../../ai/presentation/widgets/compare_table.dart';
+import '../../../ai/presentation/widgets/spec_explainer.dart';
 import '../../data/chat_models.dart';
 import '../../providers/chat_controller.dart';
 import '../chat_actions.dart';
@@ -150,6 +151,7 @@ class _AssistantMessageState extends ConsumerState<AssistantMessage> {
         );
       }
       if (meta.comparison != null) extras.add(_ComparisonCard(result: meta.comparison!));
+      if (meta.explain != null) extras.add(SpecExplainerCard(data: meta.explain!));
       if (meta.bundle != null) {
         extras.add(AiCard(child: BundleView(bundle: meta.bundle!, compact: true, source: 'assistant', animate: extrasAnimate)));
       }

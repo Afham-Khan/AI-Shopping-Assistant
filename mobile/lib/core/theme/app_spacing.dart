@@ -27,12 +27,15 @@ abstract final class AppSpacing {
   static const gapXxxl = SizedBox(width: xxxl, height: xxxl);
 }
 
-/// Corner radii: 6 tags/kbd chips, 8 inputs/buttons, 12 cards/dialogs, 16 sheets, full pills (chips, badges).
+/// Corner radii (v2, soft and rounded): 8 tags / kbd chips · 14 inputs and
+/// small tiles · 18 cards and dialogs · 24 sheets and the app frame · full
+/// pills for buttons, chips, badges and the search bar.
 abstract final class AppRadii {
-  static const double tag = 6;
-  static const double input = 8;
-  static const double card = 12;
-  static const double sheet = 16;
+  static const double tag = 8;
+  static const double input = 14;
+  static const double card = 18;
+  static const double sheet = 24;
+  static const double frame = 36;
   static const double pill = 999;
 
   static const tagAll = BorderRadius.all(Radius.circular(tag));
@@ -40,6 +43,7 @@ abstract final class AppRadii {
   static const cardAll = BorderRadius.all(Radius.circular(card));
   static const sheetTop = BorderRadius.vertical(top: Radius.circular(sheet));
   static const sheetAll = BorderRadius.all(Radius.circular(sheet));
+  static const frameAll = BorderRadius.all(Radius.circular(frame));
   static const pillAll = BorderRadius.all(Radius.circular(pill));
 }
 
@@ -65,11 +69,22 @@ abstract final class AppCurves {
 }
 
 /// Layout breakpoints (logical pixels, by width).
+///
+/// Zelora is a mobile app everywhere: on screens wider than [frameFrom] the
+/// whole app renders inside a centred phone-width column ([appColumn]) —
+/// see `AppFrame`. Inside that column every screen sees a phone-sized
+/// MediaQuery, so `context.isWide` is false and the bottom bar is always on.
 abstract final class Breakpoints {
-  /// Below this (in portrait) the shell uses a bottom bar, otherwise a rail.
+  /// Width of the app column on tablet / desktop / web.
+  static const double appColumn = 460;
+
+  /// Windows at least this wide get the framed app column.
+  static const double frameFrom = 600;
+
+  /// Legacy: tablet layouts. Only reachable on phones in landscape now.
   static const double compact = 700;
 
-  /// Rail becomes extended (labels beside icons) from here.
+  /// Legacy: desktop layouts (no longer reachable inside the app column).
   static const double expanded = 1100;
 
   /// Max width of page content on large screens.

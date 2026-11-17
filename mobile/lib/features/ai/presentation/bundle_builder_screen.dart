@@ -225,7 +225,7 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
         AppSpacing.gapLg,
         AppButton(
           label: _bundle == null ? 'Build my bundle' : 'Rebuild bundle',
-          icon: Icons.auto_awesome,
+          icon: Icons.inventory_2_outlined,
           expand: true,
           size: AppButtonSize.large,
           loading: _loading,

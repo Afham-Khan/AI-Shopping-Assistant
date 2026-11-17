@@ -1,20 +1,27 @@
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/models/product.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
 import '../providers/onboarding_provider.dart';
 import '../providers/storefront_provider.dart';
 
-/// First-launch intro: three short pages, each demonstrated with a small
-/// working vignette built from real products in the store (not stock art).
+/// First-launch intro: three pages, each showing a real Zelora feature as a
+/// small working vignette built from real products in the store:
+///
+/// 1. **Ask the assistant** — a plain-words request and its pick with reasons.
+/// 2. **Snap & Find** — a photo search framing a product, with matches.
+/// 3. **Discover + Bundle** — a swipe deck and a bundle that fits a budget.
+///
 /// Arrow keys page through it on web/desktop.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -24,11 +31,10 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _Intro {
-  const _Intro(this.eyebrow, this.lead, this.accent, this.body);
+  const _Intro(this.eyebrow, this.title, this.body);
 
   final String eyebrow;
-  final String lead;
-  final String accent;
+  final String title;
   final String body;
 }
 
@@ -38,9 +44,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _page = 0;
 
   static const _pages = [
-    _Intro('Ask', 'Say what you need,', 'in plain words.', 'No filters to learn. Describe the thing, the budget and the deal-breakers. Zel finds what fits.'),
-    _Intro('Picks', 'Picks with', 'the reasons attached.', 'Every recommendation shows why it made the cut, so you can agree or push back.'),
-    _Intro('Compare', 'Two options.', 'One clear answer.', 'Side-by-side specs and a straight verdict from the reviews. You make the call.'),
+    _Intro(
+      'Ask ${AppConfig.assistantName}',
+      'Say what you need,\nin plain words',
+      'Describe the thing, the budget and the deal-breakers. ${AppConfig.assistantName} reads the reviews and brings back picks with the reasons attached.',
+    ),
+    _Intro(
+      'Snap & Find',
+      'Seen it somewhere?\nSnap it, find it',
+      'Take a photo of anything you like. ${AppConfig.assistantName} finds the closest matches in the store, and the better deals.',
+    ),
+    _Intro(
+      'Discover & Bundle',
+      'Swipe to discover,\nbundle under budget',
+      'Swipe through picks to teach ${AppConfig.assistantName} your taste. Set a budget and get a complete set that fits it.',
+    ),
   ];
 
   bool get _isLast => _page == _pages.length - 1;
@@ -72,6 +90,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final products = ref.watch(onboardingProductsProvider).value ?? const <ProductSummary>[];
+    ProductSummary? at(int i) => products.elementAtOrNull(i);
+    final snap = ref.watch(onboardingSnapProvider).value ?? const <ProductSummary>[];
+    ProductSummary? snapAt(int i) => snap.elementAtOrNull(i) ?? at(i + 1);
 
     return Scaffold(
       body: CallbackShortcuts(
@@ -83,64 +104,60 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           focusNode: _focus,
           autofocus: true,
           child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.xs, 0),
-                      child: Row(
-                        children: [
-                          const AppLogo(size: 26),
-                          const Spacer(),
-                          AnimatedOpacity(
-                            opacity: _isLast ? 0 : 1,
-                            duration: context.motion(AppDurations.fast),
-                            child: TextButton(
-                              onPressed: _isLast ? null : _finish,
-                              style: TextButton.styleFrom(foregroundColor: colors.muted),
-                              child: const Text('Skip'),
-                            ),
-                          ),
-                        ],
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, 0),
+                  child: Row(
+                    children: [
+                      const Flexible(
+                        child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AppLogo(size: 30)),
                       ),
-                    ),
-                    Expanded(
-                      child: PageView.builder(
-                        controller: _controller,
-                        itemCount: _pages.length,
-                        onPageChanged: (i) => setState(() => _page = i),
-                        itemBuilder: (_, i) => _IntroPage(
-                          index: i,
-                          intro: _pages[i],
-                          vignette: switch (i) {
-                            0 => _AskVignette(product: products.elementAtOrNull(0)),
-                            1 => _PickVignette(product: products.elementAtOrNull(1)),
-                            _ => _CompareVignette(a: products.elementAtOrNull(2), b: products.elementAtOrNull(3)),
-                          },
+                      const Spacer(),
+                      AnimatedOpacity(
+                        opacity: _isLast ? 0 : 1,
+                        duration: context.motion(AppDurations.fast),
+                        child: TextButton(
+                          onPressed: _isLast ? null : _finish,
+                          style: TextButton.styleFrom(foregroundColor: colors.muted),
+                          child: const Text('Skip'),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xs, AppSpacing.xl, AppSpacing.xl),
-                      child: Column(
-                        children: [
-                          _Progress(count: _pages.length, index: _page),
-                          AppSpacing.gapLg,
-                          AppButton(
-                            label: _isLast ? 'Get started' : 'Continue',
-                            trailingIcon: Icons.arrow_forward_rounded,
-                            onPressed: _next,
-                            expand: true,
-                            size: AppButtonSize.large,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _controller,
+                    itemCount: _pages.length,
+                    onPageChanged: (i) => setState(() => _page = i),
+                    itemBuilder: (_, i) => _IntroPage(
+                      intro: _pages[i],
+                      vignette: switch (i) {
+                        0 => _AskVignette(product: at(0)),
+                        1 => _SnapVignette(target: snapAt(0), matches: [snapAt(1), snapAt(2), snapAt(3)]),
+                        _ => _DiscoverVignette(deck: [at(5), at(6), at(7)], bundle: [at(5), at(8), at(9)]),
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xs, AppSpacing.lg, AppSpacing.lg),
+                  child: Column(
+                    children: [
+                      _Dots(count: _pages.length, index: _page),
+                      AppSpacing.gapLg,
+                      AppButton(
+                        label: _isLast ? 'Get started' : 'Continue',
+                        trailingIcon: Icons.arrow_forward_rounded,
+                        onPressed: _next,
+                        expand: true,
+                        size: AppButtonSize.large,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -150,9 +167,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 }
 
 class _IntroPage extends StatelessWidget {
-  const _IntroPage({required this.index, required this.intro, required this.vignette});
+  const _IntroPage({required this.intro, required this.vignette});
 
-  final int index;
   final _Intro intro;
   final Widget vignette;
 
@@ -163,9 +179,9 @@ class _IntroPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // the vignette gives way first on short screens so the copy never clips
-        final stage = (constraints.maxHeight * 0.50).clamp(150.0, 320.0);
+        final stage = (constraints.maxHeight * 0.56).clamp(170.0, 360.0);
         return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Column(
@@ -173,44 +189,27 @@ class _IntroPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ExcludeSemantics(
-                  child: Container(
+                  child: SizedBox(
                     height: stage,
                     width: double.infinity,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: const BorderRadius.all(Radius.circular(16)),
-                      border: Border.all(color: colors.border),
-                    ),
-                    child: DotGridBackground(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        // scales down on short phones, up (a little) on big screens
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 400),
-                            child: FittedBox(child: SizedBox(width: 300, child: vignette)),
-                          ),
-                        ),
+                    // scales down on short phones; the vignette is drawn at 320 wide
+                    // decorative: it scales as a picture, so its text doesn't
+                    // follow the text-size setting (the copy below does)
+                    child: Center(
+                      child: FittedBox(
+                        child: MediaQuery.withNoTextScaling(child: SizedBox(width: 320, child: vignette)),
                       ),
                     ),
                   ),
                 ),
-                AppSpacing.gapXl,
-                Eyebrow(intro.eyebrow, index: index + 1),
-                AppSpacing.gapSm,
-                Semantics(
-                  header: true,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: '${intro.lead}\n'),
-                        TextSpan(text: intro.accent, style: TextStyle(color: colors.primary)),
-                      ],
-                    ),
-                    style: t.displaySmall,
-                  ),
+                AppSpacing.gapLg,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(color: colors.surface, borderRadius: AppRadii.pillAll, boxShadow: colors.shadowSm),
+                  child: Text(intro.eyebrow, style: t.labelMedium!.copyWith(color: colors.primary, fontWeight: FontWeight.w700)),
                 ),
+                AppSpacing.gapSm,
+                Semantics(header: true, child: Text(intro.title, style: t.displaySmall!.copyWith(fontSize: 27))),
                 AppSpacing.gapSm,
                 Text(intro.body, style: t.bodyLarge!.copyWith(color: colors.muted, fontSize: 15, height: 1.55)),
               ],
@@ -222,12 +221,36 @@ class _IntroPage extends StatelessWidget {
   }
 }
 
-/// Square studio well with a real product photo (or a quiet placeholder).
+/// White card with the soft resting shadow, used to build the vignettes.
+class _Card extends StatelessWidget {
+  const _Card({required this.child, this.padding = const EdgeInsets.all(AppSpacing.sm), this.radius = AppRadii.card});
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: colors.shadowMd,
+      ),
+      child: child,
+    );
+  }
+}
+
+/// Light product tile with a real photo (or a quiet placeholder).
 class _Well extends StatelessWidget {
-  const _Well({required this.product, required this.size});
+  const _Well({required this.product, required this.size, this.radius = AppRadii.input});
 
   final ProductSummary? product;
   final double size;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -236,9 +259,9 @@ class _Well extends StatelessWidget {
       width: size,
       height: size,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: colors.imageWell, borderRadius: AppRadii.inputAll),
+      decoration: BoxDecoration(color: colors.imageWell, borderRadius: BorderRadius.circular(radius)),
       child: product == null
-          ? Icon(Icons.shopping_bag_outlined, size: size * 0.36, color: colors.onImageWell.withValues(alpha: 0.28))
+          ? Icon(Icons.shopping_bag_outlined, size: size * 0.34, color: colors.onImageWell.withValues(alpha: 0.25))
           : Padding(
               padding: EdgeInsets.all(size * 0.1),
               child: AppNetworkImage(product!.thumbnail, fit: BoxFit.contain, backgroundColor: Colors.transparent),
@@ -247,28 +270,7 @@ class _Well extends StatelessWidget {
   }
 }
 
-class _Panel extends StatelessWidget {
-  const _Panel({required this.child, this.accent = false});
-
-  final Widget child;
-  final bool accent;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: AppRadii.cardAll,
-        border: Border.all(color: accent ? colors.primary.withValues(alpha: 0.45) : colors.border),
-      ),
-      child: child,
-    );
-  }
-}
-
-/// 01 — a question in plain words, and Zel's answer with a real product.
+/// 1 — a request in plain words, and the assistant's pick with a match score.
 class _AskVignette extends StatelessWidget {
   const _AskVignette({required this.product});
 
@@ -286,46 +288,47 @@ class _AskVignette extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 230),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 9),
+            constraints: const BoxConstraints(maxWidth: 240),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: colors.surfaceRaised,
+              color: colors.primary,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(3),
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(6),
               ),
             ),
             child: Text(
-              'Something well reviewed for everyday wear, not too pricey',
-              style: t.bodySmall!.copyWith(color: colors.text, fontSize: 12.5, height: 1.4),
+              'Something well reviewed for everyday use, not too pricey',
+              style: t.bodySmall!.copyWith(color: colors.onPrimary, fontSize: 13, height: 1.4, fontWeight: FontWeight.w500),
             ),
           ),
         ),
         AppSpacing.gapSm,
-        _Panel(
-          accent: true,
+        _Card(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
-                  const AiSparkleIcon(size: 12),
-                  const SizedBox(width: 6),
-                  Text('ZEL', style: AppType.eyebrow(context).copyWith(fontSize: 10)),
+                  const AiMascot(size: 28, mood: AiMood.happy, animate: false),
+                  const SizedBox(width: 8),
+                  Text(AppConfig.assistantName, style: t.labelLarge!.copyWith(fontWeight: FontWeight.w800)),
+                  const Spacer(),
+                  const AiBadge(label: '94% match', solid: false),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
-                'Start here. Top rated, and buyers mention it holds up.',
-                style: t.bodySmall!.copyWith(color: colors.text, fontSize: 12.5, height: 1.4),
+                'Start here. Top rated, and buyers say it holds up.',
+                style: t.bodySmall!.copyWith(color: colors.text, fontSize: 13, height: 1.4),
               ),
               AppSpacing.gapSm,
               Row(
                 children: [
-                  _Well(product: p, size: 52),
+                  _Well(product: p, size: 60),
                   AppSpacing.gapSm,
                   Expanded(
                     child: Column(
@@ -336,16 +339,12 @@ class _AskVignette extends StatelessWidget {
                           p?.title ?? 'Everyday sneakers',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: t.labelLarge!.copyWith(fontSize: 13),
+                          style: t.labelLarge!.copyWith(fontSize: 13.5),
                         ),
                         const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            RatingStars(p?.rating ?? 4.8, size: 12),
-                            const SizedBox(width: AppSpacing.xs),
-                            Flexible(child: PriceText(p?.price ?? 12999, size: PriceSize.small, singleLine: true)),
-                          ],
-                        ),
+                        RatingStars(p?.rating ?? 4.8, size: 12),
+                        const SizedBox(height: 4),
+                        PriceText(p?.price ?? 12999, size: PriceSize.small, singleLine: true),
                       ],
                     ),
                   ),
@@ -359,158 +358,246 @@ class _AskVignette extends StatelessWidget {
   }
 }
 
-/// 02 — a pick with its match score and the reasons behind it.
-class _PickVignette extends StatelessWidget {
-  const _PickVignette({required this.product});
+/// 2 — a photo search: a product framed by camera brackets, then matches.
+class _SnapVignette extends StatelessWidget {
+  const _SnapVignette({required this.target, required this.matches});
 
-  final ProductSummary? product;
+  final ProductSummary? target;
+  final List<ProductSummary?> matches;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final t = context.textTheme;
-    final p = product;
-
-    Widget reason(String text) => Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Row(
-        children: [
-          Icon(Icons.check_rounded, size: 14, color: colors.primary),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.bodySmall!.copyWith(color: colors.text, fontSize: 12.5)),
-          ),
-        ],
-      ),
-    );
-
-    return _Panel(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Card(
+          padding: const EdgeInsets.all(10),
+          radius: 24,
+          child: Stack(
             children: [
-              _Well(product: p, size: 108),
-              const Positioned(left: 6, bottom: 6, child: AiBadge(label: '94% match')),
-            ],
-          ),
-          AppSpacing.gapSm,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  p?.title ?? 'Your next favourite',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: t.labelLarge!.copyWith(fontSize: 13, height: 1.3),
+              _Well(product: target, size: 300, radius: 16),
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: CustomPaint(painter: _BracketsPainter(colors.primary)),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text('WHY THIS ONE', style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 9.5)),
-                reason('Inside your budget'),
-                reason('Rated ${Formatters.rating(p?.rating ?? 4.7)} by buyers'),
-                reason('Fits your taste'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// 03 — two real products side by side, the better value marked.
-class _CompareVignette extends StatelessWidget {
-  const _CompareVignette({required this.a, required this.b});
-
-  final ProductSummary? a;
-  final ProductSummary? b;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final t = context.textTheme;
-    final ratingA = a?.rating ?? 4.8;
-    final ratingB = b?.rating ?? 4.5;
-    final priceA = a?.price ?? 18999;
-    final priceB = b?.price ?? 24999;
-    // rating per rupee decides, so the line is true for whatever products load
-    final firstWins = ratingA / priceA >= ratingB / priceB;
-
-    Widget cell(String value, bool best) => Expanded(
-      child: Text(
-        value,
-        textAlign: TextAlign.center,
-        style: AppType.data(context, color: best ? colors.primary : colors.muted, size: 11.5, weight: best ? FontWeight.w700 : FontWeight.w500),
-      ),
-    );
-
-    Widget row(String label, String left, String right, bool leftBest) => Padding(
-      padding: const EdgeInsets.only(top: 7),
-      child: Row(
-        children: [
-          SizedBox(width: 52, child: Text(label.toUpperCase(), style: AppType.eyebrow(context, color: colors.faint).copyWith(fontSize: 9.5))),
-          cell(left, leftBest),
-          cell(right, !leftBest),
-        ],
-      ),
-    );
-
-    Widget column(ProductSummary? p, String fallback) => Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Well(product: p, size: 72),
-          const SizedBox(height: 6),
-          Text(
-            p?.title ?? fallback,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: t.labelMedium!.copyWith(fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-
-    return _Panel(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [const SizedBox(width: 52), column(a, 'Option A'), column(b, 'Option B')],
-          ),
-          const SizedBox(height: 4),
-          row('Rating', Formatters.rating(ratingA), Formatters.rating(ratingB), ratingA >= ratingB),
-          row('Price', Formatters.priceCompact(priceA), Formatters.priceCompact(priceB), priceA <= priceB),
-          AppSpacing.gapSm,
-          Container(height: 1, color: colors.border),
-          AppSpacing.gapXs,
-          Row(
-            children: [
-              const AiSparkleIcon(size: 12),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  'Verdict: the ${firstWins ? 'first' : 'second'} is the better value.',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: t.bodySmall!.copyWith(color: colors.text, fontSize: 12),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 14,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: AppRadii.pillAll,
+                      boxShadow: colors.shadowSm,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.photo_camera_rounded, size: 15, color: colors.primary),
+                        const SizedBox(width: 6),
+                        Text('3 matches found', style: t.labelMedium!.copyWith(color: colors.text, fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        AppSpacing.gapSm,
+        Row(
+          children: [
+            for (var i = 0; i < 3; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              Expanded(
+                child: _Card(
+                  padding: const EdgeInsets.all(6),
+                  radius: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LayoutBuilder(builder: (context, box) => _Well(product: matches[i], size: box.maxWidth, radius: 12)),
+                      const SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Text(
+                          Formatters.priceCompact(matches[i]?.price ?? (9999 + i * 2500)),
+                          maxLines: 1,
+                          style: t.labelMedium!.copyWith(fontWeight: FontWeight.w800, fontFeatures: const [FontFeature.tabularFigures()]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }
 
-/// Segmented progress with a mono page counter ("01 / 03").
-class _Progress extends StatelessWidget {
-  const _Progress({required this.count, required this.index});
+/// Four rounded camera corners.
+class _BracketsPainter extends CustomPainter {
+  const _BracketsPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+    final l = math.min(size.width, size.height) * 0.16;
+    const r = 10.0;
+    void corner(Offset o, double sx, double sy) {
+      final path = Path()
+        ..moveTo(o.dx, o.dy + sy * l)
+        ..lineTo(o.dx, o.dy + sy * r)
+        ..quadraticBezierTo(o.dx, o.dy, o.dx + sx * r, o.dy)
+        ..lineTo(o.dx + sx * l, o.dy);
+      canvas.drawPath(path, paint);
+    }
+
+    corner(Offset.zero, 1, 1);
+    corner(Offset(size.width, 0), -1, 1);
+    corner(Offset(0, size.height), 1, -1);
+    corner(Offset(size.width, size.height), -1, -1);
+  }
+
+  @override
+  bool shouldRepaint(_BracketsPainter old) => old.color != color;
+}
+
+/// 3 — a swipe deck (Discover) over a bundle that fits a budget.
+class _DiscoverVignette extends StatelessWidget {
+  const _DiscoverVignette({required this.deck, required this.bundle});
+
+  final List<ProductSummary?> deck;
+  final List<ProductSummary?> bundle;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final t = context.textTheme;
+    final front = deck.first;
+    final total = bundle.fold<num>(0, (sum, p) => sum + (p?.price ?? 15000));
+    // a round budget just above the bundle, so the bar reads "fits"
+    final budget = ((total * 1.08) / 5000).ceil() * 5000;
+
+    Widget card(ProductSummary? p, double angle, double dx, double opacity) => Transform.translate(
+      offset: Offset(dx, 0),
+      child: Transform.rotate(
+        angle: angle,
+        child: Opacity(
+          opacity: opacity,
+          child: _Card(
+            padding: const EdgeInsets.all(8),
+            radius: 22,
+            child: _Well(product: p, size: 168, radius: 16),
+          ),
+        ),
+      ),
+    );
+
+    Widget action(IconData icon, Color ink, {bool filled = false}) => Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: filled ? colors.primary : colors.surface,
+        shape: BoxShape.circle,
+        boxShadow: colors.shadowMd,
+      ),
+      child: Icon(icon, size: 22, color: filled ? colors.onPrimary : ink),
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: 214,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              card(deck.elementAtOrNull(2), 0.10, 34, 0.55),
+              card(deck.elementAtOrNull(1), -0.08, -30, 0.8),
+              card(front, 0, 0, 1),
+              Positioned(
+                bottom: 0,
+                left: 60,
+                child: action(Icons.close_rounded, colors.muted),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 60,
+                child: action(Icons.favorite_rounded, colors.sale, filled: true),
+              ),
+            ],
+          ),
+        ),
+        AppSpacing.gapMd,
+        _Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  for (var i = 0; i < bundle.length; i++)
+                    Align(
+                      widthFactor: 0.72,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: colors.surface, width: 2),
+                        ),
+                        child: ClipOval(child: _Well(product: bundle[i], size: 34, radius: 17)),
+                      ),
+                    ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Bundle · ${bundle.length} items', style: t.labelLarge!.copyWith(fontWeight: FontWeight.w800)),
+                        Text(
+                          '${Formatters.price(total)} of ${Formatters.price(budget)}',
+                          style: t.bodySmall!.copyWith(color: colors.muted, fontFeatures: const [FontFeature.tabularFigures()]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.check_circle_rounded, color: colors.success, size: 20),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ClipRRect(
+                borderRadius: AppRadii.pillAll,
+                child: LinearProgressIndicator(value: (total / budget).clamp(0, 1).toDouble(), minHeight: 6),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Page dots: the current page is a blue pill.
+class _Dots extends StatelessWidget {
+  const _Dots({required this.count, required this.index});
 
   final int count;
   final int index;
@@ -522,30 +609,20 @@ class _Progress extends StatelessWidget {
       label: 'Page ${index + 1} of $count',
       excludeSemantics: true,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           for (var i = 0; i < count; i++)
             AnimatedContainer(
               duration: context.motion(AppDurations.normal),
               curve: AppCurves.standard,
-              margin: const EdgeInsets.only(right: 6),
-              width: i == index ? 28 : 12,
-              height: 3,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: i == index ? 24 : 8,
+              height: 8,
               decoration: BoxDecoration(
-                color: i == index ? colors.primary : colors.surfaceRaised,
+                color: i == index ? colors.primary : colors.borderStrong,
                 borderRadius: AppRadii.pillAll,
               ),
             ),
-          const Spacer(),
-          if (context.isWide) ...[
-            const KbdChip('←'),
-            const SizedBox(width: 4),
-            const KbdChip('→'),
-            const SizedBox(width: AppSpacing.sm),
-          ],
-          Text(
-            '${(index + 1).toString().padLeft(2, '0')} / ${count.toString().padLeft(2, '0')}',
-            style: AppType.data(context, color: colors.faint, size: 11),
-          ),
         ],
       ),
     );
