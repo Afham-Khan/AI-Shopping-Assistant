@@ -1,5 +1,6 @@
 const Search = require('../models/search.models');
 const { ok, created } = require('../../../../helpers/response');
+const { isMemoryEnabled } = require('../../../../helpers/memory');
 
 const FALLBACK_TRENDING = [
   'iphone', 'gaming laptop', 'wireless earbuds', 'running shoes', 'perfume for women',
@@ -33,8 +34,9 @@ module.exports.trending = async (req, res) => {
 module.exports.history = async (req, res) =>
   ok(res, (await Search.history(req.userId)).map((r) => ({ query: r.query, createdAt: r.created_at })));
 
+// with shopping memory off the search is acknowledged but not stored
 module.exports.addHistory = async (req, res) => {
-  await Search.addHistory(req.userId, normalize(req.body.query), req.body.resultsCount ?? 0);
+  if (await isMemoryEnabled(req.userId)) await Search.addHistory(req.userId, normalize(req.body.query), req.body.resultsCount ?? 0);
   return created(res, null);
 };
 

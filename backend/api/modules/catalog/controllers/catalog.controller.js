@@ -3,6 +3,7 @@ const Products = require('../../products/models/products.models');
 const { ok } = require('../../../../helpers/response');
 const { toCard } = require('../../../../helpers/serializers');
 const { notFound } = require('../../../../helpers/errors');
+const engine = require('../../ai/engine');
 
 const PKT_OFFSET_MS = 5 * 60 * 60 * 1000;
 
@@ -78,3 +79,6 @@ module.exports.home = async (req, res) => {
     dealEndsAt: nextMidnightPkt(),
   });
 };
+
+// illustrated room on Home: zones -> department, categories and 3 featured cards (personalized when signed in)
+module.exports.room = async (req, res) => ok(res, await engine.roomScene({ userId: req.userId || null }));

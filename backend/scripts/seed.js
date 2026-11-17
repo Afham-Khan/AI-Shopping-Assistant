@@ -6,7 +6,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const db = require('../api/db/connection');
 const { DEPARTMENTS, CATEGORIES, kebab, transformProducts } = require('./seed-data/catalog');
-const { DEMO_USER, SHOPPER_PASSWORD, PERSONAS, buildShoppers, SEARCH_QUERIES } = require('./seed-data/people');
+const { DEMO_USER, ADMIN_USER, SHOPPER_PASSWORD, PERSONAS, buildShoppers, SEARCH_QUERIES } = require('./seed-data/people');
 const { composeReview, reviewRating, titleForRating } = require('./seed-data/reviews');
 const { createBasketBuilder, weightedPick } = require('./seed-data/orders');
 const { createRng, hashString } = require('./seed-data/random');
@@ -164,6 +164,12 @@ const seedUsers = async (trx, shoppers) => {
     name: DEMO_USER.name, email: DEMO_USER.email, password_hash: demoHash, phone: DEMO_USER.phone,
     preferences: json(DEMO_USER.preferences), is_onboarded: true, created_at: daysAgo(90),
   }).onConflict('email').merge(['name', 'password_hash', 'phone', 'preferences', 'is_onboarded']);
+
+  const adminHash = await bcrypt.hash(ADMIN_USER.password, BCRYPT_COST);
+  await trx('users').insert({
+    name: ADMIN_USER.name, email: ADMIN_USER.email, password_hash: adminHash, phone: ADMIN_USER.phone,
+    role: 'admin', preferences: json({}), is_onboarded: true, created_at: daysAgo(120),
+  }).onConflict('email').merge(['name', 'password_hash', 'phone', 'role', 'is_onboarded']);
 
   const existing = new Set((await trx('users').whereIn('email', shoppers.map((s) => s.email)).select('email')).map((r) => r.email));
   const missing = shoppers.filter((s) => !existing.has(s.email));
@@ -425,6 +431,31 @@ const seedBehaviour = async (trx, { products, shoppers, userIds }) => {
   return { interactions: interactions.length, searches: searches.length };
 };
 
+// price history starts with one row per product; a re-seed that changes a price is recorded too
+const seedPriceHistory = async (trx) => {
+  const { rows } = await trx.raw(`
+    INSERT INTO price_history (product_id, price, compare_at_price, stock, source, recorded_at)
+    SELECT p.id, p.price, p.compare_at_price, p.stock, 'seed', CASE WHEN last.product_id IS NULL THEN p.created_at ELSE now() END
+    FROM products p
+    LEFT JOIN LATERAL (
+      SELECT h.product_id, h.price FROM price_history h WHERE h.product_id = p.id ORDER BY h.recorded_at DESC, h.id DESC LIMIT 1
+    ) last ON true
+    WHERE last.product_id IS NULL OR last.price <> p.price
+    RETURNING id`);
+  return rows.length;
+};
+
+// one ready-made price watch so the demo account's "Price alerts" screen is not empty
+const seedDemoWatch = async (trx, userIds, products) => {
+  const demoId = userIds[DEMO_USER.email];
+  const target = products.find((p) => p.externalId === 101);
+  if (!demoId || !target?.db) return;
+  const row = await trx('products').where({ id: target.db.id }).first('price');
+  await trx('price_watches').insert({
+    user_id: demoId, product_id: target.db.id, target_price: Math.round(row.price * 0.9), notify_restock: true, initial_price: row.price,
+  }).onConflict(['user_id', 'product_id']).ignore();
+};
+
 const recompute = async (trx) => {
   await trx.raw(`
     UPDATE reviews r SET is_verified = EXISTS (
@@ -457,18 +488,22 @@ const main = async () => {
     await seedReviews(trx, { products, shoppers, userIds, plan });
     const behaviour = await seedBehaviour(trx, { products, shoppers, userIds });
     await recompute(trx);
-    return { featuredCount, ordersInserted: inserted, ...behaviour };
+    const priceHistory = await seedPriceHistory(trx);
+    await seedDemoWatch(trx, userIds, products);
+    return { featuredCount, ordersInserted: inserted, priceHistory, ...behaviour };
   });
 
   const count = async (table) => (await db(table).count('* as n').first()).n;
   const totals = {};
-  for (const t of ['departments', 'categories', 'brands', 'products', 'product_images', 'users', 'addresses', 'reviews', 'orders', 'order_items', 'user_interactions', 'wishlist_items', 'coupons', 'banners', 'notifications', 'search_history']) {
+  for (const t of ['departments', 'categories', 'brands', 'products', 'product_images', 'users', 'addresses', 'reviews', 'orders', 'order_items', 'user_interactions', 'wishlist_items', 'coupons', 'banners', 'notifications', 'search_history', 'price_history', 'price_watches']) {
     totals[t] = await count(t);
   }
   console.log(`Seed complete in ${((Date.now() - started) / 1000).toFixed(1)}s (enrichment: ${Object.keys(enrichment).length ? 'yes' : 'no'})`);
   console.log(`This run: ${stats.ordersInserted} orders, ${stats.interactions} interactions, ${stats.searches} searches inserted; ${stats.featuredCount} featured`);
   console.table(totals);
+  console.log(`Price history rows added this run: ${stats.priceHistory}`);
   console.log(`Demo login: ${DEMO_USER.email} / ${DEMO_USER.password}`);
+  console.log(`Admin login: ${ADMIN_USER.email} / ${ADMIN_USER.password}`);
 };
 
 main()

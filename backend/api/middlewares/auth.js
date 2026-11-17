@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { unauthorized } = require('../../helpers/errors');
+const { unauthorized, forbidden } = require('../../helpers/errors');
 
 const readToken = (req) => {
   const header = req.headers.authorization || '';
@@ -35,3 +35,19 @@ module.exports.optionalAuth = (req, res, next) => {
   }
   next();
 };
+
+// role check reads the db (not the token claim) so a demoted admin loses access immediately
+module.exports.requireRole = (role) => [
+  module.exports.requireAuth,
+  async (req, res, next) => {
+    try {
+      // lazy require keeps this middleware usable without a db connection in unit tests
+      const db = require('../db/connection');
+      const user = await db('users').where({ id: req.userId }).first('role');
+      if (!user) return next(unauthorized('Account no longer exists'));
+      return user.role === role ? next() : next(forbidden('Admins only'));
+    } catch (error) {
+      return next(error);
+    }
+  },
+];

@@ -2,6 +2,7 @@ const models = require('../models/ai.models');
 const engine = require('../engine');
 const { ok } = require('../../../../helpers/response');
 const { notFound, badRequest, AppError } = require('../../../../helpers/errors');
+const { isMemoryEnabled } = require('../../../../helpers/memory');
 
 const toMessage = (m, { withMeta = true } = {}) => ({
   id: m.id,
@@ -77,8 +78,31 @@ module.exports.boughtTogether = async (req, res) => {
 module.exports.compare = async (req, res) => {
   const ids = [...new Set(req.body.productIds)];
   if (ids.length < 2) throw badRequest('Pick at least two different products');
-  const result = await engine.compare(ids);
+  const result = await engine.compare(ids, { need: req.body.need || null });
   if (!result) throw notFound('Products not found');
+  // rows always carry `differs`; differencesOnly drops the rows where every product is the same
+  if (req.body.differencesOnly === true) result.rows = result.rows.filter((r) => r.differs);
+  return ok(res, result);
+};
+
+module.exports.completeLook = async (req, res) => {
+  const result = await engine.completeLook(req.params.productId, req.query.limit || 8);
+  if (!result) throw notFound('Product not found');
+  return ok(res, result);
+};
+
+module.exports.explain = async (req, res) => {
+  const result = await engine.explain(req.params.productId);
+  if (!result) throw notFound('Product not found');
+  return ok(res, result);
+};
+
+module.exports.gift = async (req, res) => {
+  const { recipient, occasion, budget, interests, age, limit } = req.body;
+  const result = await engine.gift({
+    recipient, occasion, interests: interests || [], age, limit: limit || 8,
+    budget: typeof budget === 'number' ? { min: null, max: budget } : budget ? { min: budget.min ?? null, max: budget.max ?? null } : null,
+  });
   return ok(res, result);
 };
 
@@ -90,7 +114,7 @@ module.exports.reviewSummary = async (req, res) => {
 
 module.exports.search = async (req, res) => {
   const result = await engine.smartSearch(req.query.q, { userId: req.userId, limit: req.query.limit || 20 });
-  if (req.userId) await models.recordSearch(req.userId, req.query.q, result.total).catch(() => {});
+  if (req.userId && (await isMemoryEnabled(req.userId))) await models.recordSearch(req.userId, req.query.q, result.total).catch(() => {});
   return ok(res, result);
 };
 

@@ -71,3 +71,37 @@ module.exports.createReview = async (req, res) => {
 };
 
 module.exports.recentlyViewed = async (req, res) => ok(res, (await Products.recentlyViewed(req.userId)).map(toCard));
+
+const rs = (n) => `Rs ${Math.round(n).toLocaleString('en-US')}`;
+
+// GET /products/:id/price-history?days=90 — real recorded changes (admin / demo updates), no simulation
+module.exports.priceHistory = async (req, res) => {
+  const productId = Number(req.params.id);
+  const days = Number(req.query.days) || 90;
+  const product = await Products.findByIdOrSlug(String(productId));
+  if (!product) throw notFound('Product not found');
+  const rows = await Products.priceHistory(productId, days);
+  const points = rows.map((r) => ({ price: r.price, compareAtPrice: r.compare_at_price, stock: r.stock, source: r.source, recordedAt: r.recorded_at }));
+  const prices = [...points.map((p) => p.price), product.price];
+  const lowest = Math.min(...prices);
+  const highest = Math.max(...prices);
+  const average = Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100;
+  const changes = points.filter((p, i) => i > 0 && p.price !== points[i - 1].price).length;
+  const previous = [...points].reverse().find((p) => p.price !== product.price);
+  const trend = !previous ? 'flat' : product.price < previous.price ? 'down' : 'up';
+  let insight;
+  if (!changes) insight = points.length ? `No price changes in the last ${days} days. Watch it to get alerted on a drop.` : 'Tracking starts with the next price change.';
+  else if (product.price <= lowest) insight = `Lowest price in the last ${days} days.`;
+  else if (product.price < average) insight = `${rs(average - product.price)} below its ${days}-day average.`;
+  else insight = `${rs(product.price - lowest)} above its ${days}-day low of ${rs(lowest)}.`;
+  return ok(res, {
+    productId,
+    currency: 'PKR',
+    days,
+    current: { price: product.price, compareAtPrice: product.compare_at_price, inStock: product.stock > 0 },
+    stats: { lowest, highest, average, changes },
+    trend,
+    insight,
+    points,
+  });
+};

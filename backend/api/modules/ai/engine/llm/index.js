@@ -1,6 +1,14 @@
 // optional rag-style reply polish: the llm only rewrites the template reply from structured facts.
 // output is validated (no new prices/numbers, length) and any failure silently keeps the local reply.
 const providers = require('./providers');
+const { createGuard } = require('./guard');
+
+// one guard per process: rate limit + daily cap + response cache + circuit breaker
+let guard = createGuard();
+const resetGuard = (options) => {
+  guard = createGuard(options);
+  return guard;
+};
 
 const SYSTEM = [
   'You are Zelora AI, a friendly shopping assistant for a Pakistani store (prices in PKR).',
@@ -19,7 +27,7 @@ const active = () => {
 const info = () => {
   const name = (process.env.LLM_PROVIDER || 'none').toLowerCase();
   const provider = providers[name];
-  return { provider: provider ? name : 'none', model: provider ? provider.model() : null, enabled: Boolean(provider && provider.enabled()) };
+  return { provider: provider ? name : 'none', model: provider ? provider.model() : null, enabled: Boolean(provider && provider.enabled()), ...guard.info() };
 };
 
 // only product facts and the user's query — never personal data
@@ -45,17 +53,20 @@ const grounded = (rewrite, draft, context) => {
   return true;
 };
 
-const enhance = async (payload) => {
-  const provider = active();
+// provider override is for tests (a fake provider); production uses LLM_PROVIDER
+const enhance = async (payload, { provider = active() } = {}) => {
   if (!provider) return { content: payload.draft, source: 'local' };
   const user = buildPrompt(payload);
   try {
-    const rewrite = (await provider.complete({ system: SYSTEM, user })).replace(/^["']|["']$/g, '').trim();
-    if (grounded(rewrite, payload.draft, user)) return { content: rewrite, source: provider.name };
+    // same prompt + facts -> cached rewrite; rate limit / daily cap / open circuit -> local reply
+    const result = await guard.run([provider.name, provider.model?.(), SYSTEM, user], async () =>
+      (await provider.complete({ system: SYSTEM, user })).replace(/^["']|["']$/g, '').trim());
+    if (result.skipped) return { content: payload.draft, source: 'local', skipped: result.skipped };
+    if (grounded(result.value, payload.draft, user)) return { content: result.value, source: provider.name, cached: result.from === 'cache' };
   } catch {
     // timeout, quota or network: the template reply is always good enough
   }
   return { content: payload.draft, source: 'local' };
 };
 
-module.exports = { enhance, info, active, grounded, buildPrompt };
+module.exports = { enhance, info, active, grounded, buildPrompt, resetGuard };

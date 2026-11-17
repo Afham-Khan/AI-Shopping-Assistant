@@ -116,3 +116,45 @@ of any product they reviewed, so seeded data is left as it was.
 | INT-01 | interactions | guest posts interaction | 200 `null`, nothing stored |
 | INT-02 | interactions | authed posts interaction | 200, row stored |
 | INT-03 | interactions | type `purchase` / bad productId / unknown product | 400 / 400 / 404 |
+
+## Price watch, admin updates and price history (`test/alerts.test.js`)
+
+Changes one seeded product that nobody (seeded) watches or wishlists, then restores its price, compare-at price, discount, stock
+and `updated_at`, and deletes only the `price_history` rows the suite created. Watchers are test users (cascade-deleted).
+
+| ID | Module | Scenario | Expected |
+|---|---|---|---|
+| PW-U1 | alerts (pure) | drop with an any-drop watcher, a target watcher above the new price and two wishlisters | any-drop watcher + wishlister notified (one row per user), target watcher not; fired watch ids returned |
+| PW-U2 | alerts (pure) | new price ≤ target / price rise | target watcher notified ("reached your target"); a rise never notifies |
+| PW-U3 | alerts (pure) | stock 0 → 3 | only watchers with `notify_restock` get a `restock` row |
+| PW-U4 | alerts (pure) | pricing on drop / rise | old price becomes compare-at with recomputed discount; compare-at cleared when the price rises above it |
+| PW-01 | alerts | `/alerts/price-watch` without token | 401 |
+| PW-02 | alerts | empty body / negative target / non-boolean notifyRestock / unknown product | 400 / 400 / 400 / 404 |
+| PW-03 | alerts | target ≥ current price | 400 on `targetPrice` |
+| PW-04 | alerts | create, update, list | 201 then 200, `initialPrice` = price at creation, status summary "above your target" |
+| ADM-01 | admin | PATCH as guest / customer | 401 / 403 |
+| ADM-02 | admin | empty body / negative price / fractional stock / unknown id | 400 / 400 / 400 / 404 |
+| ADM-03 | admin | 5% drop | `changes.price`, compare-at kept, history recorded, only the any-drop watcher gets `price_drop` with `data.productId/newPrice` |
+| ADM-04 | admin | drop below the target | both watchers notified, body mentions the target, `lastNotifiedAt` set, `targetReached: true` |
+| ADM-05 | admin | stock 0 then 7 | 2 `restock` alerts (opted-in watcher + wishlister), opted-out watcher none, no history row for a stock-only change |
+| ADM-06 | admin | demo service path (`npm run demo:price-drop`) | history row with `source: demo`, watchers notified |
+| ADM-07 | admin | seeded admin signs in | role `admin` |
+| PH-01 | products | `GET /products/:id/price-history?days=365` | seed + admin points oldest first, lowest = latest drop, trend `down`, insight "Lowest price" |
+| PH-02 | products | `days=0` / unknown product | 400 / 404 |
+| PW-05 | alerts | delete watch twice | 200 then 404, list empty |
+
+## Discover, room and shopping memory (`test/ai.v3.api.test.js`)
+
+| ID | Module | Scenario | Expected |
+|---|---|---|---|
+| DSC-01 | discover | guest deck `limit=12` | 12 in-stock cards, ≤ 3 per category, not personalized |
+| DSC-02 | discover | swipe without token / bad action / unknown product / `limit=0` | 401 / 400 / 404 / 400 |
+| DSC-03 | discover | like then pass | like: taste top category = liked item's, `next` has 1-3 similar items, priceAppetite from the liked price; pass: `next: []`, `pass` interaction stored with `source: discover` |
+| DSC-04 | discover | bag | product appears in `GET /cart` |
+| DSC-05 | discover | deck after swipes; recommendations | swiped items excluded (`excludedRecent ≥ 3`); passed item never recommended; taste has top signals |
+| DSC-06 | discover | reels | ≥ 5 departments, each 5-8 in-stock products with headline + subtitle; `perDepartment=20` → 400 |
+| ROOM-01 | catalog | `GET /catalog/room` as guest | 7 zones in order, 3 featured each, from the zone's categories |
+| ROOM-02 | catalog | signed in with `mens-shirts` interest + gender men | wardrobe personalized, no women's items |
+| MEM-01 | users | `GET /users/me/memory` after views, wishlist, AI search, chat | top category smartphones, recent search listed, budget band, readable summary, counts |
+| MEM-02 | users | `PUT /users/me/memory` bad body; turn off | 400; recommendations switch to `popularity`; new views and AI searches are not stored; `enabled: false` |
+| MEM-03 | users | `DELETE /users/me/memory` | interactions, searches and chat contexts cleared for this user only; wishlist kept; another user's interactions untouched; 401 without token |

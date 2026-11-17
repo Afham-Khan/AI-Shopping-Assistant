@@ -7,5 +7,6 @@ const { optionalAuth } = require('../../middlewares/auth');
 router.get('/departments', controller.departments);
 router.get('/categories/:slug', validate(schema.category), controller.category);
 router.get('/home', optionalAuth, controller.home);
+router.get('/room', optionalAuth, controller.room);
 
 module.exports = router;

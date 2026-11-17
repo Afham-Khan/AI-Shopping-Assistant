@@ -2,7 +2,7 @@
 const models = require('../../models/ai.models');
 const L = require('../nlu/lexicon');
 const { getCatalog } = require('../retrieval/catalog');
-const { getProfile } = require('./personalization');
+const { getProfile, aversion } = require('./personalization');
 const { mmr } = require('./ranker');
 const { money, stars, plural, list } = require('../format');
 
@@ -47,14 +47,14 @@ const recommendations = async (userId, limit = 10) => {
     return {
       title: 'Trending now',
       subtitle: 'Top rated and best-selling picks across Zelora',
-      products: trending(catalog, limit),
+      products: trending(catalog, limit, profile?.passed || new Set()),
       strategy: 'popularity',
     };
   }
   const { prefs } = profile;
   const budgetMax = prefs.budget?.max || null;
   const gender = prefs.gender && prefs.gender !== 'any' ? prefs.gender : null;
-  const exclude = new Set([...profile.purchased, ...profile.inCart]);
+  const exclude = new Set([...profile.purchased, ...profile.inCart, ...(profile.passed || [])]);
   const scored = catalog.products
     .filter((p) => p.stock > 0 && !exclude.has(p.id))
     .filter((p) => !(gender && p.gender === (gender === 'men' ? 'women' : 'men')))
@@ -65,8 +65,10 @@ const recommendations = async (userId, limit = 10) => {
       const cat = profile.catAff.get(p.category_slug) || 0;
       const brand = p.brand_name ? profile.brandAff.get(p.brand_name.toLowerCase()) || 0 : 0;
       const inBudget = budgetMax ? (p.price <= budgetMax ? 1 : Math.max(0, 1 - (p.price - budgetMax) / budgetMax)) : 1;
-      const score = 0.32 * Math.max(0, sim) + 0.26 * cat + 0.08 * brand + 0.16 * p._quality + 0.1 * p._popularity + 0.04 * p._discount + 0.04 * inBudget;
-      return { p, score, sim, cat, brand, inBudget };
+      // swiped-away taste (discover "pass") pulls the score down
+      const neg = aversion(p, profile, catalog);
+      const score = 0.32 * Math.max(0, sim) + 0.26 * cat + 0.08 * brand + 0.16 * p._quality + 0.1 * p._popularity + 0.04 * p._discount + 0.04 * inBudget - 0.25 * neg;
+      return { p, score, sim, cat, brand, inBudget, neg };
     })
     .sort((a, b) => b.score - a.score);
   const diverse = capPerCategory(mmr(scored, Math.min(scored.length, limit * 2), catalog, 0.7), limit, 3);
