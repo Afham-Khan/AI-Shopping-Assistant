@@ -14,8 +14,9 @@ import '../../../ai/presentation/widgets/budget_advice_notice.dart';
 import '../../../ai/providers/ai_providers.dart';
 import '../../providers/room_providers.dart';
 
-/// "Build my setup": pick a goal and a budget, Zel picks the pieces
-/// (`POST /ai/bundle`). Pops with the [BundleResult].
+/// "Furnish a room with AI" (opened by "Build my setup"): pick a goal and a
+/// budget, Zel picks the best combination that fits (`POST /ai/bundle`).
+/// Pops with the [BundleResult].
 ///
 /// Each goal starts at the server's suggested budget. When the budget can't
 /// cover a goal's essentials the sheet says so, with a one-tap retry at the
@@ -130,7 +131,7 @@ class _SetupSheetState extends ConsumerState<_SetupSheet> {
     final max = _maxFor(budget);
     final short = _short;
     return BottomSheetScaffold(
-      title: 'Build my setup',
+      title: 'Furnish a room with AI',
       footer: AppButton(
         label: 'Furnish the room',
         icon: Icons.chair_outlined,
@@ -143,7 +144,8 @@ class _SetupSheetState extends ConsumerState<_SetupSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Pick a goal and a budget. Zel chooses the pieces and places them in the room.',
+            'Pick a goal and a budget. Zel picks the best combination that fits (budget optimisation) '
+            'and places each piece where it belongs.',
             style: t.bodyMedium!.copyWith(color: colors.muted),
           ),
           const SizedBox(height: AppSpacing.md),

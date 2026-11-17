@@ -16,14 +16,36 @@ import '../../../ai/presentation/widgets/ai_ui.dart';
 /// keyboards), voice input with live transcript, Snap & Find button and a
 /// send button that's disabled while a reply is on its way.
 class ChatInputBar extends StatefulWidget {
-  const ChatInputBar({super.key, required this.onSend, required this.sending, this.onImage, this.controller});
+  const ChatInputBar({
+    super.key,
+    required this.onSend,
+    required this.sending,
+    this.onImage,
+    this.controller,
+    this.onTyping,
+  });
 
   final ValueChanged<String> onSend;
   final bool sending;
   final VoidCallback? onImage;
   final TextEditingController? controller;
 
+  /// Told how far the user has typed (0…1, in eighths of a short message) while
+  /// the field is focused and not empty, and `null` otherwise. The assistant
+  /// header's mascot uses it to watch the composer; it fires only when the
+  /// value changes.
+  final ValueChanged<double?>? onTyping;
+
   static const maxLength = 500;
+
+  /// Typing progress for [onTyping]: characters typed, as a fraction of a
+  /// short message (~40 characters), rounded to eighths; null when empty or
+  /// the field isn't focused.
+  static double? typingProgress(String text, {required bool focused}) {
+    if (!focused || text.trim().isEmpty) return null;
+    final raw = (text.length / 40).clamp(0.0, 1.0);
+    return (raw * 8).round() / 8;
+  }
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -52,17 +74,20 @@ class _ChatInputBarState extends State<ChatInputBar> {
   bool _listening = false;
   double _level = 0;
   String _prefix = '';
+  double? _typing;
 
   @override
   void initState() {
     super.initState();
     _current = this;
     _text.addListener(_onText);
+    _focus.addListener(_reportTyping);
   }
 
   @override
   void dispose() {
     _text.removeListener(_onText);
+    _focus.removeListener(_reportTyping);
     if (_listening) _speech.cancel();
     if (identical(_current, this)) _current = null;
     if (widget.controller == null) _text.dispose();
@@ -70,7 +95,17 @@ class _ChatInputBarState extends State<ChatInputBar> {
     super.dispose();
   }
 
-  void _onText() => setState(() {});
+  void _onText() {
+    setState(() {});
+    _reportTyping();
+  }
+
+  void _reportTyping() {
+    final progress = ChatInputBar.typingProgress(_text.text, focused: _focus.hasFocus);
+    if (progress == _typing) return;
+    _typing = progress;
+    widget.onTyping?.call(progress);
+  }
 
   bool get _canSend => _text.text.trim().isNotEmpty && !widget.sending;
 

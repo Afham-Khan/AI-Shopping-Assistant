@@ -9,12 +9,22 @@ final readAloudProvider = NotifierProvider<ReadAloudController, bool>(ReadAloudC
 
 class ReadAloudController extends Notifier<bool> {
   @override
-  bool build() => SpeechOut.isSupported && (ref.read(sharedPreferencesProvider).getBool(StorageKeys.aiReadAloud) ?? false);
+  bool build() {
+    final on = SpeechOut.isSupported && (ref.read(sharedPreferencesProvider).getBool(StorageKeys.aiReadAloud) ?? false);
+    // load the browser's voice list now so the first reply already has the
+    // preferred voice (browsers fill it in asynchronously)
+    if (on) SpeechOut.warmUp();
+    return on;
+  }
 
   Future<void> toggle() async {
     if (!SpeechOut.isSupported) return;
     state = !state;
-    if (!state) SpeechOut.stop();
+    if (state) {
+      SpeechOut.warmUp();
+    } else {
+      SpeechOut.stop();
+    }
     await ref.read(sharedPreferencesProvider).setBool(StorageKeys.aiReadAloud, state);
   }
 }

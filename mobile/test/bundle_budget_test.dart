@@ -391,7 +391,7 @@ void main() {
 
       expect(ai.calls.single.budget, 375000);
       expect(result, isNull);
-      expect(find.text('Build my setup'), findsOneWidget, reason: 'the sheet stays open');
+      expect(find.text('Furnish a room with AI'), findsOneWidget, reason: 'the sheet stays open');
       expect(find.byKey(const ValueKey('budget-advice-notice')), findsOneWidget);
       expect(find.textContaining('No gaming laptop fits', findRichText: true), findsOneWidget);
       expect(find.text('Use Rs 400,000'), findsOneWidget);
@@ -403,7 +403,7 @@ void main() {
       expect(ai.calls.map((c) => c.budget), [375000, 400000]);
       expect(result, isNotNull);
       expect(result!.items.map((i) => i.role), ['Gaming laptop', 'Headphones']);
-      expect(find.text('Build my setup'), findsNothing);
+      expect(find.text('Furnish a room with AI'), findsNothing);
     });
 
     testWidgets('"Keep these pieces" furnishes the room with what fits', (tester) async {
@@ -431,7 +431,7 @@ void main() {
       await _settle(tester);
 
       expect(find.text('Use Rs 400,000'), findsOneWidget);
-      expect(find.textContaining('that fit'), findsNothing);
+      expect(find.textContaining(RegExp(r'^Keep .*that fit')), findsNothing);
     });
 
     testWidgets('changing the budget or goal clears a stale notice', (tester) async {

@@ -31,3 +31,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    # Plus Jakarta Sans (OFL), bundled so google_fonts never fetches at runtime.
+    # File names must stay PlusJakartaSans-<Weight>.ttf (see google_fonts README).
+    - assets/google_fonts/

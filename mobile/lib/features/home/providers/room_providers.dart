@@ -78,14 +78,24 @@ class PlacedItem {
 /// The furnished setup: what the bundle chose and where each piece landed.
 @immutable
 class RoomSetup {
-  const RoomSetup({required this.title, required this.budget, required this.items});
+  const RoomSetup({required this.title, required this.budget, required this.items, this.bundle});
 
   final String title;
   final double budget;
   final List<PlacedItem> items;
 
+  /// The API answer it came from (explanation, skipped roles, budget advice).
+  final BundleResult? bundle;
+
   double get total => items.fold(0, (sum, i) => sum + i.product.price);
   bool get overBudget => budget > 0 && total > budget;
+
+  /// "Your Gaming setup".
+  String get heading {
+    final t = title.trim();
+    if (t.isEmpty) return 'Your setup';
+    return t.toLowerCase().startsWith('your ') ? t : 'Your $t';
+  }
 
   List<PlacedItem> inZone(String? zoneId) => [for (final i in items) if (i.zoneId == zoneId) i];
 }
@@ -102,11 +112,12 @@ class RoomSetupController extends Notifier<RoomSetup?> {
     final setup = RoomSetup(
       title: bundle.title,
       budget: bundle.budget,
+      bundle: bundle,
       items: [
         for (final item in bundle.items)
           PlacedItem(
             product: item.product,
-            zoneId: RoomLayout.zoneForProduct(item.product, zones),
+            zoneId: RoomLayout.zoneForItem(item.product, item.role, zones),
             role: item.role,
           ),
       ],

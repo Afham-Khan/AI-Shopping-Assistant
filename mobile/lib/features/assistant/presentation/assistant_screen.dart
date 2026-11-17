@@ -37,6 +37,9 @@ class AssistantScreen extends ConsumerStatefulWidget {
 
 class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   final _scroll = ScrollController();
+  // how far the user has typed (null = not typing): Zel's header mascot
+  // watches the composer while it is non-null
+  final _typing = ValueNotifier<double?>(null);
   String? _handledPrompt;
 
   ChatController get _chat => ref.read(chatControllerProvider.notifier);
@@ -59,6 +62,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   void dispose() {
     SpeechOut.stop();
     _scroll.dispose();
+    _typing.dispose();
     super.dispose();
   }
 
@@ -98,7 +102,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     final signedIn = ref.watch(isAuthenticatedProvider);
     if (!signedIn) {
       return Scaffold(
-        appBar: AppBar(title: const _AssistantTitle()),
+        appBar: AppBar(title: _AssistantTitle(typing: _typing)),
         body: const AssistantGuestView(),
       );
     }
@@ -115,16 +119,16 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     // speak each new reply (not history) when "read replies aloud" is on
     ref.listen(chatControllerProvider.select((s) => s.entries.isEmpty ? null : s.entries.last), (prev, next) {
       if (next == null || next.isUser || !next.fresh || prev?.key == next.key) return;
-      if (ref.read(readAloudProvider)) SpeechOut.speak(speechTextFromMarkdown(next.content));
+      if (ref.read(readAloudProvider)) SpeechOut.speak(speakableText(next.content));
     });
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final twoPane = constraints.maxWidth >= AssistantScreen.twoPaneWidth;
-        final chat = _ChatPane(scroll: _scroll, onSend: _send);
+        final chat = _ChatPane(scroll: _scroll, onSend: _send, typing: _typing);
         return Scaffold(
           appBar: AppBar(
-            title: const _AssistantTitle(),
+            title: _AssistantTitle(typing: _typing),
             actions: [
               if (SpeechOut.isSupported)
                 IconButton(
@@ -178,16 +182,36 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   }
 }
 
+/// Zel's header: the live mascot — idle (blinks, glances, smiles), thinking
+/// while a reply is on its way, and watching the composer while the user types.
 class _AssistantTitle extends ConsumerWidget {
-  const _AssistantTitle();
+  const _AssistantTitle({required this.typing});
+
+  final ValueNotifier<double?> typing;
+
+  /// The eyes follow the text as it grows: left of centre for the first
+  /// letters, right of centre for a long message, always down at the input.
+  static Offset gazeFor(double progress) => Offset(-0.5 + 1.4 * progress, 0.9);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final title = ref.watch(chatControllerProvider.select((s) => s.title));
+    final sending = ref.watch(chatControllerProvider.select((s) => s.sending));
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const AiAvatar(size: 28),
+        ValueListenableBuilder<double?>(
+          valueListenable: typing,
+          builder: (context, progress, _) => AiMascot(
+            size: 28,
+            mood: sending
+                ? AiMood.thinking
+                : progress != null
+                ? AiMood.listening
+                : AiMood.idle,
+            gaze: progress == null ? null : gazeFor(progress),
+          ),
+        ),
         const SizedBox(width: AppSpacing.sm),
         Flexible(
           child: Column(
@@ -210,10 +234,11 @@ class _AssistantTitle extends ConsumerWidget {
 }
 
 class _ChatPane extends ConsumerWidget {
-  const _ChatPane({required this.scroll, required this.onSend});
+  const _ChatPane({required this.scroll, required this.onSend, required this.typing});
 
   final ScrollController scroll;
   final ValueChanged<String> onSend;
+  final ValueNotifier<double?> typing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -224,6 +249,7 @@ class _ChatPane extends ConsumerWidget {
         ChatInputBar(
           sending: sending,
           onSend: onSend,
+          onTyping: (progress) => typing.value = progress,
           onImage: () => context.push(Routes.visualSearch),
         ),
       ],

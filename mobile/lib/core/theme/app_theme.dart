@@ -65,9 +65,10 @@ abstract final class AppTheme {
       dividerColor: p.border,
       disabledColor: disabledInk,
       hintColor: p.faint,
-      splashColor: p.primary.withValues(alpha: 0.06),
-      highlightColor: p.primary.withValues(alpha: 0.03),
-      hoverColor: p.text.withValues(alpha: 0.03),
+      splashColor: p.primary.withValues(alpha: 0.07),
+      highlightColor: p.primary.withValues(alpha: 0.04),
+      // list tiles, rows and cards: a light blue tint under the pointer
+      hoverColor: p.primary.withValues(alpha: isDark ? 0.08 : 0.05),
       focusColor: p.primary.withValues(alpha: 0.12),
       splashFactory: InkRipple.splashFactory,
       materialTapTargetSize: MaterialTapTargetSize.padded,
@@ -234,15 +235,18 @@ abstract final class AppTheme {
         ),
       ),
       // the reference's color/storage chips: white pills, selected = blue
-      // outline + light blue tint + blue label
+      // outline + light blue tint + blue label; under the pointer a chip takes
+      // the light blue tint and a soft blue outline
       chipTheme: ChipThemeData(
         color: WidgetStateProperty.resolveWith((s) {
-          if (has(s, WidgetState.selected)) return p.primarySoft;
-          return active(s) ? p.surfaceVariant : p.surface;
+          if (has(s, WidgetState.selected)) {
+            return active(s) ? Color.alphaBlend(p.primary.withValues(alpha: 0.07), p.primarySoft) : p.primarySoft;
+          }
+          return active(s) ? p.primarySoft : p.surface;
         }),
         side: WidgetStateBorderSide.resolveWith((s) {
           if (has(s, WidgetState.selected)) return BorderSide(color: p.primary, width: 1.5);
-          return BorderSide(color: active(s) ? p.borderStrong : p.border);
+          return BorderSide(color: active(s) ? p.primary.withValues(alpha: 0.45) : p.border);
         }),
         labelStyle: text.labelLarge!.copyWith(
           fontWeight: FontWeight.w600,

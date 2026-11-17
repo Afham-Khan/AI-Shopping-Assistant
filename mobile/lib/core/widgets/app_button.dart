@@ -155,7 +155,9 @@ class AppButton extends StatelessWidget {
         child: AnimatedOpacity(
           opacity: loading ? 0.55 : 1,
           duration: context.motion(AppDurations.fast),
-          child: Pressable(enabled: enabled, scale: expand ? 0.98 : 0.96, child: button),
+          // buttons already change colour under the pointer (theme states):
+          // press-scale only, no lift
+          child: Pressable(enabled: enabled, hover: PressableHover.none, scale: expand ? 0.98 : 0.97, child: button),
         ),
       ),
     );

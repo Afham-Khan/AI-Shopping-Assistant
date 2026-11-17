@@ -9,9 +9,9 @@ enum PriceSize { small, medium, large }
 
 /// `Rs 45,999` with optional strikethrough compare-at price and discount.
 ///
-/// Hierarchy: the amount is bold with tabular figures, the "Rs" prefix is
-/// lighter so the number leads; the old price is struck through and faint;
-/// the discount is a small coral tag.
+/// Hierarchy: the amount is bold with tabular figures in confident navy-blue
+/// (`colors.price`), the "Rs" prefix is lighter so the number leads; the old
+/// price is struck through and faint; the discount is a small coral tag.
 ///
 /// ```dart
 /// PriceText(product.price, compareAt: product.compareAtPrice)
@@ -62,7 +62,7 @@ class PriceText extends StatelessWidget {
               // Inter, not the serif: figures stay tabular and crisp
               PriceSize.large => t.titleLarge!.copyWith(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.8, height: 1.15),
             })
-        .copyWith(color: color ?? colors.text, fontFeatures: AppType.tabular);
+        .copyWith(color: color ?? colors.price, fontFeatures: AppType.tabular);
     final secondary = switch (size) {
       PriceSize.small => t.bodySmall!,
       PriceSize.medium => t.bodySmall!.copyWith(fontSize: 13),
@@ -89,7 +89,7 @@ class PriceText extends StatelessWidget {
                     fontSize: main.fontSize! * 0.78,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0,
-                    color: (color ?? colors.text).withValues(alpha: 0.72),
+                    color: (color ?? colors.price).withValues(alpha: 0.72),
                   ),
                 ),
                 TextSpan(text: formatted.substring(split + 1)),

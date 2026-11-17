@@ -31,8 +31,10 @@ enum ProductCardVariant {
 
 /// Product tile: a white rounded card (soft shadow) holding an inset, very
 /// light image tile (white wishlist circle, red discount pill, AI match
-/// badge), then brand, 2-line title, rating and a bold price. Hover deepens
-/// the shadow and nudges the photo. Taps open the product page.
+/// badge), then brand, 2-line title, rating and a bold navy price. The image
+/// well takes a very soft tint of the product's department. Under a mouse the
+/// card lifts 2 px, the shadow deepens and the photo nudges; a press settles
+/// it to 0.98 (all via `Pressable`). Taps open the product page.
 ///
 /// ```dart
 /// ProductCard(product: p)                                   // grid tile
@@ -82,8 +84,6 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool _hovered = false;
-
   void _open() {
     // lets the product page paint instantly while the details load
     ProductPreviewCache.remember(widget.product);
@@ -109,24 +109,24 @@ class _ProductCardState extends State<ProductCard> {
       label: label.toString(),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
         child: compact ? _buildCompact(context) : _buildWide(context),
       ),
     );
   }
 
+  // grid / rail tile: lifts 2 px under a mouse while the shadow deepens and
+  // the photo nudges (all via Pressable), 0.98 when pressed
   Widget _buildCompact(BuildContext context) {
     final colors = context.colors;
     final p = widget.product;
-    return Pressable(
+    return Pressable.builder(
       scale: 0.98,
-      child: AnimatedContainer(
-        duration: context.motion(AppDurations.color),
+      builder: (context, hovered, _) => AnimatedContainer(
+        duration: context.motion(AppDurations.hover),
         curve: AppCurves.standard,
         decoration: BoxDecoration(
           borderRadius: AppRadii.cardAll,
-          boxShadow: _hovered ? colors.shadowMd : colors.shadowSm,
+          boxShadow: hovered ? colors.shadowMd : colors.shadowSm,
         ),
         child: Material(
           color: colors.surface,
@@ -146,7 +146,7 @@ class _ProductCardState extends State<ProductCard> {
                     aspectRatio: 1,
                     child: _ImageTile(
                       product: p,
-                      hovered: _hovered,
+                      hovered: hovered,
                       showWishlist: widget.showWishlist,
                       hero: widget.hero,
                       borderRadius: AppRadii.inputAll,
@@ -165,27 +165,33 @@ class _ProductCardState extends State<ProductCard> {
     );
   }
 
+  // list row: no lift (rows shouldn't jump); the photo nudges and the row
+  // gets the blue hover tint from the InkWell
   Widget _buildWide(BuildContext context) {
     final p = widget.product;
     final width = context.isWide ? 128.0 : 104.0;
-    return InkWell(
-      onTap: _open,
-      borderRadius: AppRadii.cardAll,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: width,
-              height: width,
-              child: _ImageTile(product: p, hovered: _hovered, showWishlist: false, compactBadges: true, borderRadius: AppRadii.inputAll),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(child: _Info(product: p, wide: true)),
-            if (widget.showWishlist) _WishlistButton(productId: p.id, floating: false),
-            ?widget.trailing,
-          ],
+    return Pressable.builder(
+      scale: 0.99,
+      hover: PressableHover.none,
+      builder: (context, hovered, _) => InkWell(
+        onTap: _open,
+        borderRadius: AppRadii.cardAll,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: width,
+                height: width,
+                child: _ImageTile(product: p, hovered: hovered, showWishlist: false, compactBadges: true, borderRadius: AppRadii.inputAll),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(child: _Info(product: p, wide: true)),
+              if (widget.showWishlist) _WishlistButton(productId: p.id, floating: false),
+              ?widget.trailing,
+            ],
+          ),
         ),
       ),
     );
@@ -220,7 +226,9 @@ class _ImageTile extends StatelessWidget {
     return ClipRRect(
       borderRadius: borderRadius,
       child: ColoredBox(
-        color: colors.imageWell,
+        // a very soft department tint (electronics blue, fashion pink, …)
+        // instead of grey; unknown categories stay on the neutral well
+        color: colors.departmentWell(p.category?.slug),
         child: Stack(
           fit: StackFit.expand,
           children: [

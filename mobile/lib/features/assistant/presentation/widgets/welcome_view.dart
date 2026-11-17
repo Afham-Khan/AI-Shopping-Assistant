@@ -7,6 +7,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../ai/presentation/widgets/ai_ui.dart';
 import '../../../auth/providers/auth_controller.dart';
 
@@ -58,7 +59,8 @@ class WelcomeView extends ConsumerWidget {
             constraints: const BoxConstraints(maxWidth: 760),
             child: Column(
               children: [
-                const AiAvatar(size: 56),
+                // the live mascot: blinks, glances, smiles now and then
+                const AiMascot(size: 52),
                 AppSpacing.gapSm,
                 Semantics(
                   header: true,

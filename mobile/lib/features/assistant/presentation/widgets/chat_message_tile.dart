@@ -120,18 +120,29 @@ class AssistantMessage extends ConsumerStatefulWidget {
 }
 
 class _AssistantMessageState extends ConsumerState<AssistantMessage> {
-  late final bool _animate = ref.read(chatControllerProvider.notifier).shouldReveal(widget.entry);
-  late bool _revealed = !_animate;
+  // read once in initState so dispose() never touches ref (unsafe once the widget is deactivated)
+  late final ChatController _chat;
+  late final bool _animate;
+  late bool _revealed;
+
+  @override
+  void initState() {
+    super.initState();
+    _chat = ref.read(chatControllerProvider.notifier);
+    _animate = _chat.shouldReveal(widget.entry);
+    _revealed = !_animate;
+  }
 
   void _onRevealed() {
-    ref.read(chatControllerProvider.notifier).markRevealed(widget.entry.key);
-    if (mounted && !_revealed) setState(() => _revealed = true);
+    if (!mounted) return;
+    _chat.markRevealed(widget.entry.key);
+    if (!_revealed) setState(() => _revealed = true);
   }
 
   @override
   void dispose() {
     // scrolled away mid-reveal: don't replay it later
-    if (_animate) ref.read(chatControllerProvider.notifier).markRevealed(widget.entry.key);
+    if (_animate) _chat.markRevealed(widget.entry.key);
     super.dispose();
   }
 
