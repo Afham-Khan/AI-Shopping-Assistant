@@ -45,3 +45,7 @@ module.exports.changePassword = {
   currentPassword: { in: ['body'], isString: { errorMessage: 'Current password is required' }, notEmpty: { errorMessage: 'Current password is required' } },
   newPassword: password('newPassword'),
 };
+
+module.exports.memory = {
+  enabled: { in: ['body'], isBoolean: { options: { strict: true }, errorMessage: 'enabled must be true or false' } },
+};

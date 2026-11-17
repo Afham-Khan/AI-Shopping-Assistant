@@ -1,5 +1,6 @@
 // text normalization: casing, unicode, contractions, number formats, roman-urdu, spelling correction
 const { ROMAN_URDU, IDIOMS, STOPWORDS } = require('./lexicon');
+const { cleanSpeech } = require('./speech');
 
 const MAX_LEN = 500;
 
@@ -32,6 +33,8 @@ const baseClean = (raw) => {
     // 20k-40k is a range, other hyphens just join words
     .replace(/(\d(?:k|l|lac|lakh)?)\s*-\s*(?=\$?\d)/g, '$1 to ')
     .replace(/(\w)-(\w)/g, '$1 $2');
+  // voice transcripts: spoken numbers, fillers ("umm", "acha", "yaar"), stutters
+  s = cleanSpeech(s);
   s = cleanNumbers(s);
   for (const [pattern, replacement] of IDIOMS) s = s.replace(pattern, replacement);
   return s;

@@ -1,6 +1,7 @@
 // explainable hybrid ranking: weighted signals -> score in [0,1] + human-readable reasons, mmr diversity
 const L = require('../nlu/lexicon');
 const { money, stars, truncate, plural } = require('../format');
+const { aversion } = require('./personalization');
 
 const WEIGHTS = {
   semantic: 0.28, lexical: 0.18, quality: 0.16, popularity: 0.08, discount: 0.04,
@@ -50,7 +51,8 @@ const personalParts = (p, profile, catalog) => {
   }
   const cat = profile.catAff.get(p.category_slug) || 0;
   const brand = p.brand_name ? profile.brandAff.get(p.brand_name.toLowerCase()) || 0 : 0;
-  return { sim: Math.max(0, sim), cat, brand, value: 0.5 * Math.max(0, sim) + 0.35 * cat + 0.15 * brand };
+  const neg = aversion(p, profile, catalog);
+  return { sim: Math.max(0, sim), cat, brand, neg, value: Math.max(0, 0.5 * Math.max(0, sim) + 0.35 * cat + 0.15 * brand - 0.3 * neg) };
 };
 
 const budgetFit = (price, budget) => {

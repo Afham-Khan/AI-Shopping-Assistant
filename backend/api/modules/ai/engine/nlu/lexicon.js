@@ -49,6 +49,7 @@ const ROMAN_URDU = {
   wapis: 'return', wapas: 'return', wapsi: 'return', wapisi: 'return',
   paisay: 'rupees', paise: 'rupees', rupay: 'rupees', rupaye: 'rupees', rupee: 'rupees', rs: 'rupees', pkr: 'rupees',
   aayega: 'arrive', ayega: 'arrive', pohanchega: 'arrive', pohnchega: 'arrive', aaega: 'arrive',
+  samjhao: 'explain', samjhaen: 'explain', samjhayen: 'explain', samjhaiye: 'explain', samjha: 'explain', pasand: 'likes',
   sirf: 'only', bana: 'is', bani: 'is', pls: 'please', plz: 'please', plzz: 'please', u: 'you', ur: 'your', r: 'are', wat: 'what', wht: 'what', gud: 'good',
 };
 

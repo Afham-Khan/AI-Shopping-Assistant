@@ -14,6 +14,9 @@ const qa = require('../qa');
 const nlg = require('./nlg');
 const S = require('./state');
 const { recommendedList, serializeBundle } = require('../serialize');
+const { explainProduct } = require('../explain');
+const { buildGift } = require('../gift');
+const { completeLook, FASHION } = require('../outfit');
 const { money, stars, list, titleCase, truncate, plural, shortMoney } = require('../format');
 
 const CHAT_LIMIT = 5;
@@ -22,6 +25,8 @@ const NO_LIMIT = /\b(?:no limit|any budget|doesn'?t matter|does not matter|koi b
 const SEARCH_FAMILY = new Set(['product_search', 'recommendation', 'budget_query', 'refine_cheaper', 'refine_premium', 'refine_filter', 'show_more', 'gift_suggestion', 'deals']);
 const LLM_INTENTS = new Set(['bundle', 'product_question', 'product_search', 'recommendation', 'budget_query', 'refine_cheaper', 'refine_premium', 'refine_filter', 'show_more', 'gift_suggestion', 'deals', 'compare', 'product_info', 'greeting', 'help', 'small_talk']);
 const ORDINAL_NAMES = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
+const EXPLAIN_RE = /\b(?:explain|simplify|in simple (?:words|terms|language)|plain (?:english|language|words)|(?:specs?|specifications?) mean|what do (?:the|these|its|their) specs|break down the specs|layman)\b/;
+const GIFT_LIKES_RE = /\b(?:loves?|likes?|into|enjoys?|interested in|fan of|pasand)\b/;
 
 const hasProductSignal = (e) => Boolean(e.categories.length || e.department || e.brands.length || e.keywords.length || e.features.length);
 
@@ -71,9 +76,13 @@ const decideIntent = (a, e, ctx, refs, text) => {
   if (pending === 'shopping_what' && (product || e.recipient)) return e.recipient && !product ? 'gift_suggestion' : 'product_search';
   if (pending === 'which_product' && refs.ids.length) return 'add_to_cart';
   if (pending === 'bundle_budget' && e.budget) return 'bundle';
+  if (pending === 'gift_interest') return 'gift_suggestion';
   // a single product type without bundle words is a search ("laptop for gaming under 5 lakh")
   if (intent === 'bundle' && e.categories.length === 1 && !/\b(?:setup|kit|bundle|set|routine|outfit|pack|combo|everything|starter|makeover|hamper|look|box)\b/.test(text)) return 'product_search';
   const hasShown = ctx.lastProducts.length > 0 || ctx.focus;
+  // "explain the specs of the first one" / "in simple words" -> plain-language spec explainer
+  if (EXPLAIN_RE.test(text) && (hasShown || refs.ids.length || product)) return 'explain_specs';
+  if (ctx.lastIntent === 'gift_suggestion' && GIFT_LIKES_RE.test(text) && !refs.ids.length) return 'gift_suggestion';
   // specific questions about a shown product go to grounded q&a ("does the second one have a good camera?")
   const aboutShown = refs.ids.length || (ctx.focus && e.ordinals.pronoun);
   if (hasShown && aboutShown && qa.looksLikeQuestion(text) && !/\b(?:tell me more|more about|details)\b/.test(text)
@@ -198,14 +207,33 @@ const handlePersonal = async (t) => {
 const nl = (s) => nlg.lower(s || '');
 
 const GIFT_BUDGETS = ['Under Rs 5,000', 'Under Rs 15,000', 'Under Rs 50,000', 'No limit'];
+const GIFT_INTERESTS = {
+  women: ['Beauty & makeup', 'Jewellery & bags', 'Fragrance', 'Fashion', 'Tech', 'Surprise me'],
+  men: ['Watches', 'Fragrance', 'Tech & gaming', 'Fitness', 'Fashion', 'Surprise me'],
+  any: ['Tech', 'Fragrance', 'Home & decor', 'Fitness', 'Cooking', 'Surprise me'],
+};
+const GIFT_LIKE_CHIPS = {
+  women: ['She loves makeup', 'She likes jewellery'],
+  men: ['He likes gaming', 'He is into fitness'],
+  any: ['They love cooking', 'They like tech'],
+};
+const SURPRISE_RE = /\b(?:surprise|anything|no idea|not sure|koi bhi|whatever|any)\b/;
 
+// slot filling: recipient -> budget -> (interest, only when nothing has been asked yet) -> curated collection
 const handleGift = async (t) => {
-  const { e, ctx, catalog, profile, text } = t;
+  const { e, ctx, text, raw } = t;
   const continuing = ctx.lastIntent === 'gift_suggestion' || ctx.pending?.type?.startsWith('gift');
-  let slots = S.mergeSlots(continuing ? ctx.slots : S.EMPTY_SLOTS(), e, 'merge');
+  const flow = continuing && ctx.gift ? { ...ctx.gift, interests: [...(ctx.gift.interests || [])] } : { asked: 0, interests: [], answeredInterest: false };
+  const slots = S.mergeSlots(continuing ? ctx.slots : S.EMPTY_SLOTS(), e, 'merge');
   if (e.recipient && !e.gender && continuing && slots.recipient !== ctx.slots.recipient) slots.gender = L.RECIPIENTS[e.recipient] || null;
+  if (ctx.pending?.type === 'gift_interest') {
+    flow.answeredInterest = true;
+    if (!SURPRISE_RE.test(text)) flow.interests.push(raw.slice(0, 60));
+  } else if (continuing && GIFT_LIKES_RE.test(text)) flow.interests.push(raw.slice(0, 60));
   ctx.slots = slots;
+  ctx.gift = flow;
   if (!slots.recipient && !slots.gender && !slots.categories.length) {
+    flow.asked += 1;
     return {
       content: `I'd love to help you find a gift${slots.occasion ? ` for the ${slots.occasion}` : ''}! Who is it for?`,
       clarify: { question: 'Who is the gift for?', options: ['Mom', 'Dad', 'Wife', 'Husband', 'Sister', 'Friend'] },
@@ -214,7 +242,8 @@ const handleGift = async (t) => {
     };
   }
   const noLimit = NO_LIMIT.test(text);
-  if (!slots.budget && !noLimit && ctx.pending?.type !== 'gift_budget') {
+  if (!slots.budget && !noLimit && ctx.pending?.type !== 'gift_budget' && !flow.noLimit) {
+    flow.asked += 1;
     return {
       content: `Lovely${slots.recipient ? ` — a gift for your ${slots.recipient}` : ''}. What budget do you have in mind?`,
       clarify: { question: "What's your budget?", options: GIFT_BUDGETS },
@@ -222,26 +251,42 @@ const handleGift = async (t) => {
       suggestions: [],
     };
   }
-  const key = slots.recipient === 'kid' ? 'kid' : slots.gender || 'any';
-  const giftSlots = { ...slots, categories: slots.categories.length ? slots.categories : L.GIFT_CATEGORIES[key], category: null };
-  const result = await retrieve(giftSlots, { profile, limit: CHAT_LIMIT, perCategoryCap: 2 });
+  if (noLimit) flow.noLimit = true;
+  const genderKey = slots.gender === 'women' || slots.gender === 'men' ? slots.gender : 'any';
+  const hasInterest = flow.interests.length || slots.categories.length || flow.answeredInterest;
+  // everything came in one message ("birthday gift for my sister under 5000"): one quick question about interests
+  if (!hasInterest && flow.asked === 0) {
+    flow.asked += 1;
+    const who = slots.recipient ? `your ${slots.recipient}` : slots.gender === 'women' ? 'her' : slots.gender === 'men' ? 'him' : 'them';
+    return {
+      content: `Great${slots.budget ? `, ${nlg.budgetPhrase(slots.budget)}` : ''}. What is ${who} into? Pick one or tell me in your own words, and I'll curate the gifts around it.`,
+      clarify: { question: `What does ${slots.gender === 'women' ? 'she' : slots.gender === 'men' ? 'he' : 'they'} like?`, options: GIFT_INTERESTS[genderKey] },
+      pending: { type: 'gift_interest' },
+      suggestions: [],
+    };
+  }
+  const recipient = slots.recipient || (slots.gender === 'women' ? 'her' : slots.gender === 'men' ? 'him' : 'friend');
+  const g = await buildGift({
+    recipient, gender: slots.gender, occasion: slots.occasion, budget: flow.noLimit ? null : slots.budget,
+    interests: flow.interests, categories: slots.categories, text: raw, limit: CHAT_LIMIT,
+  });
+  const giftSlots = { ...slots, categories: g.criteria.categories.length ? g.criteria.categories : slots.categories, category: null };
   ctx.slots = giftSlots;
-  ctx.lastProducts = result.items.map((i) => i.product.id);
+  ctx.lastProducts = g.items.map((i) => i.product.id);
   ctx.pending = null;
-  const forWho = slots.recipient ? `your ${slots.recipient}` : slots.gender === 'women' ? 'her' : slots.gender === 'men' ? 'him' : 'them';
-  const cats = [...new Set(result.items.map((i) => i.product.category_name))].slice(0, 3);
-  const top = result.items[0];
+  const top = g.items[0];
   const content = [
-    result.relaxed.map((r) => r.message).join(' '),
-    `Here are gift ideas for ${forWho}${slots.occasion ? ` for the ${slots.occasion}` : ''}${slots.budget ? ` ${nlg.budgetPhrase(slots.budget)}` : ''} — a mix of ${list(cats.map((c) => c.toLowerCase()))}.`,
+    `**${g.title}**: ${g.note}`,
     top ? `My favourite: **${top.product.title}** at **${money(top.product.price)}**${top.reasons[0] ? ` (${nl(top.reasons[0])})` : ''}.` : '',
   ].filter(Boolean).join(' ');
+  const likeChips = flow.interests.length || slots.categories.length ? [] : GIFT_LIKE_CHIPS[genderKey];
   return {
     content,
-    products: result.items,
-    suggestions: ['Show cheaper options', 'Something more premium', 'Compare the first two', 'Show more'],
-    actions: result.items.length >= 2 ? [{ type: 'compare', label: 'Compare top picks', productIds: ctx.lastProducts.slice(0, 2) }] : [],
-    title: `Gift for ${slots.recipient || (slots.gender === 'women' ? 'her' : slots.gender === 'men' ? 'him' : 'someone')}`,
+    products: g.items,
+    suggestions: [...likeChips, 'Show cheaper options', 'Compare the first two', 'Something more premium'].slice(0, 4),
+    actions: g.items.length >= 2 ? [{ type: 'compare', label: 'Compare top picks', productIds: ctx.lastProducts.slice(0, 2) }] : [],
+    title: truncate(g.title, 60),
+    gift: { title: g.title, note: g.note, criteria: g.criteria },
   };
 };
 
@@ -279,7 +324,10 @@ const handleCompare = async (t) => {
   if (!ids.length) ids = [...new Set([...ctx.lastProducts, ...(ctx.prevProducts || [])])].slice(0, 2);
   ids = ids.slice(0, 4);
   if (ids.length < 2) return { content: 'I need at least two products to compare. Search for something first, then say *compare the first two*.', suggestions: ['Phones under 100k', 'Laptops', 'Perfumes'] };
-  const comparison = await compareProducts(ids);
+  // "compare the first two for gaming" / "which is better for my mom"
+  const { e } = t;
+  const need = e.features.length || e.recipient || e.occasion ? t.raw : null;
+  const comparison = await compareProducts(ids, { need });
   if (!comparison) return { content: "I couldn't load those products to compare.", suggestions: ['Show more'] };
   const names = comparison.products.map((p) => `**${p.title}**`);
   const best = comparison.verdict.picks.find((p) => p.label === 'Best value');
@@ -287,7 +335,9 @@ const handleCompare = async (t) => {
   const bolded = comparison.products
     .reduce((txt, p) => txt.split(p.title).join(`**${p.title}**`), comparison.verdict.summary)
     .replace(/Rs [\d,]+/g, (m) => `**${m}**`);
-  const content = `Comparing ${list(names)}. ${bolded}`;
+  const winnerTitle = comparison.forYou?.matched ? comparison.products.find((p) => p.id === comparison.forYou.productId)?.title : null;
+  const forYou = winnerTitle ? ` ${comparison.forYou.reason.split(winnerTitle).join(`**${winnerTitle}**`)}` : '';
+  const content = `Comparing ${list(names)}. ${bolded}${forYou}`;
   const suggestions = [
     bestIdx >= 0 ? `Add the ${ORDINAL_NAMES[ctx.lastProducts.indexOf(best.productId)] || 'first'} one to my cart` : 'Add the first one to my cart',
     `Tell me more about the ${ORDINAL_NAMES[ctx.lastProducts.indexOf(ids[0])] || 'first'} one`,
@@ -319,6 +369,36 @@ const handleProductInfo = async (t) => {
       'Add it to my cart',
       'Show similar items',
       ctx.lastProducts.length > 1 ? `Compare it with the ${pos === 0 ? 'second' : 'first'} one` : 'Show cheaper options',
+    ],
+    actions: p.stock > 0 ? [{ type: 'add_to_cart', label: `Add ${truncate(p.title, 30)} to cart`, productId: p.id, quantity: 1 }] : [],
+  };
+};
+
+const handleExplain = async (t) => {
+  const { ctx, refs, catalog, e, profile } = t;
+  let id = refs.ids[0] || null;
+  // a named product without a shown list ("explain the specs of iphone 13 pro")
+  if (!id && hasProductSignal(e) && !e.ordinals.pronoun) {
+    const r = await retrieve(S.mergeSlots(S.EMPTY_SLOTS(), e, 'new'), { profile, limit: 1 });
+    id = r.items[0]?.product.id || null;
+  }
+  id = id || ctx.focus || ctx.lastProducts[0];
+  const p = catalog.byId.get(id);
+  if (!p) return { content: 'Which product should I explain? Search for something first, then say *explain the specs of the first one*.', suggestions: ['Phones under 50k', 'Laptops'] };
+  ctx.focus = p.id;
+  const x = explainProduct(p);
+  const lines = x.specs.filter((s) => s.level).slice(0, 4).map((s) => `- **${s.title}** (${s.levelLabel.toLowerCase()}): ${s.meaning.split(/(?<=\.)\s/)[0]}`);
+  const fallback = x.specs.slice(0, 3).map((s) => `- **${s.title}**: ${s.meaning}`);
+  const body = (lines.length ? lines : fallback).join('\n');
+  const pos = ctx.lastProducts.indexOf(p.id);
+  return {
+    content: `Here's **${p.title}** in plain words. ${x.summary}${body ? `\n\n${body}` : ''}`,
+    products: [simpleItem(p, catalog)],
+    explain: x,
+    suggestions: [
+      ctx.lastProducts.length > 1 ? `Compare it with the ${pos === 0 ? 'second' : 'first'} one` : 'Show similar items',
+      'Add it to my cart',
+      'Show cheaper options',
     ],
     actions: p.stock > 0 ? [{ type: 'add_to_cart', label: `Add ${truncate(p.title, 30)} to cart`, productId: p.id, quantity: 1 }] : [],
   };
@@ -410,11 +490,15 @@ const handleRelated = (kind) => async (t) => {
   }
   const base = catalog.byId.get(baseId);
   if (!base) return { content: 'Which product should I base that on? Search for something first.', suggestions: ['Phones', 'Laptops'] };
-  const items = (kind === 'similar' ? await similar(base.id, CHAT_LIMIT) : await boughtTogether(base.id, CHAT_LIMIT)) || [];
+  // fashion items get a styled outfit (colour harmony, gender, price band) instead of co-purchases
+  const look = kind === 'bought_together' && FASHION.has(base.category_slug) ? await completeLook(base.id, { limit: CHAT_LIMIT }) : null;
+  const items = look ? look.items : (kind === 'similar' ? await similar(base.id, CHAT_LIMIT) : await boughtTogether(base.id, CHAT_LIMIT)) || [];
   ctx.lastProducts = items.map((i) => i.product.id);
   ctx.focus = base.id;
   const top = items[0];
-  const lead = kind === 'similar' ? `Here are items similar to **${base.title}**` : `Shoppers who buy **${base.title}** often add these`;
+  const lead = kind === 'similar' ? `Here are items similar to **${base.title}**`
+    : look ? `To complete the look with **${base.title}**: ${list(look.look.slice(0, 4).map((l) => l.role.toLowerCase()))}${look.palette?.tip ? `. ${look.palette.tip.replace(/\.$/, '')}` : ''}`
+      : `Shoppers who buy **${base.title}** often add these`;
   return {
     content: `${lead}.${top ? ` Top match: **${top.product.title}** at **${money(top.product.price)}** (${nl(top.reasons[0])}).` : ''}`,
     products: items,
@@ -457,7 +541,7 @@ const handleProductQuestion = async (t) => {
   const p = catalog.byId.get(id);
   if (!p) return handleProductInfo(t);
   ctx.focus = p.id;
-  const question = raw.replace(/\b(?:thes+)?(?:first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th)s+(?:one|item|product)?\b/gi, 'it').replace(/s+/g, ' ');
+  const question = raw.replace(/\b(?:the\s+)?(?:first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th)\s+(?:one|item|product)?\b/gi, 'it').replace(/\s+/g, ' ');
   const r = await qa.ask(p.id, question);
   return {
     content: r.answer,
@@ -502,6 +586,7 @@ const HANDLERS = {
   bought_together: handleRelated('bought_together'),
   bundle: handleBundle,
   product_question: handleProductQuestion,
+  explain_specs: handleExplain,
 };
 
 const titleFromSlots = (slots, catalog) => {
@@ -556,6 +641,8 @@ const respond = async ({ text, context, userId = null }) => {
       comparison: out.comparison || null,
       bundle: out.bundle ? serializeBundle(out.bundle) : null,
       qa: out.qa ? { confidence: out.qa.confidence, evidence: out.qa.evidence, followUps: out.qa.followUps } : null,
+      explain: out.explain || null,
+      gift: out.gift || null,
       clarify: out.clarify || null,
       fallback: Boolean(out.fallback),
       nlu: { source: a.source, alternatives: a.alternatives, corrections: a.corrections, normalized: a.normalized },

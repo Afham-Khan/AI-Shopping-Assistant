@@ -180,7 +180,19 @@ const userInterests = async (userId) => {
   return user?.preferences?.interests || [];
 };
 
+// points inside the window plus the last change before it (the price the window started at)
+const priceHistory = async (productId, days) => {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const cols = ['price', 'compare_at_price', 'stock', 'source', 'recorded_at'];
+  const [inside, before] = await Promise.all([
+    db('price_history').where({ product_id: productId }).where('recorded_at', '>=', since).orderBy([{ column: 'recorded_at' }, { column: 'id' }]).limit(500).select(cols),
+    db('price_history').where({ product_id: productId }).where('recorded_at', '<', since).orderBy([{ column: 'recorded_at', order: 'desc' }, { column: 'id', order: 'desc' }]).first(cols),
+  ]);
+  return before ? [before, ...inside] : inside;
+};
+
 module.exports = {
+  priceHistory,
   escapeLike,
   applyFilters,
   search,

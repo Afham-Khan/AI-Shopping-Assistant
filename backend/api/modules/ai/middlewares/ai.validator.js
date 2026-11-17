@@ -38,6 +38,28 @@ module.exports = {
   compare: validate({
     productIds: { in: ['body'], isArray: { options: { min: 2, max: 4 }, errorMessage: 'productIds must contain 2-4 ids' } },
     'productIds.*': { in: ['body'], isInt: { options: { min: 1 }, errorMessage: 'productIds must be integers' }, toInt: true },
+    need: { in: ['body'], optional: { options: { values: 'null' } }, isString: { errorMessage: 'need must be text' }, trim: true, isLength: { options: { min: 2, max: 200 }, errorMessage: 'need must be 2-200 characters' } },
+    differencesOnly: { in: ['body'], optional: true, isBoolean: { options: { strict: true }, errorMessage: 'differencesOnly must be true or false' } },
+  }),
+  completeLook: validate({ ...idParam('productId', 'product id'), ...limitQuery(12) }),
+  explain: validate(idParam('productId', 'product id')),
+  gift: validate({
+    recipient: { in: ['body'], isString: { errorMessage: 'recipient is required' }, trim: true, isLength: { options: { min: 2, max: 40 }, errorMessage: 'recipient must be 2-40 characters' } },
+    occasion: { in: ['body'], optional: { options: { values: 'null' } }, isString: { errorMessage: 'occasion must be text' }, trim: true, isLength: { options: { max: 40 }, errorMessage: 'occasion must be at most 40 characters' } },
+    budget: {
+      in: ['body'],
+      optional: { options: { values: 'null' } },
+      custom: {
+        options: (b) => (typeof b === 'number' && b >= 100 && b <= 100000000)
+          || (b && typeof b === 'object' && !Array.isArray(b) && (b.max === undefined || b.max === null || (Number(b.max) >= 100 && Number(b.max) <= 100000000))
+            && (b.min === undefined || b.min === null || Number(b.min) >= 0) && !(b.min && b.max && Number(b.min) > Number(b.max))),
+        errorMessage: 'budget must be a number (≥ 100) or { min, max } with min ≤ max',
+      },
+    },
+    interests: { in: ['body'], optional: true, isArray: { options: { max: 8 }, errorMessage: 'interests must be a list of up to 8 items' } },
+    'interests.*': { in: ['body'], isString: { errorMessage: 'each interest must be text' }, trim: true, isLength: { options: { min: 2, max: 40 }, errorMessage: 'each interest must be 2-40 characters' } },
+    age: { in: ['body'], optional: { options: { values: 'null' } }, isInt: { options: { min: 1, max: 110 }, errorMessage: 'age must be 1-110' }, toInt: true },
+    limit: { in: ['body'], optional: true, isInt: { options: { min: 1, max: 20 }, errorMessage: 'limit must be 1-20' }, toInt: true },
   }),
   search: validate({
     q: { in: ['query'], isString: { errorMessage: 'q is required' }, trim: true, isLength: { options: { min: 1, max: 200 }, errorMessage: 'q must be 1-200 characters' } },

@@ -8,6 +8,7 @@ router.get('/', optionalAuth, validate(schema.list), controller.list);
 // must stay above /:idOrSlug or "recently-viewed" would be treated as a slug
 router.get('/recently-viewed', requireAuth, controller.recentlyViewed);
 router.get('/:id/reviews', validate(schema.reviews), controller.reviews);
+router.get('/:id/price-history', validate(schema.priceHistory), controller.priceHistory);
 router.post('/:id/reviews', requireAuth, validate(schema.createReview), controller.createReview);
 router.get('/:idOrSlug', optionalAuth, validate(schema.detail), controller.detail);
 

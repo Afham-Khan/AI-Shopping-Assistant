@@ -60,3 +60,8 @@ module.exports.createReview = {
     isLength: { options: { min: 10, max: 2000 }, errorMessage: 'comment must be 10-2000 characters' },
   },
 };
+
+module.exports.priceHistory = {
+  ...idParam(),
+  days: { in: ['query'], optional: true, isInt: { options: { min: 1, max: 365 }, errorMessage: 'days must be between 1 and 365' } },
+};

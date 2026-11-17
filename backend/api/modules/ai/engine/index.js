@@ -21,6 +21,10 @@ const { cartInsights: computeCartInsights } = require('./cartInsights');
 const { shoppingDna } = require('./shoppingDna');
 const visual = require('./visual');
 const { titleCase } = require('./format');
+const { completeLook: buildLook } = require('./outfit');
+const { explainProduct } = require('./explain');
+const { buildGift } = require('./gift');
+const discover = require('./discover');
 
 const plain = (s) => String(s || '').replace(/\*\*/g, '');
 
@@ -186,6 +190,42 @@ const visualTextSearch = async (q, limit) => {
   return { products: recommendedList(r.items), latencyMs: r.latencyMs };
 };
 
+const completeLook = async (productId, limit) => {
+  const r = await buildLook(productId, { limit });
+  if (!r) return null;
+  return {
+    base: toCard(r.base),
+    kind: r.kind,
+    title: r.title,
+    look: r.look.map((l) => ({ role: l.role, category: l.category, product: recommended(l.item), alternatives: l.alternatives.map(toCard) })),
+    products: recommendedList(r.items),
+    palette: r.palette,
+  };
+};
+
+const explain = async (productId) => {
+  const catalog = await getCatalog();
+  const p = catalog.byId.get(Number(productId));
+  return p ? explainProduct(p) : null;
+};
+
+const gift = async (args) => {
+  const r = await buildGift(args);
+  return { title: r.title, products: recommendedList(r.items), note: r.note, criteria: r.criteria, relaxed: r.relaxed };
+};
+
+const discoverDeck = async (args) => {
+  const r = await discover.buildDeck(args);
+  return { cards: r.cards.map((c) => ({ ...recommended(c), deckKind: c.kind })), personalized: r.personalized, strategy: r.strategy };
+};
+
+const discoverReels = async (args) => {
+  const r = await discover.buildReels(args);
+  return { reels: r.reels.map(({ affinity, products, ...rest }) => ({ ...rest, products: products.map(toCard) })), personalized: r.personalized };
+};
+
+const roomScene = async (args) => (await discover.buildRoom(args)).map((z) => ({ ...z, featured: z.featured.map(toCard) }));
+
 const warmup = () => {
   try {
     nlu.loadModel();
@@ -199,4 +239,5 @@ module.exports = {
   respond, recommendations, similar, boughtTogether, compare: compareProducts, reviewSummary, smartSearch, nluPlayground,
   finderFlows, finder: runFinder, insights, warmup, peek, bundle, serializeBundle, askProduct, cartInsights,
   profile: shoppingDna, visualSearch, visualTextSearch, VisualUnavailable: visual.VisualUnavailable,
+  completeLook, explain, gift, discoverDeck, discoverReels, discoverTaste: discover.tasteFrom, roomScene,
 };

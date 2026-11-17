@@ -128,3 +128,61 @@ Unit tests (`ai.nlu`, `ai.engine`, `ai.reviews`, `ai.compare`) run without a dat
 | VIS-02 | Text → image | "red sneakers" | shoes in top 5 |
 | VIS-03 | Bad uploads | text file / no file | 400 |
 | VIS-04 | Insights | – | `visual.enabled`, `indexedImages` |
+
+## AI v3 — unit (`test/ai.v3.test.js`)
+
+| ID | Scenario | Expected |
+|---|---|---|
+| EXP-U1 | Laptop RAM "16 GB DDR4" | level 4, title "16 GB RAM", meaning mentions programming |
+| EXP-U2 | RAM by product kind | 8 GB = 4 on a phone, 3 on a laptop; 1 GB phone = 1 |
+| EXP-U3 | Storage | 128 GB phone = 3 with a photo estimate and memory-card note; "Refrigerate at 0 to 4 C" → fridge advice, no level |
+| EXP-U4 | Processor tiers | A15 = 5, Helio G35 = 1, i7-8550U downgraded (older generation), i7-1165G7 = 4 |
+| EXP-U5 | Display | 6.1" OLED 120 Hz = 5; HD+ IPS ≤ 3 |
+| EXP-U6 | Battery / charging / camera / network | 5000 mAh = 5, 17 h laptop = 5, 50W = 5, wireless noted, triple camera with telephoto ≥ 4 ("optical zoom"), 5G = 5 |
+| EXP-U7 | Water resistance | IP68 = 5, 100 m watch "swimming", 30 m = 2 |
+| EXP-U8 | Fabric / perfume / watch / OS | cotton = 5, wool "winter", EDP = 4 "6 to 8 hours", EDT = 3, automatic = 5, sapphire = 5, Windows 10 = 2 |
+| EXP-U9 | Product summary | kind phone, ≥ 4 explained specs, who-it's-for, "Keep in mind" weak spot, levels within 1-5 |
+| EXP-U10 | Unknown keys | listed in `others`, no overall level |
+| OUT-U1 | Colour harmony | red+black ≥ 0.85, black+white neutral, red/green complementary, red/orange analogous, green/purple < green/black |
+| OUT-U2 | Colour parsing | "Rose Gold" metal, specs "Red and black" → red primary, no colour → null |
+| VOI-U1 | Spoken numbers | "fifty thousand" → 50000, "one lakh fifty thousand rupees", "derh lakh", "pachas hazar", "between twenty and forty thousand" → 20000 and 40000, "twenty five k" → 25000 |
+| VOI-U2 | No false numbers | "the first one", "do you have earbuds" unchanged; "bana do 4 lakh" keeps "do" |
+| VOI-U3 | Fillers | "umm acha yaar" dropped, stutter collapsed, trailing "na" dropped; "bhai ke liye", "my bro", "acha laptop" and a lone "hmm" kept |
+| VOI-U4 | Full NLU on a transcript | "umm acha yaar mujhe sasta phone chahiye fifty thousand tak" → smartphones, max 50000, no recipient; "yaar ke liye gift" → friend |
+| LLM-U1 | Token bucket | burst of 2 then refused, refills after 30 s at 2/min |
+| LLM-U2 | LRU cache | least recently used entry evicted, TTL expiry |
+| LLM-U3 | Circuit breaker | opens after 3 failures, half-open after the cooldown, closed on success |
+| LLM-U4 | Guard | cache hit skips the call, daily cap refuses, 3 failures open the circuit |
+| LLM-U5 | `llm.enhance` with a fake provider | identical prompt served from cache (1 call); a failing provider falls back to the draft |
+| CMP2-U1 | Rows `differs` | price differs, availability equal |
+| CMP2-U2 | Pros/cons | cheapest pro, most expensive con, review aspect pro, ≤ 4 each |
+| CMP2-U3 | Need | "for gaming" → RTX laptop, matched, reason mentions gaming; "for my mom" boosts value; gibberish → `matched: false` |
+| GFT-U1 | Recipients | "My Sister" → sister, "ammi" → mom, grandma → senior, age 9 → kid |
+| GFT-U2 | Interests | makeup → beauty, watches → women's/men's watches by gender, "surprise me" ignored |
+| NEG-U1 | Pass as a negative signal | passed ids excluded, category aversion > 0, passed category not in affinity, aversion higher for the passed category |
+
+## AI v3 — API (`test/ai.v3.api.test.js`, needs seeded DB)
+
+| ID | Scenario | Input | Expected |
+|---|---|---|---|
+| LOOK-01 | Complete the look (dress) | `GET /ai/complete-look/:dressId` | kind outfit, ≥ 3 slots incl. Shoes and Bag, no men's items or other dresses, reasons, ≤ 2 alternatives |
+| LOOK-02 | Men's shirt | – | no women's items or tops |
+| LOOK-03 | Non-fashion / validation | phone with `limit=4`; `abc`; unknown id | kind complementary with ≤ 4 items; 400; 404 |
+| EXP-01 | Explain a laptop | 16 GB RAM laptop | RAM level 4 "programming", summary ≥ 2 sentences, every spec has title/meaning, levels 1-5 with label + scale |
+| EXP-02 | Explain a fragrance / 404 | perfume with Concentration | "Eau de ..." title; unknown id 404 |
+| EXP-03 | Chat explain | "show me phones" → "explain the specs of the first one" | intent `explain_specs`, `meta.explain.product.id` = first shown product |
+| CMP2-01 | Compare v1 shape kept | 2 laptops | products, verdict, rows with `differs`, `differencesCount`, `prosCons`, `forYou: null` |
+| CMP2-02 | differencesOnly | `differencesOnly: true` | only differing rows, count = `differencesCount` |
+| CMP2-03 | Need | 3 laptops, "for gaming" | `forYou` is one of them, matched, reason mentions gaming, one score per product |
+| CMP2-04 | Validation | need "x", differencesOnly "yes" | 400 |
+| CMP2-05 | Chat compare with a need | "laptops under 600k" → "compare the first two for gaming" | intent compare, `comparison.forYou`, content "For gaming" |
+| GFT-01 | Gift API | sister, birthday, 5000, ["makeup"] | title "Birthday gifts for your sister", ≥ 3 products ≤ 5000, no men's items, beauty first, criteria gender women |
+| GFT-02 | Range budget / kid / Roman Urdu | nephew age 10 {1000-20000}; "ammi" eid 50000 | ageBand kid, prices in range; recipient mom, gender women |
+| GFT-03 | Validation | {}, budget 10, min > max, interests not an array | 400 |
+| GFT-04 | Chat gift with an interest question | "birthday gift for my sister under 5000" → "Beauty & makeup" | clarify with "Surprise me" and no products; then products ≤ 5000, `meta.gift.criteria.interests` |
+| GFT-05 | Surprise me | "anniversary gift for my wife under 50000" → "Surprise me" | products ≤ 50000 |
+| VOI-01 | Voice transcript in chat | "umm acha yaar mujhe sasta phone chahiye fifty thousand tak" | smartphones, max 50000, no recipient, products ≤ 50000, normalized text without "yaar"/"umm" |
+| VOI-02 | Recipient kept | "bhai ke liye perfume do hazar tak" | recipient brother, max 2000 |
+| LLM-01 | Insights | `GET /ai/insights` | `llm.usedToday`, `dailyLimit`, `cacheHits`, `circuit` |
+
+Discover, room and memory cases (DSC-*, ROOM-*, MEM-*) live in the same file and are listed in `TEST_CASES.md`.

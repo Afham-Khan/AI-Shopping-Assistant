@@ -22,6 +22,9 @@ const DEMO_USER = {
   ],
 };
 
+// store admin for PATCH /admin/products/:id (price / stock changes that fire alerts)
+const ADMIN_USER = { name: 'Zelora Admin', email: 'admin@zelora.app', password: 'Admin@1234', phone: '+92 300 0000001' };
+
 const SHOPPER_PASSWORD = 'Shopper@1234';
 
 const MEN = ['Ali', 'Ahmed', 'Hamza', 'Bilal', 'Usman', 'Hassan', 'Zain', 'Saad', 'Fahad', 'Omar', 'Faisal', 'Imran',
@@ -119,4 +122,4 @@ const SEARCH_QUERIES = {
   rider: ['motorcycle', 'kawasaki', 'helmet', 'scooter'],
 };
 
-module.exports = { DEMO_USER, SHOPPER_PASSWORD, PERSONAS, buildShoppers, SEARCH_QUERIES };
+module.exports = { DEMO_USER, ADMIN_USER, SHOPPER_PASSWORD, PERSONAS, buildShoppers, SEARCH_QUERIES };

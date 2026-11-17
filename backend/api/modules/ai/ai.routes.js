@@ -29,6 +29,10 @@ router.get('/profile', requireAuth, controller.profile);
 router.post('/visual-search', optionalAuth, v.imageUpload, v.visual, controller.visualSearch);
 router.get('/visual-search/text', v.visualText, controller.visualTextSearch);
 
+router.get('/complete-look/:productId', v.completeLook, controller.completeLook);
+router.get('/explain/:productId', v.explain, controller.explain);
+router.post('/gift', optionalAuth, v.gift, controller.gift);
+
 // build indexes after boot without delaying startup
 if (process.env.NODE_ENV !== 'test') setTimeout(() => warmup(), 1500).unref();
 

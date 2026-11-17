@@ -38,7 +38,7 @@ const shoppingDna = async (userId) => {
   const prefs = user?.preferences || {};
 
   const events = [
-    ...interactions.map((i) => ({ id: i.product_id, type: i.type })),
+    ...interactions.filter((i) => i.type !== 'pass').map((i) => ({ id: i.product_id, type: i.type })),
     ...wishlist.map((w) => ({ id: w.product_id, type: 'wishlist' })),
     ...cart.map((c) => ({ id: c.product_id, type: 'cart' })),
     ...purchases.map((p) => ({ id: p.product_id, type: 'purchase' })),
