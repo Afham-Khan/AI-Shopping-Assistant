@@ -14,10 +14,21 @@ import 'simple_markdown.dart';
 /// A built bundle: items by role (with swap), total vs budget, explanation,
 /// savings tips and "Add all to cart". Used by Bundle Builder and chat.
 class BundleView extends ConsumerStatefulWidget {
-  const BundleView({super.key, required this.bundle, this.animate = true, this.compact = false, this.source = 'bundle'});
+  const BundleView({
+    super.key,
+    required this.bundle,
+    this.animate = true,
+    this.compact = false,
+    this.source = 'bundle',
+    this.adviceShownSeparately = false,
+  });
 
   final BundleResult bundle;
   final bool animate;
+
+  /// The screen shows `budgetAdvice` in its own notice, so the explanation
+  /// leaves those sentences out instead of repeating them.
+  final bool adviceShownSeparately;
 
   /// Chat card: tighter spacing, tips collapsed.
   final bool compact;
@@ -128,9 +139,9 @@ class _BundleViewState extends ConsumerState<BundleView> {
             ],
           ),
         ),
-        if (b.explanation.isNotEmpty) ...[
+        if ((widget.adviceShownSeparately ? b.explanationBody : b.explanation).isNotEmpty) ...[
           AppSpacing.gapMd,
-          SimpleMarkdown(b.explanation),
+          SimpleMarkdown(widget.adviceShownSeparately ? b.explanationBody : b.explanation),
         ],
         if (b.skippedRoles.isNotEmpty) ...[
           AppSpacing.gapSm,

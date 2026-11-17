@@ -9,15 +9,21 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
 import '../data/ai_repository.dart';
 import '../data/models/ai_models.dart';
+import '../providers/ai_providers.dart';
 import 'widgets/ai_ui.dart';
+import 'widgets/budget_advice_notice.dart';
 import 'widgets/bundle_view.dart';
 
 class _Preset {
-  const _Preset(this.title, this.goal, this.icon, this.budget);
+  const _Preset(this.title, this.goal, this.icon, this.templateId, this.budget);
 
   final String title;
   final String goal;
   final IconData icon;
+
+  /// The server template (`GET /ai/bundle/templates`) whose suggested budget
+  /// replaces [budget], which stays as the offline fallback.
+  final String templateId;
   final double budget;
 }
 
@@ -27,7 +33,7 @@ class BundleBuilderScreen extends ConsumerStatefulWidget {
   const BundleBuilderScreen({super.key});
 
   static const minBudget = 5000.0;
-  static const maxBudget = 500000.0;
+  static const maxBudget = 1000000.0;
 
   @override
   ConsumerState<BundleBuilderScreen> createState() => _BundleBuilderScreenState();
@@ -35,12 +41,12 @@ class BundleBuilderScreen extends ConsumerStatefulWidget {
 
 class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
   static const _presets = [
-    _Preset('Home office', 'home office setup', Icons.desk_outlined, 150000),
-    _Preset('Gaming setup', 'gaming setup', Icons.sports_esports_outlined, 300000),
-    _Preset('University starter', 'university starter kit', Icons.school_outlined, 120000),
-    _Preset('Gym starter', 'gym starter kit', Icons.fitness_center_rounded, 25000),
-    _Preset('Skincare routine', 'skincare routine', Icons.spa_outlined, 15000),
-    _Preset('Eid gift set', 'eid gift set', Icons.card_giftcard_rounded, 20000),
+    _Preset('Home office', 'home office setup', Icons.desk_outlined, 'home_office', 150000),
+    _Preset('Gaming setup', 'gaming setup', Icons.sports_esports_outlined, 'gaming_setup', 300000),
+    _Preset('University starter', 'university starter kit', Icons.school_outlined, 'university_kit', 120000),
+    _Preset('Gym starter', 'gym starter kit', Icons.fitness_center_rounded, 'gym_starter', 25000),
+    _Preset('Skincare routine', 'skincare routine', Icons.spa_outlined, 'skincare_routine', 15000),
+    _Preset('Eid gift set', 'eid gift set', Icons.card_giftcard_rounded, 'gift_set', 20000),
   ];
 
   final _goal = TextEditingController();
@@ -67,12 +73,18 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
     super.dispose();
   }
 
+  /// A preset's default budget: the server's suggestion once loaded, else the built-in one.
+  double _presetBudget(_Preset p) => (ref.read(bundleTemplatesProvider).value?.suggestedFor(p.templateId) ?? p.budget).clamp(
+    BundleBuilderScreen.minBudget,
+    BundleBuilderScreen.maxBudget,
+  );
+
   void _selectPreset(int i) {
     final p = _presets[i];
     setState(() {
       _preset = i;
       _goal.text = p.goal;
-      _setBudget(p.budget);
+      _setBudget(_presetBudget(p));
     });
   }
 
@@ -82,6 +94,12 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
   }
 
   String get _goalText => _goal.text.trim();
+
+  /// "Use Rs X" on the budget notice: re-run with the suggested budget.
+  void _useBudget(double budget) {
+    setState(() => _setBudget(budget));
+    _build();
+  }
 
   Future<void> _build() async {
     if (_goalText.isEmpty) {
@@ -154,6 +172,8 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
 
   Widget _form(BuildContext context) {
     final t = context.textTheme;
+    // watched so the preset budgets update once the server's suggestions arrive
+    ref.watch(bundleTemplatesProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -172,7 +192,12 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
                 for (var i = 0; i < _presets.length; i++)
                   SizedBox(
                     width: w,
-                    child: _PresetCard(preset: _presets[i], selected: _preset == i, onTap: () => _selectPreset(i)),
+                    child: _PresetCard(
+                      preset: _presets[i],
+                      budget: _presetBudget(_presets[i]),
+                      selected: _preset == i,
+                      onTap: () => _selectPreset(i),
+                    ),
                   ),
               ],
             );
@@ -258,24 +283,44 @@ class _BundleBuilderScreenState extends ConsumerState<BundleBuilderScreen> {
         ),
       );
     }
+    final advice = b.budgetAdvice;
+    final notice = advice.missesEssentials
+        ? BudgetAdviceNotice(advice: advice, budget: b.budget, onUseSuggested: _useBudget)
+        : null;
     if (b.items.isEmpty) {
+      final body = notice == null ? b.explanation : b.explanationBody;
       return AiCard(
-        child: EmptyState(
-          compact: true,
-          icon: Icons.inventory_2_outlined,
-          title: "Couldn't fit a full set",
-          message: b.explanation.isNotEmpty ? b.explanation : 'Try a higher budget or a different goal.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            EmptyState(
+              compact: true,
+              icon: Icons.inventory_2_outlined,
+              title: "Couldn't fit a full set",
+              message: body.isNotEmpty ? body : 'Try a higher budget or a different goal.',
+            ),
+            if (notice != null) ...[AppSpacing.gapSm, notice],
+          ],
         ),
       );
     }
-    return AiCard(child: BundleView(key: ValueKey(_buildSeq), bundle: b));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (notice != null) ...[notice, AppSpacing.gapSm],
+        AiCard(
+          child: BundleView(key: ValueKey(_buildSeq), bundle: b, adviceShownSeparately: notice != null),
+        ),
+      ],
+    );
   }
 }
 
 class _PresetCard extends StatelessWidget {
-  const _PresetCard({required this.preset, required this.selected, required this.onTap});
+  const _PresetCard({required this.preset, required this.budget, required this.selected, required this.onTap});
 
   final _Preset preset;
+  final double budget;
   final bool selected;
   final VoidCallback onTap;
 
@@ -285,7 +330,7 @@ class _PresetCard extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: '${preset.title}, suggested budget ${Formatters.price(preset.budget)}',
+      label: '${preset.title}, suggested budget ${Formatters.price(budget)}',
       excludeSemantics: true,
       child: Material(
         color: selected ? colors.primarySoft : colors.surface,
@@ -304,7 +349,7 @@ class _PresetCard extends StatelessWidget {
                 Icon(preset.icon, color: selected ? colors.primary : colors.muted),
                 AppSpacing.gapXs,
                 Text(preset.title, style: context.textTheme.labelLarge, maxLines: 2, overflow: TextOverflow.ellipsis),
-                Text('~${Formatters.priceCompact(preset.budget)}', style: context.textTheme.bodySmall),
+                Text('~${Formatters.priceCompact(budget)}', style: context.textTheme.bodySmall),
               ],
             ),
           ),

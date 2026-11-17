@@ -101,6 +101,11 @@ class AiRepository {
   Future<BundleResult> bundle({required String goal, required double budget}) =>
       _api.post('/ai/bundle', body: {'goal': goal, 'budget': budget.round()}, decode: BundleResult.fromJson);
 
+  /// Ready-made bundle goals with the budget that covers their essentials
+  /// (`GET /ai/bundle/templates`).
+  Future<List<BundleTemplate>> bundleTemplates() =>
+      _api.get('/ai/bundle/templates', decode: (d) => JsonX.asList(d, BundleTemplate.fromJson));
+
   Future<ProductAnswer> askProduct(int productId, String question) =>
       _api.post('/ai/products/$productId/ask', body: {'question': question}, decode: ProductAnswer.fromJson);
 

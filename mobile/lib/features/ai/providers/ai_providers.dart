@@ -58,6 +58,15 @@ final finderFlowsProvider = FutureProvider.autoDispose<List<FinderFlow>>(
   (ref) => ref.watch(aiRepositoryProvider).finder(),
 );
 
+/// Bundle goals with their suggested budgets. Kept for the session once
+/// loaded; a failed load is retried on the next watch, and callers fall back
+/// to their own defaults meanwhile.
+final bundleTemplatesProvider = FutureProvider.autoDispose<List<BundleTemplate>>((ref) async {
+  final templates = await ref.watch(aiRepositoryProvider).bundleTemplates();
+  ref.keepAlive();
+  return templates;
+});
+
 final aiInsightsProvider = FutureProvider.autoDispose<AiInsights>((ref) => ref.watch(aiRepositoryProvider).insights());
 
 /// Product header for AI screens (ask, etc.).
