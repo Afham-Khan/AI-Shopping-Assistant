@@ -1,0 +1,14 @@
+# Files Vercel never needs (applies to Git deployments and to `vercel deploy` from this folder).
+# Secrets first: .vercelignore, not .gitignore, decides what `vercel deploy` uploads, so the local .env files with
+# real passwords must be listed here.
+.env
+.env.*
+!.env.example
+node_modules
+.cache
+uploads
+test
+coverage
+*.log
+Dockerfile
+.dockerignore

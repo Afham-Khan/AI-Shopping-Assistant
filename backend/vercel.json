@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "fluid": true,
+  "regions": ["sin1"],
+  "build": {
+    "env": { "ONNXRUNTIME_NODE_INSTALL": "skip" }
+  },
+  "builds": [
+    {
+      "src": "api/vercel.mjs",
+      "use": "@vercel/node",
+      "config": {
+        "helpers": false,
+        "includeFiles": [
+          "api/modules/ai/training/models/*.json",
+          "api/modules/ai/training/data/*.json",
+          "data/dummyjson-products.json"
+        ],
+        "excludeFiles": [
+          "node_modules/@huggingface/**",
+          "node_modules/onnxruntime-node/**",
+          "node_modules/onnxruntime-web/**",
+          "node_modules/onnxruntime-common/**",
+          "node_modules/sharp/**",
+          "node_modules/@img/**",
+          ".cache/**",
+          "uploads/**",
+          "test/**",
+          "scripts/**"
+        ]
+      }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "/api/vercel.mjs" }]
+}

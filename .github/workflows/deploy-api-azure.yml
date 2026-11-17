@@ -1,0 +1,129 @@
+name: Deploy API to Azure App Service
+
+# Builds backend/ (production dependencies only) on Linux, checks that both AI models load with the bundled
+# node_modules, zips the folder and deploys it to an Azure App Service (Linux, Node 22). Full guide:
+# docs/DEPLOYMENT_AZURE.md
+#
+# One-time setup (Settings > Secrets and variables > Actions):
+#   repo secret    AZURE_WEBAPP_PUBLISH_PROFILE   the whole .PublishSettings file downloaded from the App Service
+#                                                 Overview page (needs "SCM Basic Auth Publishing Credentials" = On)
+#   repo variable  AZURE_WEBAPP_NAME              the App Service NAME (default zelora-api). Not the hostname: with
+#                                                 "secure unique default hostname" the URL has a random suffix; the
+#                                                 health check below reads the real URL from the deploy step.
+#
+# The models are NOT shipped in the zip (it would add ~170 MB to every deploy). The app downloads them once into
+# AI_CACHE_DIR=/home/.cache, App Service's persistent storage, and reuses them after every restart and redeploy.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-api-azure.yml'
+
+# never cancel a deploy half way; a newer push simply waits for the running one
+concurrency:
+  group: deploy-api-azure
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # glibc x64, the same platform as App Service's Node 22 image, so native binaries match
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # the repo variable wins; zelora-api is the name the owner created
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || 'zelora-api' }}
+      NAME_FROM_VARIABLE: ${{ vars.AZURE_WEBAPP_NAME != '' }}
+      HAS_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE != '' }}
+    steps:
+      - name: Check the settings
+        working-directory: .
+        run: |
+          if [ "$NAME_FROM_VARIABLE" != "true" ]; then
+            echo "::notice::Repository variable AZURE_WEBAPP_NAME is not set, using the default '$AZURE_WEBAPP_NAME'. Set it under Settings > Secrets and variables > Actions > Variables if your App Service has another name."
+          fi
+          if ! [[ "$AZURE_WEBAPP_NAME" =~ ^[A-Za-z0-9-]{2,60}$ ]]; then
+            echo "::error::AZURE_WEBAPP_NAME must be the App Service NAME (letters, digits, dashes), not a URL. Got: $AZURE_WEBAPP_NAME"
+            exit 1
+          fi
+          if [ "$HAS_PUBLISH_PROFILE" != "true" ]; then
+            echo "::error::Repository secret AZURE_WEBAPP_PUBLISH_PROFILE is not set. In the Azure portal open the App Service > Overview > Download publish profile (turn on SCM Basic Auth Publishing Credentials first), then paste the whole file into a new repository secret. See docs/DEPLOYMENT_AZURE.md."
+            exit 1
+          fi
+          echo "Deploying backend/ to App Service '$AZURE_WEBAPP_NAME'"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install production dependencies
+        env:
+          ONNXRUNTIME_NODE_INSTALL: skip # CPU binaries are bundled; never download the GPU (CUDA) extras
+        run: npm ci --omit=dev --no-audit --no-fund
+
+      - name: Trim native binaries for other platforms
+        run: |
+          # onnxruntime-node ships Windows, macOS and Linux arm64 builds; App Service only needs linux/x64.
+          # onnxruntime-web is the browser runtime (the Node build of transformers.js never loads it).
+          find node_modules/onnxruntime-node/bin -mindepth 2 -maxdepth 2 -type d ! -name linux -exec rm -rf {} +
+          rm -rf node_modules/onnxruntime-node/bin/napi-v*/linux/arm64 node_modules/onnxruntime-web node_modules/.bin
+          du -sh node_modules
+
+      - name: Check the app loads
+        run: node -e "require('./app'); console.log('app.js loads'); process.exit(0)"
+
+      - name: Restore the model cache (CI only, not deployed)
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/models
+          key: hf-models-minilm-clip-v1
+
+      - name: Check both AI models load with these node_modules (MiniLM + CLIP)
+        env:
+          AI_CACHE_DIR: ${{ runner.temp }}/models
+          AI_EMBEDDINGS: neural
+          AI_VISUAL: 'on'
+        run: npm run ai:prefetch -- --strict
+
+      - name: Zip backend/ with node_modules
+        run: |
+          zip -qr "$RUNNER_TEMP/api.zip" . \
+            -x 'test/*' '.cache/*' 'uploads/products/*' '*.log' '.env' '.env.*' 'Dockerfile' '.dockerignore'
+          ls -lh "$RUNNER_TEMP/api.zip"
+
+      - name: Deploy to Azure App Service
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ runner.temp }}/api.zip
+
+      - name: Wait for /api/v1/health
+        working-directory: .
+        env:
+          APP_URL: ${{ steps.deploy.outputs.webapp-url }}
+        run: |
+          url="${APP_URL%/}/api/v1/health"
+          echo "Checking $url"
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)
+            if [ "$code" = "200" ]; then
+              echo "Healthy after attempt $i: $url"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $code, retrying in 15s"
+            sleep 15
+          done
+          echo "::error::$url did not answer 200 within 5 minutes. Open the App Service > Log stream (see docs/DEPLOYMENT_AZURE.md, Troubleshooting)."
+          exit 1

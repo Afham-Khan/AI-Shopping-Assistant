@@ -232,7 +232,11 @@ const warmup = () => {
   } catch {
     // retried lazily on first request
   }
-  return getCatalog().catch(() => null);
+  const catalog = getCatalog().catch(() => null);
+  // CLIP stays lazy (first Snap & Find request) unless AI_VISUAL_WARMUP=on: then it loads in the background right
+  // after boot (~300 MB more RAM), so the first photo search does not wait for the model. Never blocks startup.
+  if (process.env.AI_VISUAL_WARMUP === 'on') catalog.then(() => visual.load()).catch(() => null);
+  return catalog;
 };
 
 module.exports = {
