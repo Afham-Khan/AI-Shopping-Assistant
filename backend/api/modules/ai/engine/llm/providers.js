@@ -3,7 +3,7 @@ const TIMEOUT_MS = 6000;
 
 const gemini = {
   name: 'gemini',
-  model: () => process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
+  model: () => process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
   enabled: () => Boolean(process.env.GEMINI_API_KEY),
   async complete({ system, user }) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(gemini.model())}:generateContent`;

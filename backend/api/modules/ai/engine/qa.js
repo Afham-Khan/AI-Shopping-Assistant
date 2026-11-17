@@ -165,7 +165,8 @@ const ask = async (productId, rawQuestion) => {
         confidence = 0.6;
       }
     }
-    if (!answer && top && top.score >= 0.22) {
+    // a spec row matching the asked spec ("waterproof" -> "Water Resistance: IP68") is evidence on its own
+    if (!answer && top && (top.score >= 0.22 || (specPassages[0] && top === specPassages[0]))) {
       const text = top.text.replace(/\.$/, '');
       if (type === 'yesno') {
         const negative = top.source === 'spec' && NEGATIVE_VALUE.test(text.split(':').slice(1).join(':'));

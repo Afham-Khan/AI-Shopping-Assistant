@@ -5,6 +5,7 @@ const { extractEntities } = require('./entities');
 const { getVocabulary } = require('./vocab');
 const { maskTokens, extractFeatures, TfidfVectorizer, SoftmaxRegression } = require('./classifier');
 const trainer = require('./trainer');
+const scope = require('./scope');
 
 const CONFIDENCE_THRESHOLD = 0.45;
 let loaded = null;
@@ -96,10 +97,13 @@ const analyze = (text) => {
       source = 'low_confidence';
     }
   }
+  // rule signals for off-script messages (safety, noise, off-topic, store faq); the dialogue manager decides
+  const signals = scope.detect({ raw: text, normalized: norm.text, tokens: norm.tokens, entities, vocab, modelVocab: loadModel().vectorizer.index });
   return {
     intent,
     confidence,
     source,
+    signals,
     alternatives: ranked.filter((r) => r.intent !== intent).slice(0, 3),
     entities,
     tokens: norm.tokens,

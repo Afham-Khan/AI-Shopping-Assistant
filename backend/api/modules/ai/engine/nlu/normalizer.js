@@ -1,5 +1,5 @@
 // text normalization: casing, unicode, contractions, number formats, roman-urdu, spelling correction
-const { ROMAN_URDU, IDIOMS, STOPWORDS } = require('./lexicon');
+const { ROMAN_URDU, IDIOMS, STOPWORDS, EMOJI_WORDS } = require('./lexicon');
 const { cleanSpeech } = require('./speech');
 
 const MAX_LEN = 500;
@@ -19,7 +19,9 @@ const cleanNumbers = (s) => {
 };
 
 const baseClean = (raw) => {
-  let s = String(raw ?? '').slice(0, MAX_LEN).toLowerCase();
+  let s = String(raw ?? '').slice(0, MAX_LEN);
+  for (const [pattern, word] of EMOJI_WORDS) s = s.replace(pattern, word);
+  s = s.toLowerCase();
   s = s.normalize('NFKD').replace(/[̀-ͯ]/g, '');
   s = s
     .replace(/[‘’`´]/g, "'")

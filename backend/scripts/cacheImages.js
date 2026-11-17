@@ -1,9 +1,12 @@
-/* Downloads product images from the CDN into uploads/products/<sku>/ and points the DB at the local copies. */
+/* Downloads product images from the CDN into uploads/products/<sku>/ and points the DB at the local copies.
+   Local/offline option only (IMAGE_MODE=local, the default on a laptop with a local database). A deployed API has no
+   uploads folder, so with IMAGE_MODE=cdn (default in production or with DATABASE_URL set) this script does nothing. */
 require('dotenv').config({ quiet: true, path: require('path').join(__dirname, '..', '.env') });
 
 const fs = require('fs');
 const path = require('path');
 const db = require('../api/db/connection');
+const { imageMode } = require('../helpers/imageMode');
 
 const UPLOAD_ROOT = path.join(__dirname, '..', 'uploads', 'products');
 const CONCURRENCY = 4;
@@ -101,6 +104,11 @@ const main = async () => {
 
   console.log(`Images: ${stats.downloaded} downloaded, ${stats.skipped} already cached, ${stats.failed} failed (of ${jobs.size})`);
 };
+
+if (imageMode() === 'cdn') {
+  console.log('IMAGE_MODE=cdn: products keep their cdn.dummyjson.com image URLs, nothing to cache. Set IMAGE_MODE=local to cache images on this machine.');
+  process.exit(0);
+}
 
 main()
   .then(() => db.destroy())

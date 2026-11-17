@@ -1,0 +1,11 @@
+node_modules
+.cache
+uploads/products
+.env
+.env.*
+*.log
+coverage
+test
+.git
+Dockerfile
+.dockerignore

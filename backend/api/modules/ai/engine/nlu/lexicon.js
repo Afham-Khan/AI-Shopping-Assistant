@@ -53,6 +53,17 @@ const ROMAN_URDU = {
   sirf: 'only', bana: 'is', bani: 'is', pls: 'please', plz: 'please', plzz: 'please', u: 'you', ur: 'your', r: 'are', wat: 'what', wht: 'what', gud: 'good',
 };
 
+// emojis -> words, so "📱 under 50k" is a phone search and "😂" reads as laughter (applied before tokenizing)
+const EMOJI_WORDS = [
+  [/📱|📲/gu, ' phone '], [/💻|🖥️?/gu, ' laptop '], [/⌚/gu, ' watch '], [/🎁/gu, ' gift '], [/👟|👞|👠|👡|🥿/gu, ' shoes '],
+  [/👗/gu, ' dress '], [/👕|👔/gu, ' shirt '], [/👜|👛/gu, ' bag '], [/💄/gu, ' makeup '], [/🕶️?/gu, ' sunglasses '],
+  [/💍/gu, ' jewellery '], [/🎧/gu, ' headphones '], [/🏍️?/gu, ' motorcycle '], [/🚗/gu, ' car '], [/🛋️?/gu, ' sofa '],
+  [/🛒/gu, ' cart '], [/📦|🚚/gu, ' order '], [/💸|🏷️?/gu, ' deals '], [/🌸|🧴/gu, ' perfume '],
+  [/😂|🤣|😆|😹/gu, ' haha '], [/😄|😁|😀|😃|😊|🙂/gu, ' nice '], [/❤️?|💖|💕|😍|🥰|😘/gu, ' love you '],
+  [/👍|👌|✅|🆗/gu, ' ok '], [/👋/gu, ' hi '], [/🙏/gu, ' thanks '], [/😢|😭|😞|😔|☹️?|🙁|💔/gu, ' i am sad '],
+  [/😡|🤬|😠/gu, ' i am angry '], [/🤔/gu, ' hmm '], [/😴|🥱/gu, ' i am tired '],
+];
+
 // multi-word roman-urdu idioms rewritten before tokenizing ($1 = captured amount)
 const AMOUNT = '(\\$?\\d+(?:\\.\\d+)?\\s*(?:k|l|lac|lakh|lakhs|thousand|hazar|hazaar|m)?)\\s*(?:rs|rupees|rupay|pkr)?';
 const IDIOMS = [
@@ -235,8 +246,8 @@ const STOPWORDS = new Set(`a an the and or of to in on for with at by from is ar
   please can could would will shall should do does did have has had want need looking look find show get give buy purchase some any something
   anything one ones thing things item items product products also just really very so too what which who whom how there here hi hey
   like love about into over upto up as than then but if not no yes ok okay kindly plz pls tell let us
-  hai hain he ho ka ki ke ko se mein main mai ne kar karo krna karna wala wali walay wale ek do bhi to tu hum ap aap
-  rupees rs pkr price budget under below within less more around between`.split(/\s+/).filter(Boolean));
+  hai hain he ho ka ki ke ko se mein main mai ne kar karo krna karna wala wali walay wale ek do bhi to tu hum ap aap kese kaise kesi kaisi kesay kaisay haal hal theek thik shukriya salam assalam walaikum
+  rupees rs pkr price budget under below within less more around between sa si sy`.split(/\s+/).filter(Boolean));
 
 // words the spell-corrector must never touch (frequent chat words)
 const COMMON_WORDS = `show shoe shoes what want with which while white where when there their then than this that those these them they
@@ -254,5 +265,5 @@ const COMMON_WORDS = `show shoe shoes what want with which while white where whe
 
 module.exports = {
   ROMAN_URDU, IDIOMS, CATEGORY_SYNONYMS, GENDERED, DEPARTMENTS, CATEGORY_NAMES, COLORS, FEATURES, OCCASIONS,
-  RECIPIENTS, GENDER_WORDS, GIFT_CATEGORIES, COMPLEMENTS, SORTS, STOPWORDS, COMMON_WORDS,
+  RECIPIENTS, GENDER_WORDS, GIFT_CATEGORIES, COMPLEMENTS, SORTS, STOPWORDS, COMMON_WORDS, EMOJI_WORDS,
 };

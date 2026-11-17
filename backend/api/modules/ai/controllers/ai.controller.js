@@ -12,7 +12,7 @@ const toMessage = (m, { withMeta = true } = {}) => ({
   ...(withMeta && m.role === 'assistant' ? { meta: m.meta } : {}),
 });
 
-const NON_TOPICAL = new Set(['greeting', 'goodbye', 'thanks', 'help', 'small_talk', 'fallback']);
+const NON_TOPICAL = new Set(['greeting', 'goodbye', 'thanks', 'help', 'small_talk', 'fallback', 'out_of_scope', 'about_assistant', 'feelings', 'abuse', 'store_info', 'concept']);
 const fallbackTitle = (text) => {
   const t = text.replace(/\s+/g, ' ').trim();
   return (t.length > 48 ? `${t.slice(0, 47)}…` : t).replace(/^\w/, (c) => c.toUpperCase());

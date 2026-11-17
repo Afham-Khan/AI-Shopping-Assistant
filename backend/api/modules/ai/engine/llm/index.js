@@ -53,8 +53,51 @@ const grounded = (rewrite, draft, context) => {
   return true;
 };
 
+// ---------------------------------------------------------------- general (out-of-scope) answers
+// persona-locked: Zel answers harmless general questions in one or two sentences, never live facts,
+// never products/prices, never names an ai vendor; then steers back to shopping.
+const PERSONA = [
+  'You are Zel, the shopping assistant inside the Zelora app, a Pakistani online store. You were built by the Zelora team.',
+  'The shopper asked something that is not about shopping. Reply in at most 2 short sentences (max 45 words).',
+  'If it is harmless general knowledge you are sure about, answer it briefly. If it needs live or current information (weather, news, sports scores, prices, rates, today\'s events), say you cannot check live information.',
+  'Never give medical, legal or financial advice. Never write essays, homework, or code.',
+  'End by inviting them back to shopping in a friendly way.',
+  'Never mention specific products, brands, prices, discounts, delivery times or store policies. Never name or hint at any AI company, model or chatbot; you are only Zel.',
+  'Reply with the text only, no markdown headings.',
+].join(' ');
+
+const VENDOR_RE = /\b(?:openai|chat ?gpt|gpt-?\d|google|gemini|anthropic|claude|meta|llama|groq|microsoft|bard|mistral|deepseek|language model|llm)\b/i;
+
+// the reply must be short, plain, persona-safe and must not invent prices or numbers about the store
+const generalOk = (text) => Boolean(text)
+  && text.length >= 8 && text.length <= 420
+  && !VENDOR_RE.test(text)
+  && !/(?:\brs\.?|\bpkr\b|rupees?|\$|€|£)\s*\d/i.test(text)
+  && !/https?:\/\//i.test(text)
+  && !/```/.test(text);
+
+const general = async ({ query, fallback, topic = 'general' }, { provider = active() } = {}) => {
+  if (!provider) return { content: fallback, source: 'local' };
+  const user = `Shopper asked: "${String(query).slice(0, 300)}"\nTopic hint: ${topic}`;
+  try {
+    const result = await guard.run([provider.name, provider.model?.(), PERSONA, user], async () =>
+      (await provider.complete({ system: PERSONA, user })).replace(/^["']|["']$/g, '').trim());
+    if (result.skipped) return { content: fallback, source: 'local', skipped: result.skipped };
+    if (generalOk(result.value)) return { content: result.value, source: provider.name, cached: result.from === 'cache' };
+  } catch {
+    // timeout, quota, network or bad key: the offline reply is always ready
+  }
+  return { content: fallback, source: 'local' };
+};
+
 // provider override is for tests (a fake provider); production uses LLM_PROVIDER
-const enhance = async (payload, { provider = active() } = {}) => {
+// rewording normal replies costs a network round-trip per message, so it is opt-in (LLM_REWRITE=on);
+// the llm still answers out-of-scope questions through general()
+const rewriteEnabled = () => (process.env.LLM_REWRITE || 'off').toLowerCase() === 'on';
+
+const enhance = async (payload, options = {}) => {
+  if (!('provider' in options) && !rewriteEnabled()) return { content: payload.draft, source: 'local' };
+  const provider = 'provider' in options ? options.provider : active();
   if (!provider) return { content: payload.draft, source: 'local' };
   const user = buildPrompt(payload);
   try {
@@ -69,4 +112,4 @@ const enhance = async (payload, { provider = active() } = {}) => {
   return { content: payload.draft, source: 'local' };
 };
 
-module.exports = { enhance, info, active, grounded, buildPrompt, resetGuard };
+module.exports = { enhance, general, generalOk, info, active, grounded, buildPrompt, resetGuard, PERSONA };
