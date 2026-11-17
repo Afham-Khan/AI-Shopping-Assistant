@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_spacing.dart';
 import '../utils/extensions.dart';
+import 'feedback.dart';
 
 enum AppButtonVariant { primary, secondary, ghost, destructive }
 
@@ -91,7 +92,7 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final enabled = onPressed != null && !loading;
-    // while loading keep the enabled look (no grey flash); taps are absorbed below
+    // while loading the button keeps its colors but dims to 0.55; taps are absorbed below
     final action = onPressed;
     final VoidCallback? callback = loading
         ? _noop
@@ -149,7 +150,14 @@ class AppButton extends StatelessWidget {
       label: semanticLabel,
       // keep the button visible as busy to screen readers
       value: loading ? 'Loading' : null,
-      child: AbsorbPointer(absorbing: loading, child: button),
+      child: AbsorbPointer(
+        absorbing: loading,
+        child: AnimatedOpacity(
+          opacity: loading ? 0.55 : 1,
+          duration: context.motion(AppDurations.fast),
+          child: Pressable(enabled: enabled, scale: expand ? 0.98 : 0.96, child: button),
+        ),
+      ),
     );
   }
 
@@ -193,7 +201,7 @@ class _ButtonContent extends StatelessWidget {
         if (loading)
           SizedBox.square(
             dimension: 18,
-            child: CircularProgressIndicator(strokeWidth: 2, color: spinnerColor),
+            child: CircularProgressIndicator(strokeWidth: 2, color: spinnerColor, strokeCap: StrokeCap.round),
           ),
       ],
     );

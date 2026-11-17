@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/widgets.dart';
 
-/// The hero "Ask Zelora" prompt: a real input with a rotating example as its
+/// The hero "Ask Zel" prompt: a real input with a rotating example as its
 /// hint. Submitting (or tapping the arrow with an empty field) opens the
 /// Assistant tab with the text prefilled.
 class AskBar extends StatefulWidget {
@@ -73,7 +73,7 @@ class _AskBarState extends State<AskBar> {
 
     return Semantics(
       textField: true,
-      label: 'Ask ${AppConfig.appName}',
+      label: 'Ask Zel, the ${AppConfig.appName} AI',
       child: AnimatedContainer(
         duration: context.motion(AppDurations.normal),
         padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xxs, AppSpacing.xxs, AppSpacing.xxs),
@@ -94,7 +94,14 @@ class _AskBarState extends State<AskBar> {
                     IgnorePointer(
                       child: Row(
                         children: [
-                          Text('Ask for ', style: t.bodyLarge!.copyWith(color: colors.muted)),
+                          Flexible(
+                            child: Text(
+                              'Ask for ',
+                              maxLines: 1,
+                              overflow: TextOverflow.clip,
+                              style: t.bodyLarge!.copyWith(color: colors.muted),
+                            ),
+                          ),
                           Expanded(
                             child: ClipRect(
                               child: AnimatedSwitcher(
@@ -146,7 +153,7 @@ class _AskBarState extends State<AskBar> {
             ),
             const SizedBox(width: AppSpacing.xs),
             IconButton.filled(
-              tooltip: 'Ask ${AppConfig.appName}',
+              tooltip: 'Ask Zel',
               onPressed: _submit,
               style: IconButton.styleFrom(
                 backgroundColor: colors.primary,

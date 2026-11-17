@@ -221,11 +221,10 @@ class _IntroPage extends StatelessWidget {
 
 /// Square studio well with a real product photo (or a quiet placeholder).
 class _Well extends StatelessWidget {
-  const _Well({required this.product, required this.size, this.fallback = Icons.shopping_bag_outlined});
+  const _Well({required this.product, required this.size});
 
   final ProductSummary? product;
   final double size;
-  final IconData fallback;
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +235,7 @@ class _Well extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(color: colors.imageWell, borderRadius: AppRadii.inputAll),
       child: product == null
-          ? Icon(fallback, size: size * 0.36, color: colors.onImageWell.withValues(alpha: 0.28))
+          ? Icon(Icons.shopping_bag_outlined, size: size * 0.36, color: colors.onImageWell.withValues(alpha: 0.28))
           : Padding(
               padding: EdgeInsets.all(size * 0.1),
               child: AppNetworkImage(product!.thumbnail, fit: BoxFit.contain, backgroundColor: Colors.transparent),
@@ -246,17 +245,16 @@ class _Well extends StatelessWidget {
 }
 
 class _Panel extends StatelessWidget {
-  const _Panel({required this.child, this.padding = const EdgeInsets.all(AppSpacing.sm), this.accent = false});
+  const _Panel({required this.child, this.accent = false});
 
   final Widget child;
-  final EdgeInsetsGeometry padding;
   final bool accent;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Container(
-      padding: padding,
+      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         color: colors.background,
         borderRadius: AppRadii.cardAll,

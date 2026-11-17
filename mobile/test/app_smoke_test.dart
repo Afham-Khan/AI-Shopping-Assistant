@@ -45,11 +45,13 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('desktop guest gets an extended rail; protected tab asks to sign in', (tester) async {
+  testWidgets('desktop guest gets the storefront header; protected tab asks to sign in', (tester) async {
     await _boot(tester, {StorageKeys.onboardingDone: true, StorageKeys.guestChosen: true}, const Size(1280, 800));
-    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byKey(const Key('store-header')), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.text('Ask Zel'), findsOneWidget);
 
-    await tester.tap(find.text('Cart'));
+    await tester.tap(find.byTooltip('Cart'));
     await tester.pumpAndSettle();
     expect(find.text('Welcome back'), findsOneWidget);
     expect(tester.takeException(), isNull);

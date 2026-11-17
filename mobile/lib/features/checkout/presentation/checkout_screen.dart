@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/utils/form_reveal.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/utils/extensions.dart';
@@ -13,12 +14,10 @@ import '../../../core/widgets/widgets.dart';
 import '../../cart/data/models/cart.dart';
 import '../../cart/presentation/widgets/cart_summary.dart';
 import '../../cart/providers/cart_controller.dart';
-import '../../notifications/providers/notifications_providers.dart';
-import '../../orders/data/orders_repository.dart';
-import '../../orders/providers/orders_providers.dart';
 import '../../profile/data/models/address.dart';
 import '../../profile/presentation/widgets/address_form.dart';
 import '../../profile/providers/profile_providers.dart';
+import '../providers/checkout_controller.dart';
 import 'widgets/card_utils.dart';
 
 enum _Payment { cod, card }
@@ -77,8 +76,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       setState(() => _error = 'Add a delivery address to continue.');
       return;
     }
-    if (_payment == _Payment.card && !(_cardForm.currentState?.validate() ?? false)) {
-      setState(() => _error = 'Check your card details.');
+    if (_payment == _Payment.card && !FormReveal.validate(_cardForm)) {
+      setState(() => _error = FormReveal.fixFields);
       return;
     }
     if (cart.unavailable.isNotEmpty) {
@@ -90,8 +89,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     try {
       final digits = CardValidators.digitsOf(_cardNumber.text);
       final order = await ref
-          .read(ordersRepositoryProvider)
-          .place(
+          .read(checkoutControllerProvider)
+          .placeOrder(
             addressId: address.id,
             paymentMethod: _payment.name,
             cardLast4: _payment == _Payment.card ? digits.substring(digits.length - 4) : null,
@@ -99,10 +98,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           );
       if (!mounted) return;
       HapticFeedback.mediumImpact();
-      ref.read(cartProvider.notifier).markEmpty();
-      ref.invalidate(ordersProvider);
-      ref.invalidate(userStatsProvider);
-      ref.read(unreadNotificationsProvider.notifier).refresh();
       context.pushReplacement(Routes.orderSuccessOf(order.id));
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -110,9 +105,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         _placing = false;
         _error = e.message;
       });
-      // stock / empty cart / coupon problems: show the cart as the server sees it
-      if (e.isConflict || e.isValidation) ref.read(cartProvider.notifier).refresh().catchError((_) {});
-      if (e.isNotFound) ref.invalidate(addressesProvider);
     }
   }
 
@@ -577,11 +569,10 @@ class _ReviewLine extends StatelessWidget {
                   p.inStock ? 'Qty ${item.quantity} × ${Formatters.price(p.price)}' : 'Out of stock',
                   style: t.bodySmall!.copyWith(color: p.inStock ? null : context.colors.error),
                 ),
+                if (p.inStock) Text(Formatters.price(item.lineTotal), style: t.titleSmall),
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(Formatters.price(item.lineTotal), style: t.titleSmall),
         ],
       ),
     );

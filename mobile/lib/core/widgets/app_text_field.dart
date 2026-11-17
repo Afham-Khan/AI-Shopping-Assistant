@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../theme/app_spacing.dart';
 import '../utils/extensions.dart';
 
 /// Labelled text field with inline error, optional prefix icon and a
@@ -46,6 +45,7 @@ class AppTextField extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.onTap,
     this.initialValue,
+    this.required = false,
   });
 
   final TextEditingController? controller;
@@ -81,6 +81,9 @@ class AppTextField extends StatefulWidget {
   final TextCapitalization textCapitalization;
   final VoidCallback? onTap;
   final String? initialValue;
+
+  /// Marks the label with a red asterisk.
+  final bool required;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -146,7 +149,8 @@ class _AppTextFieldState extends State<AppTextField> {
       onFieldSubmitted: widget.onSubmitted,
       onTap: widget.onTap,
       validator: widget.validator,
-      autovalidateMode: AutovalidateMode.onUserInteractionIfError,
+      // errors appear only once a field has been touched (left), then live
+      autovalidateMode: AutovalidateMode.onUnfocus,
       autofillHints: widget.enabled ? widget.autofillHints : null,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
       minLines: widget.minLines,
@@ -173,8 +177,14 @@ class _AppTextFieldState extends State<AppTextField> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.label!,
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: widget.label),
+              if (widget.required) TextSpan(text: ' *', style: TextStyle(color: colors.error)),
+            ],
+          ),
+          semanticsLabel: widget.required ? '${widget.label}, required' : widget.label,
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: 13,
             color: widget.enabled ? colors.text : colors.faint,

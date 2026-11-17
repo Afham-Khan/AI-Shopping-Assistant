@@ -61,7 +61,7 @@ ChatEntry _assistant({ChatMeta? meta}) => ChatEntry(
   key: 'm2',
   id: 2,
   isUser: false,
-  content: 'Here are **2 phones** near Rs 30,000:\n- Realme C35\n- Infinix Hot 30',
+  content: 'Here are **2 phones** near Rs 30,000:\n- Great battery\n- Big screen',
   meta: meta,
 );
 

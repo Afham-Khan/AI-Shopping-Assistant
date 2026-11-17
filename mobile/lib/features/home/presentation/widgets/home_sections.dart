@@ -71,11 +71,15 @@ class _DealCountdownState extends State<DealCountdown> {
           children: [
             Icon(Icons.timer_outlined, size: 14, color: colors.sale),
             const SizedBox(width: 4),
-            Text(
-              ended ? text : 'Ends in $text',
-              style: t.labelMedium!.copyWith(
-                color: colors.sale,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            Flexible(
+              child: Text(
+                ended ? text : 'Ends in $text',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: t.labelMedium!.copyWith(
+                  color: colors.sale,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
             ),
           ],

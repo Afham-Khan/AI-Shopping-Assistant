@@ -27,12 +27,12 @@ abstract final class AppSpacing {
   static const gapXxxl = SizedBox(width: xxxl, height: xxxl);
 }
 
-/// Corner radii: 6 tags/kbd chips, 10 inputs/buttons/chips, 12 cards, 20 sheets, full pills.
+/// Corner radii: 6 tags/kbd chips, 8 inputs/buttons, 12 cards/dialogs, 16 sheets, full pills (chips, badges).
 abstract final class AppRadii {
   static const double tag = 6;
-  static const double input = 10;
+  static const double input = 8;
   static const double card = 12;
-  static const double sheet = 20;
+  static const double sheet = 16;
   static const double pill = 999;
 
   static const tagAll = BorderRadius.all(Radius.circular(tag));
@@ -49,6 +49,12 @@ abstract final class AppDurations {
   /// Hover / press / focus color changes.
   static const fast = Duration(milliseconds: 150);
   static const normal = Duration(milliseconds: 250);
+
+  /// Color / border transitions on buttons, cards and links.
+  static const color = Duration(milliseconds: 300);
+
+  /// Bottom sheets (ease-out).
+  static const sheet = Duration(milliseconds: 450);
   static const slow = Duration(milliseconds: 400);
   static const page = Duration(milliseconds: 300);
 }

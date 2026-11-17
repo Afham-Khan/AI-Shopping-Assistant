@@ -30,7 +30,7 @@ abstract final class AppTheme {
     const buttonShape = RoundedRectangleBorder(borderRadius: AppRadii.inputAll);
     const buttonPadding = EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm);
     const buttonMinSize = Size(64, 48);
-    final buttonText = text.labelLarge!.copyWith(fontSize: 15);
+    final buttonText = text.labelLarge!.copyWith(fontSize: 15, letterSpacing: 0.1);
 
     bool has(Set<WidgetState> s, WidgetState state) => s.contains(state);
     bool active(Set<WidgetState> s) => has(s, WidgetState.hovered) || has(s, WidgetState.pressed);
@@ -115,7 +115,7 @@ abstract final class AppTheme {
           shape: const WidgetStatePropertyAll(buttonShape),
           textStyle: WidgetStatePropertyAll(buttonText),
           elevation: const WidgetStatePropertyAll(0),
-          animationDuration: AppDurations.fast,
+          animationDuration: AppDurations.color,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -148,7 +148,7 @@ abstract final class AppTheme {
           padding: const WidgetStatePropertyAll(buttonPadding),
           shape: const WidgetStatePropertyAll(buttonShape),
           textStyle: WidgetStatePropertyAll(buttonText),
-          animationDuration: AppDurations.fast,
+          animationDuration: AppDurations.color,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -235,8 +235,8 @@ abstract final class AppTheme {
         deleteIconColor: p.muted,
         checkmarkColor: p.primary,
         showCheckmark: false,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadii.inputAll),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: AppSpacing.xs),
         labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
         elevation: 0,
         pressElevation: 0,
@@ -293,10 +293,10 @@ abstract final class AppTheme {
         elevation: 12,
         shadowColor: p.shadow,
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          borderRadius: AppRadii.cardAll,
           side: BorderSide(color: p.border),
         ),
-        titleTextStyle: AppType.serif(text.headlineSmall!),
+        titleTextStyle: text.titleMedium,
         contentTextStyle: text.bodyMedium!.copyWith(color: p.muted),
         barrierColor: Colors.black.withValues(alpha: isDark ? 0.62 : 0.38),
       ),
@@ -310,7 +310,7 @@ abstract final class AppTheme {
         insetPadding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.md),
         shape: RoundedRectangleBorder(
           borderRadius: AppRadii.inputAll,
-          side: isDark ? BorderSide(color: p.borderStrong) : BorderSide.none,
+          side: BorderSide(color: isDark ? p.borderStrong : AppColors.darkBorderStrong),
         ),
       ),
       dividerTheme: DividerThemeData(color: p.border, thickness: 1, space: 1),

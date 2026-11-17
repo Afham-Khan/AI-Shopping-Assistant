@@ -91,7 +91,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   void _sendCode() {
-    if (!_emailForm.currentState!.validate()) return;
+    if (!validateForm(_emailForm)) return;
     _run(() async {
       await _auth.requestPasswordReset(_email.text);
       if (!mounted) return;
@@ -125,7 +125,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   void _reset() {
-    if (!_passwordForm.currentState!.validate()) return;
+    if (!validateForm(_passwordForm)) return;
     _run(() async {
       await _auth.resetPassword(resetToken: _resetToken!, password: _password.text);
       if (!mounted) return;

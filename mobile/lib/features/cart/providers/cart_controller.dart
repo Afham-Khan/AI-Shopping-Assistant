@@ -92,6 +92,22 @@ class CartController extends AsyncNotifier<Cart> {
     }
   }
 
+  /// Adds several lines (e.g. "Buy again"). Returns how many were added and
+  /// the last server error, if any line failed.
+  Future<({int added, String? error})> addAll(List<({int productId, int quantity})> lines, {String? source}) async {
+    var added = 0;
+    String? error;
+    for (final line in lines) {
+      try {
+        await add(line.productId, quantity: line.quantity, source: source);
+        added++;
+      } on ApiException catch (e) {
+        error = e.message;
+      }
+    }
+    return (added: added, error: error);
+  }
+
   /// Puts a removed line back (undo).
   Future<void> restore(CartItem item) => add(item.productId, quantity: item.quantity);
 

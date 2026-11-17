@@ -7,8 +7,8 @@ import '../utils/extensions.dart';
 import 'app_button.dart';
 import 'editorial.dart';
 
-/// Considered empty screen/section: a bordered icon tile on a quiet dot
-/// grid, a serif title, one helpful sentence and one way forward.
+/// Empty screen/section: a soft tinted icon circle, a bold title, one
+/// muted help line and (optionally) one way forward.
 ///
 /// ```dart
 /// EmptyState(
@@ -61,44 +61,28 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final t = context.textTheme;
-    final tile = compact ? 52.0 : 64.0;
+    final tile = compact ? 48.0 : 60.0;
+    final tint = accent;
 
     return Center(
       child: SingleChildScrollView(
         padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.xl),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
+          constraints: const BoxConstraints(maxWidth: 340),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // the tile sits on a small patch of dot grid, like a specimen
-              SizedBox(
-                width: tile + 88,
-                height: tile + 44,
-                child: DotGridBackground(
-                  spacing: 11,
-                  color: colors.borderStrong.withValues(alpha: 0.55),
-                  child: Center(
-                    child: Container(
-                      width: tile,
-                      height: tile,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: AppRadii.cardAll,
-                        border: Border.all(color: colors.borderStrong),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (accent != null)
-                            Positioned(top: 0, left: 0, right: 0, height: 2, child: ColoredBox(color: accent!)),
-                          iconWidget ?? Icon(icon, size: compact ? 22 : 26, color: accent ?? colors.muted),
-                        ],
-                      ),
-                    ),
-                  ),
+              // soft tinted circle: quiet, but clearly a state and not content
+              Container(
+                width: tile,
+                height: tile,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: tint == null ? colors.surfaceVariant : tint.withValues(alpha: context.isDark ? 0.14 : 0.10),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: tint == null ? colors.border : tint.withValues(alpha: 0.28)),
                 ),
+                child: iconWidget ?? Icon(icon, size: compact ? 22 : 26, color: tint ?? colors.muted),
               ),
               SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
               if (eyebrow != null) ...[
@@ -109,7 +93,7 @@ class EmptyState extends StatelessWidget {
                 header: true,
                 child: Text(
                   title,
-                  style: compact ? t.titleMedium : t.headlineSmall!.copyWith(fontSize: 22),
+                  style: compact ? t.titleSmall!.copyWith(fontWeight: FontWeight.w700) : t.titleMedium,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -117,7 +101,7 @@ class EmptyState extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   message!,
-                  style: t.bodyMedium!.copyWith(color: colors.muted, height: 1.5),
+                  style: (compact ? t.bodySmall! : t.bodyMedium!.copyWith(fontSize: 13)).copyWith(color: colors.muted, height: 1.5),
                   textAlign: TextAlign.center,
                 ),
               ],

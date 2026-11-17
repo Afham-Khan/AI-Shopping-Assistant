@@ -11,7 +11,6 @@ import '../../../core/utils/debouncer.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
-import '../../auth/providers/auth_controller.dart';
 import '../data/search_repository.dart';
 
 /// Search with live suggestions, recent history, trending chips and a
@@ -27,7 +26,8 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final _controller = TextEditingController(text: widget.initialQuery ?? '');
-  final _debouncer = Debouncer(duration: const Duration(milliseconds: 250));
+  final _debouncer = Debouncer(duration: const Duration(milliseconds: 600));
+  static const _minChars = 2;
   late String _q = (widget.initialQuery ?? '').trim();
   bool _smart = false;
 
@@ -37,6 +37,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _controller.dispose();
     super.dispose();
   }
+
+  String get _typed => _controller.text.trim();
 
   void _onChanged(String value) {
     setState(() {}); // clear button
@@ -49,14 +51,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final q = (value ?? _controller.text).trim();
     if (q.isEmpty) return;
     _debouncer.cancel();
-    if (ref.read(isAuthenticatedProvider)) {
-      // fire and forget; history is a convenience
-      unawaited(
-        ref.read(searchRepositoryProvider).saveHistory(q).then((_) {
-          if (mounted) ref.invalidate(searchHistoryProvider);
-        }, onError: (_) {}),
-      );
-    }
+    unawaited(ref.read(searchHistoryProvider.notifier).record(q));
     if (_smart) {
       context.push(Routes.smartSearchOf(q));
     } else {
@@ -116,19 +111,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               onChanged: (v) => setState(() => _smart = v),
             ),
             const SizedBox(height: AppSpacing.sm),
-            if (_q.isEmpty) ...[
+            if (_typed.length < _minChars) ...[
+              if (_typed.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: Text('Keep typing to see suggestions', style: context.textTheme.bodySmall),
+                ),
               const _History(),
               _Trending(onTap: _fill),
             ] else ...[
               if (!_smart)
                 _SuggestionTile(
                   leading: const AiSparkleIcon(size: 20),
-                  title: 'Smart AI search for "$_q"',
+                  title: 'Smart AI search for "$_typed"',
                   subtitle: 'Understands budgets, colours and use cases',
-                  onTap: () => context.push(Routes.smartSearchOf(_q)),
+                  onTap: () => context.push(Routes.smartSearchOf(_typed)),
                   tint: colors.aiSoft,
                 ),
-              _Suggestions(query: _q, onQuery: _fill),
+              // loading shows immediately while the debounce is pending
+              _typed != _q ? const SkeletonList(count: 4) : _Suggestions(query: _q, onQuery: _fill),
             ],
           ],
         ),
@@ -191,14 +192,12 @@ class _SmartToggle extends StatelessWidget {
 class _History extends ConsumerWidget {
   const _History();
 
-  Future<void> _clear(BuildContext context, WidgetRef ref) async {
-    try {
-      await ref.read(searchRepositoryProvider).clearHistory();
-      ref.invalidate(searchHistoryProvider);
-    } catch (e) {
-      if (context.mounted) AppSnack.error(context, e);
-    }
-  }
+  Future<void> _clear(BuildContext context, WidgetRef ref) => ConfirmDialog.show(
+    context,
+    title: 'Clear recent searches?',
+    confirmLabel: 'Clear',
+    onConfirm: () => ref.read(searchHistoryProvider.notifier).clear(),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

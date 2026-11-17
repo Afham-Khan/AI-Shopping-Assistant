@@ -26,7 +26,15 @@ Future<T?> showAppBottomSheet<T>(
     isDismissible: isDismissible,
     useRootNavigator: useRootNavigator,
     showDragHandle: false,
-    sheetAnimationStyle: context.reduceMotion ? AnimationStyle.noAnimation : null,
+    // 450 ms ease-out in, a little quicker out
+    sheetAnimationStyle: context.reduceMotion
+        ? AnimationStyle.noAnimation
+        : const AnimationStyle(
+            duration: AppDurations.sheet,
+            reverseDuration: Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
   );
 }
 

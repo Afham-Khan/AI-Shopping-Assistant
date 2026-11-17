@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/utils/form_reveal.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/validators.dart';
@@ -33,18 +34,21 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_form.currentState!.validate()) return;
+    if (!FormReveal.validate(_form)) {
+      setState(() => _error = const ApiException(FormReveal.fixFields));
+      return;
+    }
     context.unfocus();
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await ref
+      final message = await ref
           .read(profileRepositoryProvider)
           .changePassword(currentPassword: _current.text, newPassword: _next.text);
       if (!mounted) return;
-      AppSnack.success(context, 'Password changed');
+      AppSnack.success(context, message ?? 'Password changed');
       context.pop();
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e);
