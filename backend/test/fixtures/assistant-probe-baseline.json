@@ -1,0 +1,2446 @@
+{
+ "date": "2026-11-17",
+ "rows": [
+  {
+   "group": "off-topic",
+   "text": "who won the cricket match",
+   "intent": "small_talk",
+   "confidence": 0.911,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "tell me a joke",
+   "intent": "small_talk",
+   "confidence": 0.998,
+   "source": "model",
+   "content": "Why did the shopping cart go to therapy? It had too much baggage! Speaking of carts — want me to find you something?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "off-topic",
+   "text": "what's the weather",
+   "intent": "small_talk",
+   "confidence": 0.998,
+   "source": "model",
+   "content": "I can't check the weather, but I can find you sunglasses for sunny days or a cozy jacket alternative. What do you need?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "off-topic",
+   "text": "what is the weather in karachi today",
+   "intent": "small_talk",
+   "confidence": 0.998,
+   "source": "model",
+   "content": "I can't check the weather, but I can find you sunglasses for sunny days or a cozy jacket alternative. What do you need?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "off-topic",
+   "text": "write my assignment",
+   "intent": "product_search",
+   "confidence": 0.182,
+   "source": "entities",
+   "content": "I couldn't find anything matching **write assignment** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "can you help me with my homework",
+   "intent": "small_talk",
+   "confidence": 0.926,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "who made you",
+   "intent": "help",
+   "confidence": 0.974,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "are you ChatGPT",
+   "intent": "help",
+   "confidence": 0.981,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "how do you work",
+   "intent": "help",
+   "confidence": 0.994,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "what is AI",
+   "intent": "help",
+   "confidence": 0.829,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "who is the prime minister of pakistan",
+   "intent": "small_talk",
+   "confidence": 0.995,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what is the news today",
+   "intent": "small_talk",
+   "confidence": 0.999,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what is 2 plus 2",
+   "intent": "small_talk",
+   "confidence": 0.967,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "translate hello to french",
+   "intent": "product_search",
+   "confidence": 0.51,
+   "source": "model",
+   "content": "I found 4 translate french; here are the top 4: Best match: **Potatoes** at **Rs 649** — rated 4.5★ by 6 shoppers.",
+   "products": 4,
+   "top": "Potatoes",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what time is it",
+   "intent": "small_talk",
+   "confidence": 0.933,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what's the bitcoin price today",
+   "intent": "small_talk",
+   "confidence": 0.982,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "recommend a movie",
+   "intent": "small_talk",
+   "confidence": 0.97,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "sing a song",
+   "intent": "small_talk",
+   "confidence": 0.994,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what is the capital of france",
+   "intent": "small_talk",
+   "confidence": 0.992,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "are you a human",
+   "intent": "help",
+   "confidence": 0.995,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "identity",
+   "text": "what's your name",
+   "intent": "help",
+   "confidence": 0.99,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "off-topic",
+   "text": "do you love me",
+   "intent": "small_talk",
+   "confidence": 0.982,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "tell me about yourself",
+   "intent": "help",
+   "confidence": 0.919,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "off-topic",
+   "text": "can you code in python",
+   "intent": "small_talk",
+   "confidence": 0.924,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "who is elon musk",
+   "intent": "product_search",
+   "confidence": 0.873,
+   "source": "model",
+   "content": "I found 6 elon musk; here are the top 5: My top pick is **Calvin Klein CK One** at **Rs 13,999** — bestseller — 7 sold.",
+   "products": 5,
+   "top": "Calvin Klein CK One",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Calvin Klein",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "identity",
+   "text": "are you made by google",
+   "intent": "help",
+   "confidence": 0.986,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "what should i eat for dinner",
+   "intent": "small_talk",
+   "confidence": 0.932,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "off-topic",
+   "text": "play some music",
+   "intent": "small_talk",
+   "confidence": 0.992,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "feelings",
+   "text": "I'm sad",
+   "intent": "small_talk",
+   "confidence": 0.96,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "feelings",
+   "text": "i feel so lonely",
+   "intent": "product_search",
+   "confidence": 0.254,
+   "source": "entities",
+   "content": "I found 11 feel lonely; here are the top 5: My top pick is **Cricket Bat** at **Rs 8,399** — 3.7★ average rating.",
+   "products": 5,
+   "top": "Cricket Bat",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Classic Wear",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "feelings",
+   "text": "i'm really stressed about my exams",
+   "intent": "product_search",
+   "confidence": 0.687,
+   "source": "model",
+   "content": "I couldn't find anything matching **stressed exam** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "feelings",
+   "text": "i'm happy today",
+   "intent": "small_talk",
+   "confidence": 0.963,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "abuse",
+   "text": "you are stupid",
+   "intent": "small_talk",
+   "confidence": 0.947,
+   "source": "model",
+   "content": "Sorry I missed the mark. Try telling me the product, budget or brand you want and I'll do better.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "abuse",
+   "text": "you're a useless bot",
+   "intent": "product_search",
+   "confidence": 0.74,
+   "source": "model",
+   "content": "Take a look at these 3 useless bot: My top pick is **Olay Ultra Moisture Shea Butter Body Wash** at **Rs 3,649** — rated 4.1★ by 8 shoppers.",
+   "products": 3,
+   "top": "Olay Ultra Moisture Shea Butter Body Wash",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Olay",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "abuse",
+   "text": "fuck you",
+   "intent": "product_search",
+   "confidence": 0.576,
+   "source": "model",
+   "content": "I couldn't find anything matching **fuck** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "abuse",
+   "text": "shut up",
+   "intent": "product_search",
+   "confidence": 0.386,
+   "source": "entities",
+   "content": "I couldn't find anything matching **shut** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "feelings",
+   "text": "i want to kill myself",
+   "intent": "product_search",
+   "confidence": 0.775,
+   "source": "model",
+   "content": "I couldn't find anything matching **kill myself** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "do you deliver to Lahore",
+   "intent": "product_search",
+   "confidence": 0.582,
+   "source": "model",
+   "content": "Only one match for deliver lahore: My top pick is **Apple HomePod Mini Cosmic Grey** at **Rs 27,999** — rated 4.1★ by 7 shoppers.",
+   "products": 1,
+   "top": "Apple HomePod Mini Cosmic Grey",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "do you deliver to quetta",
+   "intent": "product_search",
+   "confidence": 0.524,
+   "source": "model",
+   "content": "Only one match for deliver quetta: My top pick is **Apple HomePod Mini Cosmic Grey** at **Rs 27,999** — rated 4.1★ by 7 shoppers.",
+   "products": 1,
+   "top": "Apple HomePod Mini Cosmic Grey",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "what are the payment methods",
+   "intent": "cart_help",
+   "confidence": 0.555,
+   "source": "model",
+   "content": "Your cart is empty. Want some recommendations to get started?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "how long is delivery",
+   "intent": "order_status",
+   "confidence": 0.978,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "cash on delivery?",
+   "intent": "order_status",
+   "confidence": 0.774,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "is cod available",
+   "intent": "product_search",
+   "confidence": 0.356,
+   "source": "entities",
+   "content": "I found 4 cod available; here are the top 4: My top pick is **Nescafe Coffee** at **Rs 2,249** — rated 4.8★ by 9 shoppers.",
+   "products": 4,
+   "top": "Nescafe Coffee",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "how to return",
+   "intent": "return_policy",
+   "confidence": 1,
+   "source": "model",
+   "content": "Return windows depend on the product and are shown on every product page (for example \"30 days return policy\" or \"No return policy\"). Orders can be **cancelled** while they're still placed or confirmed from **Orders → Cancel**, and the items are restocked.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Where is my order?",
+    "Show my cart",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "store-faq",
+   "text": "contact support",
+   "intent": "product_search",
+   "confidence": 0.052,
+   "source": "entities",
+   "content": "Here are 5 contact support: Top of the list is **TV Studio Camera Pedestal** at **Rs 139,999** — 3.8★ average rating.",
+   "products": 5,
+   "top": "TV Studio Camera Pedestal",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only ProVision",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "what are the shipping charges",
+   "intent": "product_search",
+   "confidence": 0.527,
+   "source": "model",
+   "content": "Take a look at these 5 shipping charge: Best match: **Apple iPhone Charger** at **Rs 5,599** — 18% off — save Rs 1,250.",
+   "products": 5,
+   "top": "Apple iPhone Charger",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Apple",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "is shipping free",
+   "intent": "cart_help",
+   "confidence": 0.577,
+   "source": "model",
+   "content": "Your cart is empty. Want some recommendations to get started?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "do you have any coupons",
+   "intent": "deals",
+   "confidence": 0.902,
+   "source": "model",
+   "content": "Today's best deals on coupon: the biggest is **Man Plaid Shirt** at **Rs 9,799** — **20% off**, saving Rs 2,400. Tip: use code **FLAT500** at checkout — Rs 500 off on orders above Rs 5,000.",
+   "products": 5,
+   "top": "Man Plaid Shirt",
+   "chips": 4,
+   "chipList": [
+    "Deals on phones",
+    "Deals on fashion",
+    "Compare the first two",
+    "Show cheaper options"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "discount codes",
+   "intent": "deals",
+   "confidence": 1,
+   "source": "model",
+   "content": "Today's best deals on code: the biggest is **Man Plaid Shirt** at **Rs 9,799** — **20% off**, saving Rs 2,400. Tip: use code **FLAT500** at checkout — Rs 500 off on orders above Rs 5,000.",
+   "products": 5,
+   "top": "Man Plaid Shirt",
+   "chips": 4,
+   "chipList": [
+    "Deals on phones",
+    "Deals on fashion",
+    "Compare the first two",
+    "Show cheaper options"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "can i pay with card",
+   "intent": "cart_help",
+   "confidence": 0.961,
+   "source": "model",
+   "content": "Your cart is empty. Want some recommendations to get started?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "delivery kitne din mein hoti hai",
+   "intent": "order_status",
+   "confidence": 0.46,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "do you ship internationally",
+   "intent": "product_search",
+   "confidence": 0.571,
+   "source": "model",
+   "content": "I couldn't find anything matching **ship internationally** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "what are your working hours",
+   "intent": "help",
+   "confidence": 0.876,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "is it safe to pay by card online",
+   "intent": "cart_help",
+   "confidence": 0.77,
+   "source": "model",
+   "content": "Your cart is empty. Want some recommendations to get started?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "how do i cancel my order",
+   "intent": "return_policy",
+   "confidence": 0.992,
+   "source": "model",
+   "content": "Return windows depend on the product and are shown on every product page (for example \"30 days return policy\" or \"No return policy\"). Orders can be **cancelled** while they're still placed or confirmed from **Orders → Cancel**, and the items are restocked.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Where is my order?",
+    "Show my cart",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "store-faq",
+   "text": "do you have a physical shop",
+   "intent": "product_search",
+   "confidence": 0.261,
+   "source": "entities",
+   "content": "I couldn't find anything matching **physical shop** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "how much is delivery charges for 3000 order",
+   "intent": "order_status",
+   "confidence": 0.974,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "store-faq",
+   "text": "do you deliver on sunday",
+   "intent": "product_search",
+   "confidence": 0.606,
+   "source": "model",
+   "content": "Only one match for deliver sunday: My top pick is **Apple HomePod Mini Cosmic Grey** at **Rs 27,999** — rated 4.1★ by 7 shoppers.",
+   "products": 1,
+   "top": "Apple HomePod Mini Cosmic Grey",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "personal",
+   "text": "track my order",
+   "intent": "order_status",
+   "confidence": 1,
+   "source": "model",
+   "content": "Your latest order **CW-DEMO-0003** (Huawei Matebook X Pro + 1 more) — 2 items, **Rs 400,998** — has been **placed** and is awaiting confirmation. You can follow every step in **Orders**.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Show my cart",
+    "Return policy",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "personal",
+   "text": "where is my parcel",
+   "intent": "order_status",
+   "confidence": 0.999,
+   "source": "model",
+   "content": "Your latest order **CW-DEMO-0003** (Huawei Matebook X Pro + 1 more) — 2 items, **Rs 400,998** — has been **placed** and is awaiting confirmation. You can follow every step in **Orders**.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Show my cart",
+    "Return policy",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "personal",
+   "text": "what's in my cart",
+   "intent": "cart_help",
+   "confidence": 0.998,
+   "source": "model",
+   "content": "Your cart is empty. Want some recommendations to get started?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "something nice",
+   "intent": "fallback",
+   "confidence": 0.438,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "vague",
+   "text": "I'm bored",
+   "intent": "small_talk",
+   "confidence": 0.987,
+   "source": "model",
+   "content": "Let's fix that with some window shopping! Want to see today's biggest deals?",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "best thing you have",
+   "intent": "recommendation",
+   "confidence": 0.831,
+   "source": "model",
+   "content": "Trending now. Leading the list is **Nescafe Coffee** at **Rs 2,249** (trending — 14 sold).",
+   "products": 5,
+   "top": "Nescafe Coffee",
+   "chips": 4,
+   "chipList": [
+    "Show cheaper options",
+    "Compare the first two",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "surprise me",
+   "intent": "gift_suggestion",
+   "confidence": 0.969,
+   "source": "model",
+   "content": "I'd love to help you find a gift! Who is it for?",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Mom",
+    "Dad",
+    "Wife",
+    "Husband",
+    "Sister",
+    "Friend"
+   ],
+   "clarify": true,
+   "ok": false
+  },
+  {
+   "group": "vague",
+   "text": "what's trending",
+   "intent": "recommendation",
+   "confidence": 0.962,
+   "source": "model",
+   "content": "Trending now. Leading the list is **Nescafe Coffee** at **Rs 2,249** (trending — 14 sold).",
+   "products": 5,
+   "top": "Nescafe Coffee",
+   "chips": 4,
+   "chipList": [
+    "Show cheaper options",
+    "Compare the first two",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "show me something cool",
+   "intent": "product_search",
+   "confidence": 0.593,
+   "source": "model",
+   "content": "I found 17 cool; here are the top 5: I'd start with **Gigabyte Aorus Men Tshirt** at **Rs 6,999** — 3.1★ average rating.",
+   "products": 5,
+   "top": "Gigabyte Aorus Men Tshirt",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Show more",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "i have 20000 rupees what can i buy",
+   "intent": "budget_query",
+   "confidence": 0.988,
+   "source": "model",
+   "content": "Sure! What are you shopping for with around **Rs 20,000**? Pick a category or just describe it.",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Phones",
+    "Laptops",
+    "Fashion",
+    "Beauty",
+    "Home & kitchen",
+    "Gifts"
+   ],
+   "clarify": true,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "recommend something",
+   "intent": "recommendation",
+   "confidence": 0.993,
+   "source": "model",
+   "content": "Trending now. Leading the list is **Nescafe Coffee** at **Rs 2,249** (trending — 14 sold).",
+   "products": 5,
+   "top": "Nescafe Coffee",
+   "chips": 4,
+   "chipList": [
+    "Show cheaper options",
+    "Compare the first two",
+    "Today's deals",
+    "Gift ideas"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "vague",
+   "text": "i don't know what to buy",
+   "intent": "help",
+   "confidence": 0.569,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "vague",
+   "text": "what do you sell",
+   "intent": "help",
+   "confidence": 0.71,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "is iphone 13 waterproof",
+   "intent": "product_search",
+   "confidence": 0.365,
+   "source": "entities",
+   "content": "Take a look at these 4 waterproof Apple smartphones: Top of the list is **iPhone 13 Pro** at **Rs 307,999** — great for waterproof: Water Resistance: IP68 (up to 6 m for 30 min).",
+   "products": 4,
+   "top": "iPhone 13 Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "product-fact",
+   "text": "difference between iPad and tablet",
+   "intent": "product_search",
+   "confidence": 0.97,
+   "source": "model",
+   "content": "Only one match for Apple tablets: I'd start with **iPad Mini 2021 Starlight** at **Rs 139,999** — Apple, as you asked.",
+   "products": 1,
+   "top": "iPad Mini 2021 Starlight",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "does the samsung galaxy s10 have fast charging",
+   "intent": "product_search",
+   "confidence": 0.335,
+   "source": "entities",
+   "content": "I found 2 fast charging Samsung smartphones; here are the top 2: I'd start with **Samsung Galaxy S7** at **Rs 83,999** — great for fast charging: Wireless and fast charging.",
+   "products": 2,
+   "top": "Samsung Galaxy S7",
+   "chips": 3,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "how much ram does the macbook pro have",
+   "intent": "product_search",
+   "confidence": 0.815,
+   "source": "model",
+   "content": "Only one match for Apple laptops: I'd start with **Apple MacBook Pro 14 Inch Space Grey** at **Rs 559,999** — Apple, as you asked.",
+   "products": 1,
+   "top": "Apple MacBook Pro 14 Inch Space Grey",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "is iphone x good for gaming",
+   "intent": "recommendation",
+   "confidence": 0.745,
+   "source": "model",
+   "content": "Here's what I'd recommend — 4 gaming Apple smartphones: Top of the list is **iPhone 13 Pro** at **Rs 307,999** — great for gaming: Processor: Apple A15 Bionic (5 nm).",
+   "products": 4,
+   "top": "iPhone 13 Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "what is the warranty on iphone 13 pro",
+   "intent": "return_policy",
+   "confidence": 0.672,
+   "source": "model",
+   "content": "Return windows depend on the product and are shown on every product page (for example \"30 days return policy\" or \"No return policy\"). Orders can be **cancelled** while they're still placed or confirmed from **Orders → Cancel**, and the items are restocked.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Where is my order?",
+    "Show my cart",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "what is a 5g phone",
+   "intent": "recommendation",
+   "confidence": 0.791,
+   "source": "model",
+   "content": "Here's what I'd recommend — 5 smartphones: I'd start with **iPhone 13 Pro** at **Rs 307,999** — rated 4.3★ by 6 shoppers.",
+   "products": 5,
+   "top": "iPhone 13 Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Apple",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "what does RAM mean",
+   "intent": "product_search",
+   "confidence": 0.909,
+   "source": "model",
+   "content": "Here are 5 ram mean: I'd start with **Apple MacBook Pro 14 Inch Space Grey** at **Rs 559,999** — 3.9★ average rating.",
+   "products": 5,
+   "top": "Apple MacBook Pro 14 Inch Space Grey",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Apple",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "product-fact",
+   "text": "which laptop is best for students",
+   "intent": "recommendation",
+   "confidence": 0.999,
+   "source": "model",
+   "content": "Here's what I'd recommend — 5 laptops: Best match: **Huawei Matebook X Pro** at **Rs 391,999** — great for work & study: Processor: Intel Core i7-1165G7 (11th Gen).",
+   "products": 5,
+   "top": "Huawei Matebook X Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Huawei",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "product-fact",
+   "text": "what is the price of iphone x",
+   "intent": "product_search",
+   "confidence": 0.436,
+   "source": "entities",
+   "content": "Take a look at these 4 Apple smartphones: Best match: **iPhone 13 Pro** at **Rs 307,999** — Apple, as you asked.",
+   "products": 4,
+   "top": "iPhone 13 Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "multi-intent",
+   "text": "cheap phone and a cover for it",
+   "intent": "product_search",
+   "confidence": 0.856,
+   "source": "model",
+   "content": "Here are 5 smartphones or mobile accessories, cheapest first: I'd start with **Selfie Stick Monopod** at **Rs 3,649** — 19% off — save Rs 850.",
+   "products": 5,
+   "top": "Selfie Stick Monopod",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only SnapTech",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "multi-intent",
+   "text": "a laptop and a mouse",
+   "intent": "product_search",
+   "confidence": 0.473,
+   "source": "model",
+   "content": "Take a look at these 5 laptops: My top pick is **Huawei Matebook X Pro** at **Rs 391,999** — bestseller — 5 sold.",
+   "products": 5,
+   "top": "Huawei Matebook X Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Huawei",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "multi-intent",
+   "text": "i need a phone and headphones under 100k",
+   "intent": "product_search",
+   "confidence": 0.805,
+   "source": "model",
+   "content": "I found 22 smartphones or mobile accessories; here are the top 5 under **Rs 100,000**: My top pick is **Selfie Lamp with iPhone** at **Rs 4,199** — 19% off — save Rs 1,000.",
+   "products": 5,
+   "top": "Selfie Lamp with iPhone",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only GadgetMaster",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "multi-intent",
+   "text": "perfume for my wife and a watch for me",
+   "intent": "product_search",
+   "confidence": 0.913,
+   "source": "model",
+   "content": "Take a look at these 5 fragrances or watches for your wife: I'd start with **Calvin Klein CK One** at **Rs 13,999** — bestseller — 7 sold.",
+   "products": 5,
+   "top": "Calvin Klein CK One",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Calvin Klein",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "multi-intent",
+   "text": "hi, can you show me laptops",
+   "intent": "product_search",
+   "confidence": 0.779,
+   "source": "model",
+   "content": "Here are 5 laptops: Top of the list is **Huawei Matebook X Pro** at **Rs 391,999** — bestseller — 5 sold.",
+   "products": 5,
+   "top": "Huawei Matebook X Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Huawei",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "multi-intent",
+   "text": "show me shoes and also tell me the delivery time",
+   "intent": "product_search",
+   "confidence": 0.334,
+   "source": "entities",
+   "content": "Here are 5 shoes or shoes: My top pick is **Calvin Klein Heel Shoes** at **Rs 22,399** — rated 4.3★ by 9 shoppers.",
+   "products": 5,
+   "top": "Calvin Klein Heel Shoes",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Calvin Klein",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "roman-urdu",
+   "text": "mjhe kuch acha sa chahiye",
+   "intent": "product_search",
+   "confidence": 0.247,
+   "source": "entities",
+   "content": "I couldn't find anything matching **sa** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "roman-urdu",
+   "text": "kia ap ke pas laptops hain",
+   "intent": "recommendation",
+   "confidence": 0.699,
+   "source": "model",
+   "content": "These 5 laptops stand out: I'd start with **Huawei Matebook X Pro** at **Rs 391,999** — bestseller — 5 sold.",
+   "products": 5,
+   "top": "Huawei Matebook X Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Huawei",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "sasta mobile chahiye",
+   "intent": "product_search",
+   "confidence": 0.796,
+   "source": "model",
+   "content": "Take a look at these 5 smartphones, cheapest first: My top pick is **Realme C35** at **Rs 41,999** — 15% off — save Rs 7,600.",
+   "products": 5,
+   "top": "Realme C35",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Realme",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "shoes dikhao 5000 tak",
+   "intent": "product_search",
+   "confidence": 0.927,
+   "source": "model",
+   "content": "Nothing under Rs 5,000 — the closest options start at Rs 5,599. Here are 5 shoes or shoes: Best match: **Black & Brown Slipper** at **Rs 5,599** — 2.9★ average rating.",
+   "products": 5,
+   "top": "Black & Brown Slipper",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Comfort Trends",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "ami ke liye tohfa",
+   "intent": "gift_suggestion",
+   "confidence": 1,
+   "source": "model",
+   "content": "Lovely — a gift for your mom. What budget do you have in mind?",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Under Rs 5,000",
+    "Under Rs 15,000",
+    "Under Rs 50,000",
+    "No limit"
+   ],
+   "clarify": true,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "mera order kahan hai",
+   "intent": "order_status",
+   "confidence": 1,
+   "source": "model",
+   "content": "Your latest order **CW-DEMO-0003** (Huawei Matebook X Pro + 1 more) — 2 items, **Rs 400,998** — has been **placed** and is awaiting confirmation. You can follow every step in **Orders**.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Show my cart",
+    "Return policy",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "delivery kab tak hogi",
+   "intent": "order_status",
+   "confidence": 0.995,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "roman-urdu",
+   "text": "cash on delivery hai?",
+   "intent": "order_status",
+   "confidence": 0.57,
+   "source": "model",
+   "content": "You haven't placed any orders yet. Want me to help you find something?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Trending products",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "roman-urdu",
+   "text": "wapis kaise karun",
+   "intent": "return_policy",
+   "confidence": 0.998,
+   "source": "model",
+   "content": "Return windows depend on the product and are shown on every product page (for example \"30 days return policy\" or \"No return policy\"). Orders can be **cancelled** while they're still placed or confirmed from **Orders → Cancel**, and the items are restocked.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Where is my order?",
+    "Show my cart",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "typo",
+   "text": "lapotp for gamng",
+   "intent": "product_search",
+   "confidence": 0.945,
+   "source": "model",
+   "content": "I found 5 gaming laptops; here are the top 5: My top pick is **Asus Zenbook Pro Dual Screen Laptop** at **Rs 503,999** — great for gaming: RAM: 16 GB DDR4.",
+   "products": 5,
+   "top": "Asus Zenbook Pro Dual Screen Laptop",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Asus",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "typo",
+   "text": "iphoen x prise",
+   "intent": "product_search",
+   "confidence": 0.746,
+   "source": "model",
+   "content": "Take a look at these 4 Apple smartphones: I'd start with **iPhone 13 Pro** at **Rs 307,999** — Apple, as you asked.",
+   "products": 4,
+   "top": "iPhone 13 Pro",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Best rated first",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "typo",
+   "text": "whre is my ordr",
+   "intent": "order_status",
+   "confidence": 1,
+   "source": "model",
+   "content": "Your latest order **CW-DEMO-0003** (Huawei Matebook X Pro + 1 more) — 2 items, **Rs 400,998** — has been **placed** and is awaiting confirmation. You can follow every step in **Orders**.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Show my cart",
+    "Return policy",
+    "Recommend something"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "typo",
+   "text": "perfum for wife",
+   "intent": "product_search",
+   "confidence": 0.995,
+   "source": "model",
+   "content": "Here are 5 fragrances for your wife: Top of the list is **Calvin Klein CK One** at **Rs 13,999** — bestseller — 7 sold.",
+   "products": 5,
+   "top": "Calvin Klein CK One",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Calvin Klein",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "typo",
+   "text": "smartwach under 10k",
+   "intent": "product_search",
+   "confidence": 0.827,
+   "source": "model",
+   "content": "I found 5 mobile accessories; here are the top 5 under **Rs 10,000**: Top of the list is **Monopod** at **Rs 5,599** — rated 4.0★ by 8 shoppers.",
+   "products": 5,
+   "top": "Monopod",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only TechGear",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "roman-urdu",
+   "text": "aap kaun ho",
+   "intent": "help",
+   "confidence": 0.482,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "roman-urdu",
+   "text": "mujhe udaasi ho rahi hai",
+   "intent": "product_search",
+   "confidence": 0.658,
+   "source": "model",
+   "content": "I couldn't find anything matching **udaasi rahi** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "long",
+   "text": "Hi there, I am a university student in Islamabad and I need a laptop that can handle programming and a little bit of gaming in the evenings, my budget is around 250000 rupees and I would prefer something light that I can carry to class every day without breaking my back, what would you suggest?",
+   "intent": "product_search",
+   "confidence": 0.342,
+   "source": "entities",
+   "content": "Nothing under Rs 300,000 — the closest options start at Rs 307,999. I found 5 gaming laptops for university; here are the top 5: Top of the list is **Lenovo Yoga 920** at **Rs 307,999** — great for work & study: Processor: Intel Core i7-8550U (8th Gen).",
+   "products": 5,
+   "top": "Lenovo Yoga 920",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Lenovo",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "long",
+   "text": "So yesterday I was watching the cricket match with my friends and we were arguing about who is the best batsman of all time and whether Pakistan will win the next world cup, honestly I think they will but my friend disagrees, what do you think about all of this?",
+   "intent": "product_search",
+   "confidence": 0.418,
+   "source": "entities",
+   "content": "I found 16 sports equipment for your friend; here are the top 5: I'd start with **Cricket Wicket** at **Rs 8,399** — rated 4.8★ by 8 shoppers.",
+   "products": 5,
+   "top": "Cricket Wicket",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Show more",
+    "Best rated first"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "long",
+   "text": "My sister is getting married next month and I want to buy her something really special, she likes makeup and jewellery and she is very fashionable, I can spend maybe 30000 rupees, also can you tell me how long delivery takes because I need it before the wedding?",
+   "intent": "gift_suggestion",
+   "confidence": 0.747,
+   "source": "model",
+   "content": "**Wedding gifts for your sister under Rs 30k**: A curated mix of women's jewellery, makeup and fragrances, all within Rs 30,000. Want to go bigger? Green Crystal Earring + Red Lipstick together come to Rs 12,048. My favourite: **Green Crystal Earring** at **Rs 8,399** (matches her love of women's jewellery).",
+   "products": 5,
+   "top": "Green Crystal Earring",
+   "chips": 3,
+   "chipList": [
+    "Show cheaper options",
+    "Compare the first two",
+    "Something more premium"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "long",
+   "text": "I ordered something last week and I am not sure if it has been shipped yet or not because I did not get any message and I am getting worried, can you check what is happening with it please?",
+   "intent": "product_search",
+   "confidence": 0.176,
+   "source": "entities",
+   "content": "Here are 5 ordered week sure shipped yet because message getting worried check happening: Best match: **Blue & Black Check Shirt** at **Rs 8,399** — 15% off — save Rs 1,500.",
+   "products": 5,
+   "top": "Blue & Black Check Shirt",
+   "chips": 4,
+   "chipList": [
+    "Compare the first two",
+    "Show cheaper options",
+    "Only Fashion Trends",
+    "Show more"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "emoji",
+   "text": "😂😂😂",
+   "intent": "fallback",
+   "confidence": 0,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "emoji",
+   "text": "👍",
+   "intent": "fallback",
+   "confidence": 0,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "emoji",
+   "text": "❤️",
+   "intent": "fallback",
+   "confidence": 0,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "emoji",
+   "text": "📱 under 50k",
+   "intent": "budget_query",
+   "confidence": 0.999,
+   "source": "model",
+   "content": "Sure! What are you shopping for with under **Rs 50,000**? Pick a category or just describe it.",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Phones",
+    "Laptops",
+    "Fashion",
+    "Beauty",
+    "Home & kitchen",
+    "Gifts"
+   ],
+   "clarify": true,
+   "ok": false
+  },
+  {
+   "group": "emoji",
+   "text": "🎁 for mom",
+   "intent": "gift_suggestion",
+   "confidence": 0.461,
+   "source": "model",
+   "content": "Lovely — a gift for your mom. What budget do you have in mind?",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Under Rs 5,000",
+    "Under Rs 15,000",
+    "Under Rs 50,000",
+    "No limit"
+   ],
+   "clarify": true,
+   "ok": true
+  },
+  {
+   "group": "emoji",
+   "text": "🙏 thanks",
+   "intent": "thanks",
+   "confidence": 1,
+   "source": "model",
+   "content": "You're welcome! Anything else I can find for you?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Recommend something",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "numbers",
+   "text": "50000",
+   "intent": "budget_query",
+   "confidence": 1,
+   "source": "model",
+   "content": "Sure! What are you shopping for with around **Rs 50,000**? Pick a category or just describe it.",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Phones",
+    "Laptops",
+    "Fashion",
+    "Beauty",
+    "Home & kitchen",
+    "Gifts"
+   ],
+   "clarify": true,
+   "ok": true
+  },
+  {
+   "group": "numbers",
+   "text": "100",
+   "intent": "small_talk",
+   "confidence": 0.502,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "numbers",
+   "text": "12345678",
+   "intent": "budget_query",
+   "confidence": 1,
+   "source": "model",
+   "content": "Sure! What are you shopping for with around **Rs 12,345,678**? Pick a category or just describe it.",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Phones",
+    "Laptops",
+    "Fashion",
+    "Beauty",
+    "Home & kitchen",
+    "Gifts"
+   ],
+   "clarify": true,
+   "ok": false
+  },
+  {
+   "group": "numbers",
+   "text": "50k",
+   "intent": "budget_query",
+   "confidence": 1,
+   "source": "model",
+   "content": "Sure! What are you shopping for with around **Rs 50,000**? Pick a category or just describe it.",
+   "products": 0,
+   "top": "",
+   "chips": 6,
+   "chipList": [
+    "Phones",
+    "Laptops",
+    "Fashion",
+    "Beauty",
+    "Home & kitchen",
+    "Gifts"
+   ],
+   "clarify": true,
+   "ok": true
+  },
+  {
+   "group": "gibberish",
+   "text": "asdkjh",
+   "intent": "product_search",
+   "confidence": 0.187,
+   "source": "entities",
+   "content": "I couldn't find anything matching **asdkjh** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "qwerty uiop",
+   "intent": "product_search",
+   "confidence": 0.091,
+   "source": "entities",
+   "content": "I couldn't find anything matching **qwerty uiop** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "jjjjjjjj",
+   "intent": "product_search",
+   "confidence": 0.196,
+   "source": "entities",
+   "content": "I couldn't find anything matching **jjjjjjjj** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "???",
+   "intent": "fallback",
+   "confidence": 0,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "...",
+   "intent": "fallback",
+   "confidence": 0,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "lkjsdf sdfkj werqwe",
+   "intent": "product_search",
+   "confidence": 0.042,
+   "source": "entities",
+   "content": "I couldn't find anything matching **lkjsdf sdfkj werqwe** in our catalog. Try a category like phones, perfumes or kitchen items — or describe what it's for.",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Perfumes for her",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "x",
+   "intent": "fallback",
+   "confidence": 0.196,
+   "source": "low_confidence",
+   "content": "Sorry, I didn't quite get that. You can ask me things like *phones under 50k*, *compare the first two* or *where is my order*.",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Phones under 50k",
+    "Gift ideas",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "ok",
+   "intent": "small_talk",
+   "confidence": 0.979,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "gibberish",
+   "text": "hmm",
+   "intent": "small_talk",
+   "confidence": 0.991,
+   "source": "model",
+   "content": "That's a little outside my aisle — I'm best at shopping help. Try asking for a product, a gift idea or today's deals!",
+   "products": 0,
+   "top": "",
+   "chips": 3,
+   "chipList": [
+    "Recommend something",
+    "Today's deals",
+    "Help"
+   ],
+   "clarify": false,
+   "ok": false
+  },
+  {
+   "group": "basics",
+   "text": "hi",
+   "intent": "greeting",
+   "confidence": 1,
+   "source": "model",
+   "content": "Hey! Looking for something specific, or want me to suggest a few things?",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Phones under 50k",
+    "Gift for mom",
+    "Today's deals",
+    "Where is my order?"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "basics",
+   "text": "thanks",
+   "intent": "thanks",
+   "confidence": 1,
+   "source": "model",
+   "content": "You're welcome! Anything else I can find for you?",
+   "products": 0,
+   "top": "",
+   "chips": 2,
+   "chipList": [
+    "Recommend something",
+    "Today's deals"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "basics",
+   "text": "bye",
+   "intent": "goodbye",
+   "confidence": 1,
+   "source": "model",
+   "content": "Bye for now! Your chat is saved — come back anytime. Happy shopping!",
+   "products": 0,
+   "top": "",
+   "chips": 0,
+   "chipList": [],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "basics",
+   "text": "what can you do",
+   "intent": "help",
+   "confidence": 0.999,
+   "source": "model",
+   "content": "I'm **Zel**, your Zelora shopping assistant. I can:\n• find products from plain language — *red running shoes for women under 15k*\n• recommend picks for you and suggest **gifts** by recipient, occasion and budget\n• **compare** products and pick the best value\n• summarize **reviews** and answer about any product I show\n• check your **order status**, **cart total**, today's **deals** and **return policy**\nI understand typos and Roman Urdu too (*sasta mobile chahiye 30k tak*).",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Gaming laptop under 300k",
+    "Gift for my sister",
+    "Compare iPhone and Samsung",
+    "sasta mobile chahiye"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "basics",
+   "text": "phones under 50k",
+   "intent": "product_search",
+   "confidence": 0.874,
+   "source": "model",
+   "content": "Only one match for smartphones under **Rs 50,000**: My top pick is **Realme C35** at **Rs 41,999** — 15% off — save Rs 7,600.",
+   "products": 1,
+   "top": "Realme C35",
+   "chips": 2,
+   "chipList": [
+    "Show cheaper options",
+    "Tell me more about the first one"
+   ],
+   "clarify": false,
+   "ok": true
+  },
+  {
+   "group": "basics",
+   "text": "gift for my mom",
+   "intent": "gift_suggestion",
+   "confidence": 1,
+   "source": "model",
+   "content": "Lovely — a gift for your mom. What budget do you have in mind?",
+   "products": 0,
+   "top": "",
+   "chips": 4,
+   "chipList": [
+    "Under Rs 5,000",
+    "Under Rs 15,000",
+    "Under Rs 50,000",
+    "No limit"
+   ],
+   "clarify": true,
+   "ok": true
+  }
+ ]
+}

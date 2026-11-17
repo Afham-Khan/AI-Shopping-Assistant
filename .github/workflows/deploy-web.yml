@@ -1,0 +1,71 @@
+name: Deploy web to Vercel
+
+# Builds the Flutter web app and uploads build/web to Vercel (Vercel's own build image has no Flutter SDK).
+# One-time setup, see docs/DEPLOYMENT.md step D:
+#   repo variable  API_BASE_URL     the public backend address, e.g. https://zelora-api.example.com
+#   repo secrets   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: 'Backend address to bake into this build (empty = use the API_BASE_URL repo variable)'
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/deploy-web.yml'
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      API_BASE_URL: ${{ inputs.api_base_url || vars.API_BASE_URL }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the settings
+        run: |
+          if [[ ! "$API_BASE_URL" =~ ^https?://[^/[:space:]]+$ ]]; then
+            echo "::error::API_BASE_URL is missing or not like https://host (set the repo variable, or type it when running the workflow by hand)."
+            exit 1
+          fi
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is not set (Settings > Secrets and variables > Actions)."
+              exit 1
+            fi
+          done
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.x
+          cache: true
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Build web (release)
+        run: flutter build web --release "--dart-define=API_BASE_URL=${API_BASE_URL%/}"
+
+      - name: Add the Vercel config (SPA rewrite, cache headers)
+        run: cp vercel.json build/web/vercel.json
+
+      - name: Deploy build/web to Vercel (production)
+        run: npx --yes vercel@latest deploy build/web --prod --yes --token "$VERCEL_TOKEN"

@@ -1,0 +1,35 @@
+{
+    "name": "Zelora — AI Shopping Assistant",
+    "short_name": "Zelora",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#EEF1FB",
+    "theme_color": "#EEF1FB",
+    "description": "Your AI shopping assistant: ask Zel in plain words, snap a photo to find it, and build bundles under budget.",
+    "orientation": "portrait",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

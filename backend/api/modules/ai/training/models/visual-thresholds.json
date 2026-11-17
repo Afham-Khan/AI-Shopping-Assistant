@@ -1,0 +1,242 @@
+{
+  "model": "clip-vit-base-patch32",
+  "calibratedAt": "2026-11-17T18:33:35.115Z",
+  "classesSignature": "382fa9be9690",
+  "rule": "not recognized if a non-product class wins the zero-shot softmax (logit scale 100, prompt-ensembled), or the best category probability renormalized over product classes < minCategoryProb, or no in-stock neighbour has cosine >= simFloor. displayed match = clamp((sim - simFloor) / (simCeil - simFloor)).",
+  "thresholds": {
+    "minCategoryProb": 0.15,
+    "simFloor": 0.6,
+    "simCeil": 0.911,
+    "textSimFloor": 0.265
+  },
+  "calibration": {
+    "targetRecall": 0.95,
+    "note": "Negatives are synthetic images generated in pure Node (note pages, printed text, diagrams, scribbles, solid colours, noise, gradients, shapes, checkerboards). They approximate real off-catalog photos; real camera shots (blur, perspective, lighting, real handwriting) may score differently. Positive recall uses each product thumbnail with its own vector excluded from the neighbour search. minCategoryProb/simFloor maximize rejection by gates 2+3 alone (gate 1 already rejects nearly every synthetic negative, which would give the search no signal).",
+    "positives": {
+      "n": 194,
+      "recall": 0.954,
+      "ownCategoryTop1": 0.68,
+      "ownCategoryTop1AmongRecognized": 0.714,
+      "nonProductClassWon": 4,
+      "nonProductClassWonBy": {
+        "screenshot": 2,
+        "pattern": 2
+      },
+      "categoryProb": {
+        "p05": 0.162,
+        "p25": 0.325,
+        "median": 0.599,
+        "p75": 0.791,
+        "p95": 0.948
+      },
+      "bestNonSelfSimilarity": {
+        "p05": 0.724,
+        "p25": 0.824,
+        "median": 0.863,
+        "p75": 0.89,
+        "p95": 0.924
+      },
+      "rejected": [
+        {
+          "id": 22,
+          "title": "Dog Food",
+          "category": "groceries",
+          "winner": "screenshot",
+          "categoryProb": 0.223,
+          "bestSim": 0.617
+        },
+        {
+          "id": 61,
+          "title": "Hand Blender",
+          "category": "kitchen-accessories",
+          "winner": "fragrances",
+          "categoryProb": 0.148,
+          "bestSim": 0.838
+        },
+        {
+          "id": 77,
+          "title": "Yellow Peeler",
+          "category": "kitchen-accessories",
+          "winner": "mobile-accessories",
+          "categoryProb": 0.1,
+          "bestSim": 0.873
+        },
+        {
+          "id": 112,
+          "title": "TV Studio Camera Pedestal",
+          "category": "mobile-accessories",
+          "winner": "screenshot",
+          "categoryProb": 0.116,
+          "bestSim": 0.859
+        },
+        {
+          "id": 143,
+          "title": "Cricket Bat",
+          "category": "sports-accessories",
+          "winner": "womens-bags",
+          "categoryProb": 0.133,
+          "bestSim": 0.873
+        },
+        {
+          "id": 158,
+          "title": "Sunglasses",
+          "category": "sunglasses",
+          "winner": "mobile-accessories",
+          "categoryProb": 0.14,
+          "bestSim": 0.87
+        },
+        {
+          "id": 160,
+          "title": "Samsung Galaxy Tab S8 Plus Grey",
+          "category": "tablets",
+          "winner": "fragrances",
+          "categoryProb": 0.124,
+          "bestSim": 0.817
+        },
+        {
+          "id": 163,
+          "title": "Girl Summer Dress",
+          "category": "tops",
+          "winner": "pattern",
+          "categoryProb": 0.256,
+          "bestSim": 0.859
+        },
+        {
+          "id": 183,
+          "title": "Green Oval Earring",
+          "category": "womens-jewellery",
+          "winner": "pattern",
+          "categoryProb": 0.115,
+          "bestSim": 0.85
+        }
+      ]
+    },
+    "negatives": {
+      "n": 230,
+      "rejection": 1,
+      "rejectedByNonProductClassAlone": 1,
+      "rejectedByBackstopGatesAlone": 0.409,
+      "rejectedWithWinningClassLeftOut": 0.965,
+      "byKind": {
+        "handwrittenNotes": {
+          "n": 60,
+          "rejected": 60,
+          "byNonProductClass": 60,
+          "byBackstopAlone": 43,
+          "leaveWinnerOut": 60,
+          "rejection": 1
+        },
+        "printedText": {
+          "n": 30,
+          "rejected": 30,
+          "byNonProductClass": 30,
+          "byBackstopAlone": 2,
+          "leaveWinnerOut": 30,
+          "rejection": 1
+        },
+        "diagram": {
+          "n": 20,
+          "rejected": 20,
+          "byNonProductClass": 20,
+          "byBackstopAlone": 11,
+          "leaveWinnerOut": 20,
+          "rejection": 1
+        },
+        "scribbles": {
+          "n": 25,
+          "rejected": 25,
+          "byNonProductClass": 25,
+          "byBackstopAlone": 5,
+          "leaveWinnerOut": 25,
+          "rejection": 1
+        },
+        "solid": {
+          "n": 20,
+          "rejected": 20,
+          "byNonProductClass": 20,
+          "byBackstopAlone": 17,
+          "leaveWinnerOut": 20,
+          "rejection": 1
+        },
+        "noise": {
+          "n": 15,
+          "rejected": 15,
+          "byNonProductClass": 15,
+          "byBackstopAlone": 4,
+          "leaveWinnerOut": 13,
+          "rejection": 1
+        },
+        "gradient": {
+          "n": 20,
+          "rejected": 20,
+          "byNonProductClass": 20,
+          "byBackstopAlone": 0,
+          "leaveWinnerOut": 17,
+          "rejection": 1
+        },
+        "shapes": {
+          "n": 25,
+          "rejected": 25,
+          "byNonProductClass": 25,
+          "byBackstopAlone": 5,
+          "leaveWinnerOut": 24,
+          "rejection": 1
+        },
+        "checkerboard": {
+          "n": 15,
+          "rejected": 15,
+          "byNonProductClass": 15,
+          "byBackstopAlone": 7,
+          "leaveWinnerOut": 13,
+          "rejection": 1
+        }
+      },
+      "winnerClasses": {
+        "handwritten-notes": 65,
+        "printed-text": 30,
+        "whiteboard": 16,
+        "pattern": 84,
+        "drawing": 18,
+        "screenshot": 16,
+        "blank-wall": 1
+      },
+      "categoryProb": {
+        "p05": 0.101,
+        "p25": 0.129,
+        "median": 0.165,
+        "p75": 0.203,
+        "p95": 0.298
+      },
+      "bestSimilarity": {
+        "p05": 0.671,
+        "p25": 0.713,
+        "median": 0.749,
+        "p75": 0.769,
+        "p95": 0.804
+      }
+    },
+    "text": {
+      "positives": 245,
+      "negatives": 24,
+      "recall": 0.955,
+      "rejection": 0.583,
+      "genericPhraseRecall": 0.966,
+      "positiveBestSimilarity": {
+        "p05": 0.266,
+        "p25": 0.285,
+        "median": 0.299,
+        "p75": 0.31,
+        "p95": 0.324
+      },
+      "negativeBestSimilarity": {
+        "p05": 0.249,
+        "p25": 0.255,
+        "median": 0.262,
+        "p75": 0.266,
+        "p95": 0.286
+      }
+    },
+    "gridSize": 2452,
+    "tookMs": 24282
+  }
+}
