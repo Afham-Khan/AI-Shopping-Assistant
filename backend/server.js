@@ -1,6 +1,7 @@
 const app = require('./app');
 const db = require('./api/db/connection');
 const { describeTarget } = require('./helpers/dbConfig');
+const { weakSecrets, weakSecretsMessage } = require('./helpers/runtime');
 
 const PORT = Number(process.env.PORT) || 5000;
 const DB_ATTEMPTS = 5;
@@ -26,12 +27,9 @@ const waitForDatabase = async () => {
 
 // a public API must not sign tokens with the placeholder secrets from .env.example
 const refuseWeakSecrets = () => {
-  if (process.env.NODE_ENV !== 'production') return;
-  const weak = ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET']
-    .filter((name) => !process.env[name] || process.env[name].length < 24 || /^change-me/i.test(process.env[name]));
+  const weak = weakSecrets();
   if (!weak.length) return;
-  console.error(`NODE_ENV=production needs real secrets: ${weak.join(', ')} missing, shorter than 24 characters or still "change-me".\n`
-    + 'Make one with:  node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+  console.error(weakSecretsMessage(weak));
   process.exit(1);
 };
 

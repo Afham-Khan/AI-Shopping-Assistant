@@ -2,8 +2,9 @@ name: Deploy web to Vercel
 
 # Builds the Flutter web app and uploads build/web to Vercel (Vercel's own build image has no Flutter SDK).
 # One-time setup, see docs/DEPLOYMENT.md step D:
-#   repo variable  API_BASE_URL     the public backend address, e.g. https://zelora-api.example.com
-#   repo secrets   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+#   repo variable  API_BASE_URL     the backend's Vercel production address (the separate "zelora-api" project from
+#                                   step C), e.g. https://zelora-api.vercel.app  (no slash at the end, no /api/v1)
+#   repo secrets   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID   (VERCEL_PROJECT_ID = the WEBSITE project, not the API)
 on:
   workflow_dispatch:
     inputs:
@@ -51,6 +52,17 @@ jobs:
               exit 1
             fi
           done
+
+      # informational only: a wrong address is the most common mistake, but a sleeping database can make the very
+      # first call slow, so this warns instead of failing the build
+      - name: Check the backend answers
+        run: |
+          if curl -fsS --max-time 60 "${API_BASE_URL%/}/api/v1/health"; then
+            echo
+            echo "Backend at $API_BASE_URL is up."
+          else
+            echo "::warning::${API_BASE_URL%/}/api/v1/health did not answer. Check API_BASE_URL (the backend's Vercel production URL) before you rely on this build."
+          fi
 
       - uses: subosito/flutter-action@v2
         with:

@@ -23,7 +23,7 @@ const MODEL_KEY = 'clip-vit-base-patch32';
 const DIMS = 512;
 const LOGIT_SCALE = 100;
 const BACKEND_ROOT = path.join(__dirname, '../../../..');
-const CACHE_DIR = path.join(BACKEND_ROOT, '.cache/transformers');
+const { transformersCacheDir } = require('../../../../helpers/aiCache');
 const THRESHOLDS_FILE = path.join(__dirname, '../training/models/visual-thresholds.json');
 
 // prompt ensembling: every class description is expanded with these templates, embedded, averaged and
@@ -77,7 +77,7 @@ const load = () => {
   state.promise = (async () => {
     try {
       const T = require('@huggingface/transformers');
-      T.env.cacheDir = CACHE_DIR;
+      T.env.cacheDir = transformersCacheDir(); // AI_CACHE_DIR (e.g. /home/.cache on Azure) or backend/.cache
       const [processor, vision, tokenizer, text] = await Promise.all([
         T.AutoProcessor.from_pretrained(MODEL_ID),
         T.CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, { dtype: 'q8' }),
