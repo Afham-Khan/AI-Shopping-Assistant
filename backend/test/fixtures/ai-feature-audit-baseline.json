@@ -1,0 +1,1848 @@
+{
+ "date": "2026-11-17",
+ "results": [
+  {
+   "feature": "compare",
+   "name": "iPhone 13 Pro vs Realme XT vs Samsung Galaxy S10",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Oppo A57 vs Realme C35",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Oppo F19 Pro Plus vs Realme XT vs Vivo X21",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "iPhone 5s vs iPhone 6",
+   "pass": false,
+   "failures": [
+    "iPhone 6: \"rating\" is listed as both a pro and a con (Highest rated (3.4★) / Lower rating (3.4★))"
+   ]
+  },
+  {
+   "feature": "compare",
+   "name": "Apple MacBook Pro 14 Inch Space Grey vs Asus Zenbook Pro Dual Screen Laptop vs Huawei Matebook X Pro",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Lenovo Yoga 920 vs New DELL XPS 13 9300 Laptop",
+   "pass": false,
+   "failures": [
+    "Lenovo Yoga 920: \"rating\" is listed as both a pro and a con (Highest rated (3.4★) / Lower rating (3.4★))"
+   ]
+  },
+  {
+   "feature": "compare",
+   "name": "Apple Airpods vs Beats Flex Wireless Earphones vs Apple AirPods Max Silver",
+   "pass": false,
+   "failures": [
+    "Battery row marks Apple Airpods (\"Up to 5 hours listening, 24 hours with charging case\") as best over Apple AirPods Max Silver (\"Up to 20 hours with ANC\")"
+   ]
+  },
+  {
+   "feature": "compare",
+   "name": "iPad Mini 2021 Starlight vs Samsung Galaxy Tab S8 Plus Grey vs Samsung Galaxy Tab White",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Brown Leather Belt Watch vs Longines Master Collection vs Rolex Datejust",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Calvin Klein CK One vs Chanel Coco Noir Eau De vs Dior J'adore",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Nike Air Jordan 1 Red And Black vs Puma Future Rider Trainers vs Sports Sneakers Off White & Red",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Boxed Blender vs Hand Blender",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Samsung Galaxy S7 vs Samsung Galaxy S8 vs Samsung Galaxy S10",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Realme C35 vs Samsung Galaxy S7 vs Vivo V9",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "iPhone 13 Pro vs Realme XT vs Samsung Galaxy S10 — \"for gaming\"",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Oppo A57 vs Realme C35 vs Vivo S1 — \"for my mom\"",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Apple MacBook Pro 14 Inch Space Grey vs Asus Zenbook Pro Dual Screen Laptop vs Huawei Matebook X Pro — \"for gaming\"",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Apple MacBook Pro 14 Inch Space Grey vs Huawei Matebook X Pro vs New DELL XPS 13 9300 Laptop — \"for travel\"",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Oppo F19 Pro Plus vs Realme XT vs Samsung Galaxy S10 — \"for photography\"",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "compare",
+   "name": "Oppo A57 vs Realme X vs Samsung Galaxy S7 — \"long battery life\"",
+   "pass": false,
+   "failures": [
+    "Storage row marks Samsung Galaxy S7 (\"32 GB (microSD up to 200 GB)\") as best over Oppo A57 (\"64 GB (expandable via microSD)\")"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"gaming setup\" for Rs 400,000 → Gaming laptop: Lenovo Yoga 920; Headphones: Beats Flex Wireless Earphones; Speaker: Apple HomePod Mini Cosmic Grey",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "bundle",
+   "name": "\"gaming setup\" for Rs 800,000 → Gaming laptop: Huawei Matebook X Pro; Headphones: Apple AirPods Max Silver; Gaming chair: Knoll Saarinen Executive Conference Chair; Speaker: Apple HomePod Mini Cosmic Grey",
+   "pass": false,
+   "failures": [
+    "gaming laptop is \"Huawei Matebook X Pro\" (Intel Iris Xe) although \"Asus Zenbook Pro Dual Screen Laptop\" has a NVIDIA GeForce RTX 2060 6 GB and fits the budget"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"home office setup\" for Rs 600,000 → Laptop: Lenovo Yoga 920; Office chair: Knoll Saarinen Executive Conference Chair; Desk / table: Bedside Table African Cherry; Desk lamp: Table Lamp; Headphones: Beats Flex Wireless Earphones",
+   "pass": false,
+   "failures": [
+    "Desk / table is filled by \"Bedside Table African Cherry\" (furniture), which is not a desk / table"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"university starter kit\" for Rs 250,000 → Laptop or tablet: Samsung Galaxy Tab S8 Plus Grey; Earphones: Beats Flex Wireless Earphones; Watch: Brown Leather Belt Watch; Power bank / charger: iPhone 12 Silicone Case with MagSafe Plum; Coffee & snacks: Nescafe Coffee",
+   "pass": false,
+   "failures": [
+    "Power bank / charger is filled by \"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories), which is not a power bank / charger"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"gym starter pack\" for Rs 60,000 → Protein: Protein Powder; Training shoes: Puma Future Rider Trainers; Wireless earbuds: Beats Flex Wireless Earphones; Hydration: Water; Sports gear: Cricket Wicket",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "bundle",
+   "name": "\"gift set for her\" for Rs 60,000 → Fragrance: Dolce Shine Eau de; Jewellery / watch: Green Crystal Earring; Bag / accessory: Blue Women's Handbag; Beauty treat: Red Lipstick",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "bundle",
+   "name": "\"skincare routine\" for Rs 15,000 → Cleanser: Olay Ultra Moisture Shea Butter Body Wash; Moisturizer: Vaseline Men Body and Face Lotion; Makeup: Red Lipstick",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "bundle",
+   "name": "\"kitchen starter set\" for Rs 40,000 → Cookware: Silver Pot With Glass Cap; Knife: Knife; Utensils: Red Tongs; Appliance: Boxed Blender; Pantry basics: Rice",
+   "pass": false,
+   "failures": [
+    "Cookware: \"Silver Pot With Glass Cap\" (Rs 11,199, 2.8★) while \"Carbon Steel Wok\" is cheaper and rated higher (Rs 8,399, 4.29★)",
+    "Pantry basics: \"Rice\" (Rs 1,699, 3.33★) while \"Cooking Oil\" is cheaper and rated higher (Rs 1,399, 4.14★)"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"travel kit\" for Rs 120,000 → Sunglasses: Party Glasses; Power bank: iPhone 12 Silicone Case with MagSafe Plum; Earphones: Beats Flex Wireless Earphones; Watch: Brown Leather Belt Watch; Bag: Heshe Women's Leather Bag",
+   "pass": false,
+   "failures": [
+    "Power bank is filled by \"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories), which is not a power bank"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"vlogging kit\" for Rs 200,000 → Camera phone: Oppo K1; Monopod / stick: Monopod; Power bank: iPhone 12 Silicone Case with MagSafe Plum",
+   "pass": false,
+   "failures": [
+    "Power bank is filled by \"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories), which is not a power bank"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"party outfit for women\" for Rs 80,000 → Outfit: Girl Summer Dress; Shoes: Red Shoes; Accessory: Green Crystal Earring; Bag / eyewear: Heshe Women's Leather Bag; Fragrance: Calvin Klein CK One",
+   "pass": false,
+   "failures": [
+    "Outfit: children's item \"Girl Summer Dress\" in an adult bundle",
+    "Outfit \"Girl Summer Dress\" (Casual, summer outings, birthdays) is not a party outfit; \"Short Frock\" (Casual outings, parties, summer days) is"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"wedding look for men\" for Rs 120,000 → Outfit: Blue & Black Check Shirt; Shoes: Puma Future Rider Trainers; Accessory: Brown Leather Belt Watch; Bag / eyewear: Party Glasses; Fragrance: Calvin Klein CK One",
+   "pass": false,
+   "failures": [
+    "Bag / eyewear: novelty \"Party Glasses\" in a wedding look for men"
+   ]
+  },
+  {
+   "feature": "bundle",
+   "name": "\"living room makeover\" for Rs 900,000 → Sofa: Annibale Colombo Sofa; Table: Bedside Table African Cherry; Lamp: Table Lamp; Decor piece: House Showpiece Plant",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "bundle",
+   "name": "\"gym starter pack for men\" for Rs 50,000 → Protein: Protein Powder; Training shoes: Puma Future Rider Trainers; Wireless earbuds: Beats Flex Wireless Earphones; Hydration: Water; Sports gear: Tennis Ball",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "gift",
+   "name": "dad likes watches, Rs 30,000 → Brown Leather Belt Watch, Apple HomePod Mini Cosmic Grey, Amazon Echo Plus, Puma Future Rider Trainers",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "mom likes cooking, Rs 20,000 → Red Tongs, Tray, Boxed Blender, Dolce Shine Eau de",
+   "pass": false,
+   "failures": [
+    "top picks feel cheap for a Rs 20,000 gift (Rs 1,949, Rs 4,749)"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "sister likes makeup, Rs 10,000 → Powder Canister, Red Lipstick, Eyeshadow Palette with Mirror, Green Crystal Earring",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "brother likes gaming, Rs 60,000 → Apple HomePod Mini Cosmic Grey, Amazon Echo Plus, Party Glasses, Calvin Klein CK One",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift",
+    "interest gaming barely reflected in the top 3"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "my boss (office), Rs 40,000 → Heshe Women's Leather Bag, Chanel Coco Noir Eau De, Apple HomePod Mini Cosmic Grey, Apple Airpods",
+   "pass": false,
+   "failures": [
+    "gender unknown but the top 4 has women's \"Heshe Women's Leather Bag\", women's \"Chanel Coco Noir Eau De\""
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "wife (anniversary), Rs 60,000 → Green Crystal Earring, Chanel Coco Noir Eau De, Heshe Women's Leather Bag, Dior J'adore",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "gift",
+   "name": "husband likes watches, Rs 100,000 → Brown Leather Belt Watch, Apple Watch Series 4 Gold, Apple HomePod Mini Cosmic Grey, Calvin Klein CK One",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "son likes sports, Rs 15,000 → Tennis Racket, Cricket Helmet, Cricket Wicket, Beats Flex Wireless Earphones",
+   "pass": false,
+   "failures": [
+    "\"Monopod\" (Mobile Accessories) is not a gift for a child",
+    "\"Monopod\" is an odd gift without a photography interest"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "daughter, Rs 10,000 → Cricket Wicket, Monopod, iPhone 12 Silicone Case with MagSafe Plum, Cricket Bat",
+   "pass": false,
+   "failures": [
+    "\"Monopod\" (Mobile Accessories) is not a gift for a child",
+    "\"Monopod\" is an odd gift without a photography interest",
+    "\"iPhone 12 Silicone Case with MagSafe Plum\" (Mobile Accessories) is not a gift for a child",
+    "\"iPhone 12 Silicone Case with MagSafe Plum\" is not a gift (model-specific accessory or consumable)"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "grandma, Rs 15,000 → Green Crystal Earring, Calvin Klein CK One, Blue Women's Handbag, Green Oval Earring",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift",
+    "\"Party Glasses\" is an odd gift for a grandmother"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "friend likes coffee, Rs 8,000 → Nescafe Coffee, Protein Powder, Soft Drinks, Party Glasses",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift",
+    "\"Monopod\" is an odd gift without a photography interest",
+    "\"Apple iPhone Charger\" is not a gift (model-specific accessory or consumable)"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "girlfriend (valentine) likes jewellery, Rs 25,000 → Green Crystal Earring, Green Oval Earring, Tropical Earring, Dolce Shine Eau de",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a valentine gift"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "bhai (eid), Rs 20,000 → Calvin Klein CK One, Beats Flex Wireless Earphones, Party Glasses, Monopod",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a eid gift",
+    "\"Monopod\" is an odd gift without a photography interest",
+    "eid gift: only 1 of the top 4 are classic eid gifts (fragrances, mens-shirts, mens-watches)"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "nephew, Rs 5,000 → Selfie Stick Monopod, Selfie Lamp with iPhone, Basketball, Golf Ball",
+   "pass": false,
+   "failures": [
+    "\"Selfie Stick Monopod\" (Mobile Accessories) is not a gift for a child",
+    "\"Selfie Stick Monopod\" is an odd gift without a photography interest",
+    "\"Selfie Lamp with iPhone\" (Mobile Accessories) is not a gift for a child",
+    "\"Selfie Lamp with iPhone\" is an odd gift without a photography interest"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "colleague (farewell), Rs 10,000 → Monopod, iPhone 12 Silicone Case with MagSafe Plum, Family Tree Photo Frame, Party Glasses",
+   "pass": false,
+   "failures": [
+    "\"Monopod\" is an odd gift without a photography interest",
+    "\"iPhone 12 Silicone Case with MagSafe Plum\" is not a gift (model-specific accessory or consumable)",
+    "novelty \"Party Glasses\" for a farewell gift"
+   ]
+  },
+  {
+   "feature": "gift",
+   "name": "dad likes travel, Rs 15,000 → Beats Flex Wireless Earphones, Monopod, Party Glasses, Classic Sun Glasses",
+   "pass": false,
+   "failures": [
+    "novelty \"Party Glasses\" for a general gift"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Blue Frock (Blue, Rs 8,399) → Shoes: Pampi Shoes; Bag: White Faux Leather Backpack; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Classic Sun Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Gray Dress (Grey, Rs 9,799) → Shoes: Pampi Shoes; Bag: Women Handbag Black; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Classic Sun Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Tartan Dress (Red, Rs 11,199) → Shoes: Pampi Shoes; Bag: Women Handbag Black; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Classic Sun Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Black Women's Gown (Black, Rs 36,399) → Shoes: Calvin Klein Heel Shoes; Bag: Women Handbag Black; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Party Glasses; Fragrance: Chanel Coco Noir Eau De",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Marni Red & Black Suit (Red, Rs 50,399) → Shoes: Calvin Klein Heel Shoes; Bag: Heshe Women's Leather Bag; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Sunglasses; Fragrance: Chanel Coco Noir Eau De",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Girl Summer Dress (Pink, Rs 5,599) → Shoes: Black & Brown Slipper; Bag: White Faux Leather Backpack; Jewellery: Tropical Earring; Watch: Women's Wrist Watch; Sunglasses: Classic Sun Glasses",
+   "pass": false,
+   "failures": [
+    "Watch: \"Women's Wrist Watch\" costs Rs 36,399 for a Rs 5,599 women's tops (more than 5×)",
+    "Watch: \"Women's Wrist Watch\" for a children's dress"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Blue & Black Check Shirt (Blue, Rs 8,399) → Shoes: Puma Future Rider Trainers; Watch: Brown Leather Belt Watch; Sunglasses: Classic Sun Glasses; Fragrance: Calvin Klein CK One",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Man Plaid Shirt (Red, Rs 9,799) → Shoes: Puma Future Rider Trainers; Watch: Brown Leather Belt Watch; Sunglasses: Classic Sun Glasses; Fragrance: Calvin Klein CK One",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Nike Air Jordan 1 Red And Black (Red, Rs 41,999) → Shirt: Gigabyte Aorus Men Tshirt; Watch: Brown Leather Belt Watch; Sunglasses: Green and Black Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Puma Future Rider Trainers (White, Rs 25,199) → Shirt: Gigabyte Aorus Men Tshirt; Watch: Brown Leather Belt Watch; Sunglasses: Classic Sun Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Blue Women's Handbag (Blue, Rs 13,999) → Dress: Dress Pea; Shoes: Pampi Shoes; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Sunglasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Prada Women Bag (Black, Rs 167,999) → Dress: Black Women's Gown; Shoes: Calvin Klein Heel Shoes; Jewellery: Green Crystal Earring; Watch: Women's Wrist Watch; Sunglasses: Sunglasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Green Crystal Earring (Green, Rs 8,399) → Dress: Black Women's Gown; Top: Tartan Dress; Bag: Women Handbag Black; Watch: Women's Wrist Watch",
+   "pass": false,
+   "failures": [
+    "children's item \"Girl Summer Dress\" in an adult look"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Calvin Klein Heel Shoes (Black, Rs 22,399) → Dress: Black Women's Gown; Top: Tartan Dress; Bag: Women Handbag Black; Jewellery: Green Crystal Earring",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Brown Leather Belt Watch (Brown, Rs 25,199) → Shirt: Blue & Black Check Shirt; Shoes: Puma Future Rider Trainers; Sunglasses: Classic Sun Glasses; Fragrance: Calvin Klein CK One",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "look",
+   "name": "Black Sun Glasses (Black, Rs 8,399) → Shirt: Gigabyte Aorus Men Tshirt; Top: Girl Summer Dress; Bag: Blue Women's Handbag; Watch: Brown Leather Belt Watch",
+   "pass": false,
+   "failures": [
+    "mixes men's and women's pieces in one look (Shirt: Gigabyte Aorus Men Tshirt; Top: Girl Summer Dress; Bag: Blue Women's Handbag; Watch: Brown Leather Belt Watch)",
+    "children's item \"Girl Summer Dress\" in an adult look",
+    "children's item \"Girl Summer Dress\" in an adult look"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Rolex Datejust Women (Rose Gold, Rs 3,079,999) → Dress: Black Women's Gown; Top: Girl Summer Dress; Jewellery: Green Crystal Earring; Bag: Heshe Women's Leather Bag",
+   "pass": false,
+   "failures": [
+    "children's item \"Girl Summer Dress\" in an adult look",
+    "children's item \"Girl Summer Dress\" in an adult look"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "iPhone 13 Pro (non-fashion) → Apple Airpower Wireless Charger, Apple AirPods Max Silver, Apple iPhone Charger, iPhone 12 Silicone Case with MagSafe Plum",
+   "pass": false,
+   "failures": [
+    "\"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories) does not go with a smartphones"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Boxed Blender (non-fashion) → Nescafe Coffee, Red Onions, House Showpiece Plant, Family Tree Photo Frame",
+   "pass": false,
+   "failures": [
+    "\"House Showpiece Plant\" (home-decoration) does not go with a kitchen accessories",
+    "\"Family Tree Photo Frame\" (home-decoration) does not go with a kitchen accessories"
+   ]
+  },
+  {
+   "feature": "look",
+   "name": "Asus Zenbook Pro Dual Screen Laptop (non-fashion) → TV Studio Camera Pedestal, Apple Watch Series 4 Gold, Selfie Stick Monopod, Apple HomePod Mini Cosmic Grey",
+   "pass": false,
+   "failures": [
+    "\"TV Studio Camera Pedestal\" (mobile-accessories) does not go with a laptops",
+    "\"Apple Watch Series 4 Gold\" (mobile-accessories) does not go with a laptops",
+    "\"Selfie Stick Monopod\" (mobile-accessories) does not go with a laptops",
+    "\"Apple HomePod Mini Cosmic Grey\" (mobile-accessories) does not go with a laptops",
+    "\"iPad Mini 2021 Starlight\" (tablets) does not go with a laptops"
+   ]
+  },
+  {
+   "feature": "explain",
+   "name": "iPhone 5s — This phone suits first-time smartphone users or anyone needing a simple backup phone and anyone who wants a li…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "iPhone 13 Pro — This phone suits photography lovers, mobile gamers and binge-watchers. Its strongest points are the processor …",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Oppo A57 — This phone suits heavy users who are away from a charger all day and first-time smartphone users or anyone nee…",
+   "pass": false,
+   "failures": [
+    "Display \"6.56-inch HD+ IPS LCD, 1612 x 720, 90 Hz\" is level 2 but praised: \"6.56\" LCD display, 90 Hz — Big screen, great for videos and games. IPS LCD panel: accurate colours and good viewing angles, though blacks look a bit grey. HD+ resolution: fine for casual use, but text is less crisp. 90 Hz refresh rate feels smoother than a standard 60 Hz screen.\""
+   ]
+  },
+  {
+   "feature": "explain",
+   "name": "Realme C35 — This phone suits heavy users who are away from a charger all day and first-time smartphone users or anyone nee…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Realme XT — This phone suits photography lovers and binge-watchers. Its strongest points are the RAM and display (8 GB RAM…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Samsung Galaxy S10 — This phone suits photography lovers, mobile gamers and binge-watchers. Its strongest points are the display an…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Samsung Galaxy S7 — This phone suits photography lovers, binge-watchers and anyone who wants a light, pocketable phone. Its strong…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Samsung Galaxy Tab S8 Plus Grey — This tablet suits mobile gamers, heavy users who are away from a charger all day and binge-watchers. Its stron…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Samsung Galaxy Tab White — This tablet suits heavy users who are away from a charger all day and first-time smartphone users or anyone ne…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Apple MacBook Pro 14 Inch Space Grey — This laptop suits programmers, designers and other power users. Its strongest points are the processor and dis…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Asus Zenbook Pro Dual Screen Laptop — This laptop suits gamers and programmers, designers and other power users. Its strongest points are the displa…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Lenovo Yoga 920 — This laptop suits students and travellers who work on the go. Its strongest points are the battery life and RA…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Huawei Matebook X Pro — This laptop suits programmers, designers and other power users and students and travellers who work on the go.…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Apple Airpods — A Rs 36,399 mobile accessorie for everyday use. Its strongest points are the weight and connectivity (4 g per …",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Apple AirPods Max Silver — This pair suits commuters and frequent flyers and long listening sessions. Its strongest points are the batter…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Apple Watch Series 4 Gold — A Rs 97,999 mobile accessorie for everyday use. Its strongest points are the battery and OS (Up to 18 hours ba…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Brown Leather Belt Watch — This watch suits everyday wear with zero fuss. Keep in mind: the water resistance is fair (30 m (3 ATM, splash…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Rolex Submariner Watch — This watch suits watch enthusiasts and formal occasions and active people who swim. Its strongest points are t…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Chanel Coco Noir Eau De — This fragrance suits evenings, events and cooler weather, anyone who loves a romantic floral scent and people …",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Calvin Klein CK One — This fragrance suits daytime, the office and warm weather.…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Generic Motorcycle — This bike suits daily city commuting on a budget. Its strongest point is the mileage (About 45 km per litre). …",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "Kawasaki Z800 — This bike suits experienced riders who want highway power. Its strongest points are the brakes and engine (Dua…",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "explain",
+   "name": "generic sweep over all 194 products (invented specs, missing numbers, praise/level mismatches)",
+   "pass": false,
+   "failures": [
+    "Oppo A57: Display \"6.56-inch HD+ IPS LCD, 1612 x 720, 90 Hz\" is level 2 but praised: \"6.56\" LCD display, 90 Hz — Big screen, great for videos and games. IPS LCD panel: accurate colours and good viewing angles, though blacks look a bit grey. HD+ resolution: fine for casual use, but text is less crisp. 90 Hz refresh rate feels smoother than a standard 60 Hz screen.\"",
+    "iPad Mini 2021 Starlight: Battery \"19.3 Wh, up to 10 hours\" explained without its number: \"Up to 10 hours battery\""
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 13 Pro: \"is it waterproof\" → Yes — Water Resistance: IP68 (up to 6 m for 30 min).",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Oppo A57: \"is it waterproof\" → I couldn't find that in the product details for Oppo A57. Try asking about its specs, reviews, warranty or price.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Brown Leather Belt Watch: \"is it waterproof\" → Yes — Water Resistance: 30 m (3 ATM, splash-proof).",
+   "pass": false,
+   "failures": [
+    "answer should not match /^yes —/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Apple MacBook Pro 14 Inch Space Grey: \"how much RAM does it have\" → RAM: 16 GB unified memory.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Realme XT: \"how much ram\" → RAM: 8 GB.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Samsung Galaxy S10: \"how much storage does it have\" → Storage: 128 GB (microSD up to 512 GB).",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Oppo A57: \"how big is the battery\" → Battery: 5000 mAh.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Apple Airpods: \"how long does the battery last\" → Reviewers are mostly positive about the battery life (2 positive, 0 negative mentions). Spec: Battery: Up to 5 hours lis",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Apple AirPods Max Silver: \"does it have noise cancellation\" → Yes — Noise Cancellation: Active Noise Cancellation with Transparency mode.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Apple Airpods: \"does it have noise cancellation\" → No — Noise Cancellation: None.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Calvin Klein Heel Shoes: \"what is the heel height\" → Heel Height: 7.5 cm (3 inch).",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Annibale Colombo Sofa: \"what size is it\" → Dimensions: 220 x 95 x 90 cm.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Asus Zenbook Pro Dual Screen Laptop: \"is it good for gaming\" → Reviewers are mixed about the performance (1 positive, 1 negative mentions).",
+   "pass": false,
+   "failures": [
+    "answer does not match /RTX 2060|gaming/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 5s: \"is it good for gaming\" → Reviewers are mostly negative about the performance (1 positive, 2 negative mentions).",
+   "pass": false,
+   "failures": [
+    "answer does not match /\\bno\\b|not (?:great|ideal|suited|built)|basic|light|older|struggle/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 13 Pro: \"does it come with warranty\" → Yes — Warranty: 3 year warranty.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Huawei Matebook X Pro: \"does it come with warranty\" → No — Warranty: No warranty.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 13 Pro: \"does it support 5g\" → Yes — Network: 5G.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Samsung Galaxy Tab White: \"does it support 5g\" → Yes — Connectivity: Wi-Fi, Bluetooth 5.0 (LTE optional).",
+   "pass": false,
+   "failures": [
+    "answer should not match /^yes/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Chanel Coco Noir Eau De: \"how long does the scent last\" → Reviewers are mixed about the scent (3 positive, 3 negative mentions).",
+   "pass": false,
+   "failures": [
+    "answer does not match /8 to 10 hours/"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Calvin Klein CK One: \"is it for men\" → Yes — Gender: Unisex.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Generic Motorcycle: \"what is the mileage\" → Mileage: Approx. 45 km/l.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Scooter Motorcycle: \"is it automatic\" → Yes — Easy twist-and-go automatic.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Kawasaki Z800: \"is it automatic\" → I couldn't find that in the product details for Kawasaki Z800. Try asking about its specs, reviews, warranty or price.",
+   "pass": false,
+   "failures": [
+    "answer does not match /^no\\b.*manual/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Samsung Galaxy Tab S8 Plus Grey: \"does it come with a stylus\" → Yes — Stylus: S Pen included.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Realme X: \"what is the price\" → It costs Rs 83,999 — 7% off the usual Rs 90,299.",
+   "pass": false,
+   "failures": [
+    "no evidence cited"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Samsung Galaxy S8: \"is it in stock\" → Sorry, it is out of stock right now.",
+   "pass": false,
+   "failures": [
+    "no evidence cited"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 13 Pro: \"what colour is it\" → Colour: Sierra Blue.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 5s: \"does it have face id\" → Yes — Touch ID fingerprint sensor.",
+   "pass": false,
+   "failures": [
+    "answer does not match /^no\\b|UNKNOWN|couldn'?t find|not listed/i",
+    "answer should not match /^yes/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone X: \"does it have face id\" → Yes — Face ID facial recognition.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Apple MacBook Pro 14 Inch Space Grey: \"how heavy is it\" → Weight: 1.6 kg.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Amazon Echo Plus: \"does it work with alexa\" → Yes — Voice Assistant: Amazon Alexa.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "iPhone 6: \"does it support wireless charging\" → Yes — Charging: 5W wired (Lightning).",
+   "pass": false,
+   "failures": [
+    "answer should not match /^yes/i"
+   ]
+  },
+  {
+   "feature": "qa",
+   "name": "Boxed Blender: \"is it dishwasher safe\" → Yes — Dishwasher Safe: Jar and lid, yes.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Protein Powder: \"is it gluten free\" → Yes — Dietary: Gluten-free, contains milk.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "Microwave Oven: \"what is the capacity\" → Capacity: 20 L.",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "qa",
+   "name": "White Faux Leather Backpack: \"is it real leather\" → Yes — Material: PU faux leather with polyester lining.",
+   "pass": false,
+   "failures": [
+    "answer should not match /^yes/i"
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "iPhone 13 Pro (6 reviews, avg 4.3★) → Very positive; pros Build quality, Display, Performance, Delivery; cons Battery life, Value for money, Looks & design, Camera",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Oppo A57 (9 reviews, avg 4.0★) → Very positive; pros Build quality, Camera, Battery life, Performance, Value for money; cons Display, Delivery, Packaging",
+   "pass": false,
+   "failures": [
+    "pro \"Value for money\" but no 4-5★ review mentions it (3★)"
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "New DELL XPS 13 9300 Laptop (6 reviews, avg 2.8★) → Mixed; pros Value for money, Battery life, Delivery; cons Matches description, Build quality, Keyboard",
+   "pass": false,
+   "failures": [
+    "pro \"Value for money\" but no 4-5★ review mentions it (2★, 3★, 3★)"
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "Gucci Bloom Eau de (8 reviews, avg 2.6★) → Mixed; pros Value for money; cons Scent, Long-lasting wear, Matches description, Build quality, Packaging",
+   "pass": false,
+   "failures": [
+    "pro \"Value for money\" but no 4-5★ review mentions it (3★, 2★, 1★, 3★)"
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "Essence Mascara Lash Princess (8 reviews, avg 2.9★) → Mixed; pros Long-lasting wear; cons Matches description, Shade & colour, Skin feel, Looks & design, Texture",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Samsung Galaxy Tab White (6 reviews, avg 3.0★) → Positive; pros Build quality, Value for money, Display, Packaging; cons -",
+   "pass": false,
+   "failures": [
+    "pro \"Value for money\" but no 4-5★ review mentions it (3★, 1★, 3★)"
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "Asus Zenbook Pro Dual Screen Laptop (8 reviews, avg 3.6★) → Very positive; pros Value for money, Display, Build quality, Portability, Keyboard; cons Matches description, Battery life, Performance",
+   "pass": false,
+   "failures": [
+    "average 3.6★ but labelled \"Very positive\""
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "Knoll Saarinen Executive Conference Chair (7 reviews, avg 4.0★) → Very positive; pros Ease of use, Size, Looks & design, Value for money, Assembly; cons -",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Heshe Women's Leather Bag (7 reviews, avg 4.4★) → Very positive; pros Fit & sizing, Build quality, Fabric, Value for money, Looks & design; cons -",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Calvin Klein Heel Shoes (9 reviews, avg 4.3★) → Very positive; pros Value for money, Comfort, Looks & design, Style, Fit & sizing; cons Matches description",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Kawasaki Z800 (9 reviews, avg 4.0★) → Very positive; pros Performance, Build quality, Comfort, Value for money, Delivery; cons Fuel economy, Matches description",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Protein Powder (7 reviews, avg 3.6★) → Positive; pros Taste, Portion size; cons Freshness",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Rolex Submariner Watch (9 reviews, avg 3.3★) → Positive; pros Value for money, Comfort, Build quality, Looks & design, Style; cons Matches description, Packaging",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "reviews",
+   "name": "Samsung Galaxy S10 (9 reviews, avg 3.8★) → Very positive; pros Performance, Battery life, Build quality; cons Camera, Display, Looks & design",
+   "pass": false,
+   "failures": [
+    "average 3.8★ but labelled \"Very positive\""
+   ]
+  },
+  {
+   "feature": "reviews",
+   "name": "Boxed Blender (7 reviews, avg 4.4★) → Very positive; pros Build quality, Value for money, Size; cons Ease of use",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "iPhone 13 Pro → iPhone X, Oppo F19 Pro Plus, Samsung Galaxy S10, iPhone 6",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Asus Zenbook Pro Dual Screen Laptop → Huawei Matebook X Pro, Lenovo Yoga 920, New DELL XPS 13 9300 Laptop, Apple MacBook Pro 14 Inch Space Grey",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Apple Airpods → Apple Airpower Wireless Charger, Apple HomePod Mini Cosmic Grey, Apple AirPods Max Silver, Beats Flex Wireless Earphones",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Nike Air Jordan 1 Red And Black → Sports Sneakers Off White & Red, Sports Sneakers Off White Red, Nike Baseball Cleats, Puma Future Rider Trainers",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Black Women's Gown → Corset With Black Skirt, Marni Red & Black Suit, Corset Leather With Skirt, Dress Pea",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Chanel Coco Noir Eau De → Dolce Shine Eau de, Dior J'adore, Gucci Bloom Eau de, Calvin Klein CK One",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Boxed Blender → Hand Blender, Lunch Box, Electric Stove, Chopping Board",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Protein Powder → Dog Food, Ice Cream, Nescafe Coffee, Milk",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Knoll Saarinen Executive Conference Chair → Bedside Table African Cherry, Wooden Bathroom Sink With Mirror, Annibale Colombo Sofa, Tray",
+   "pass": false,
+   "failures": [
+    "\"Tray\" (kitchen-accessories) is not the same kind of product as a furniture"
+   ]
+  },
+  {
+   "feature": "similar",
+   "name": "Basketball → Football, Basketball Rim, Tennis Ball, American Football",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Generic Motorcycle → Scooter Motorcycle, Kawasaki Z800, MotoGP CI.H1, 300 Touring",
+   "pass": false,
+   "failures": [
+    "\"300 Touring\" (vehicle) is not the same kind of product as a motorcycles"
+   ]
+  },
+  {
+   "feature": "similar",
+   "name": "Blue Women's Handbag → Women Handbag Black, White Faux Leather Backpack, Heshe Women's Leather Bag, Prada Women Bag",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "similar",
+   "name": "Brown Leather Belt Watch → Rolex Cellini Date Black Dial, Longines Master Collection, Women's Wrist Watch, Rolex Submariner Watch",
+   "pass": false,
+   "failures": [
+    "\"Women's Wrist Watch\" (womens-watches) is not the same kind of product as a men's watches",
+    "\"Women's Wrist Watch\" is for women"
+   ]
+  },
+  {
+   "feature": "similar",
+   "name": "Essence Mascara Lash Princess → Eyeshadow Palette with Mirror, Red Lipstick, Powder Canister, Red Nail Polish",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "iPhone 13 Pro → Apple Airpower Wireless Charger, Apple AirPods Max Silver, Apple iPhone Charger, iPhone 12 Silicone Case with MagSafe Plum",
+   "pass": false,
+   "failures": [
+    "\"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories) is not a complement to a smartphones"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Asus Zenbook Pro Dual Screen Laptop → TV Studio Camera Pedestal, Apple Watch Series 4 Gold, Selfie Stick Monopod, Apple HomePod Mini Cosmic Grey",
+   "pass": false,
+   "failures": [
+    "\"TV Studio Camera Pedestal\" (mobile-accessories) is not a complement to a laptops",
+    "\"Apple Watch Series 4 Gold\" (mobile-accessories) is not a complement to a laptops",
+    "\"Selfie Stick Monopod\" (mobile-accessories) is not a complement to a laptops",
+    "\"Apple HomePod Mini Cosmic Grey\" (mobile-accessories) is not a complement to a laptops",
+    "\"iPad Mini 2021 Starlight\" (tablets) is not a complement to a laptops"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Apple Airpods → Apple Watch Series 4 Gold, iPhone 12 Silicone Case with MagSafe Plum, Apple HomePod Mini Cosmic Grey, Monopod",
+   "pass": false,
+   "failures": [
+    "\"iPhone 13 Pro\" (smartphones) is not a complement to a mobile accessories",
+    "\"Oppo K1\" (smartphones) is not a complement to a mobile accessories"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Nike Air Jordan 1 Red And Black → Sports Sneakers Off White Red, Gigabyte Aorus Men Tshirt, Brown Leather Belt Watch, Blue & Black Check Shirt",
+   "pass": false,
+   "failures": [
+    "\"Sports Sneakers Off White Red\" (mens-shoes) is not a complement to a men's shoes"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Black Women's Gown → Black & Brown Slipper, Tropical Earring, Blue Women's Handbag, Women Handbag Black",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Chanel Coco Noir Eau De → Red Lipstick, Powder Canister, Red Nail Polish, Olay Ultra Moisture Shea Butter Body Wash",
+   "pass": false,
+   "failures": [
+    "\"Vaseline Men Body and Face Lotion\" is for men"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Boxed Blender → Nescafe Coffee, Red Onions, House Showpiece Plant, Family Tree Photo Frame",
+   "pass": false,
+   "failures": [
+    "\"House Showpiece Plant\" (home-decoration) is not a complement to a kitchen accessories",
+    "\"Family Tree Photo Frame\" (home-decoration) is not a complement to a kitchen accessories"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Protein Powder → Milk, Nescafe Coffee, Cucumber, Green Bell Pepper",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Knoll Saarinen Executive Conference Chair → Family Tree Photo Frame, House Showpiece Plant, Ice Cube Tray, Table Lamp",
+   "pass": false,
+   "failures": [
+    "\"Ice Cube Tray\" (kitchen-accessories) is not a complement to a furniture",
+    "\"Microwave Oven\" (kitchen-accessories) is not a complement to a furniture"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Basketball → Basketball Rim, Golf Ball, Iron Golf, Nescafe Coffee",
+   "pass": false,
+   "failures": [
+    "\"Golf Ball\" (sports-accessories) is not a complement to a sports equipment",
+    "\"Iron Golf\" (sports-accessories) is not a complement to a sports equipment",
+    "\"Tennis Ball\" (sports-accessories) is not a complement to a sports equipment"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Generic Motorcycle → Cricket Wicket, American Football, Party Glasses, Green and Black Glasses",
+   "pass": false,
+   "failures": [
+    "\"Cricket Wicket\" (sports-accessories) is not a complement to a motorcycles",
+    "\"American Football\" (sports-accessories) is not a complement to a motorcycles"
+   ]
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Blue Women's Handbag → Marni Red & Black Suit, Black Women's Gown, Black & Brown Slipper, Green Oval Earring",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Brown Leather Belt Watch → Gigabyte Aorus Men Tshirt, Classic Sun Glasses, Black Sun Glasses, Green and Black Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "boughtTogether",
+   "name": "Essence Mascara Lash Princess → Vaseline Men Body and Face Lotion, Attitude Super Leaves Hand Soap, Powder Canister, Olay Ultra Moisture Shea Butter Body Wash",
+   "pass": false,
+   "failures": [
+    "\"Vaseline Men Body and Face Lotion\" is for men"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× iPhone 13 Pro → savings: -; set: Apple Airpower Wireless Charger, Apple AirPods Max Silver, Apple iPhone Charger, iPhone 12 Silicone Case with MagSafe Plum",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"iPhone 12 Silicone Case with MagSafe Plum\" (mobile-accessories) does not go with the cart",
+    "complete-the-set \"iPhone 12 Silicone Case with MagSafe Plum\" is not compatible with the iPhone 13 Pro"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Asus Zenbook Pro Dual Screen Laptop + 1× Apple Airpods → savings: -; set: TV Studio Camera Pedestal, Apple Watch Series 4 Gold, Selfie Stick Monopod, Apple HomePod Mini Cosmic Grey",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Apple Watch Series 4 Gold\" is not compatible with the Asus Zenbook Pro Dual Screen Laptop",
+    "complete-the-set \"Apple HomePod Mini Cosmic Grey\" is not compatible with the Asus Zenbook Pro Dual Screen Laptop"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Rolex Datejust → savings: Rolex Cellini Date Black Dial; set: Party Glasses, Gigabyte Aorus Men Tshirt, Green and Black Glasses, Chanel Coco Noir Eau De",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Chanel Coco Noir Eau De\" is for women"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "2× Cucumber + 3× Lemon → savings: -; set: Green Bell Pepper, Nescafe Coffee, Protein Powder, Eggs",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "cart",
+   "name": "1× Marni Red & Black Suit → savings: -; set: Calvin Klein Heel Shoes, Heshe Women's Leather Bag, Green Crystal Earring, Blue Women's Handbag",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "cart",
+   "name": "2× Boxed Blender → savings: -; set: Nescafe Coffee, Red Onions, House Showpiece Plant, Family Tree Photo Frame",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"House Showpiece Plant\" (home-decoration) does not go with the cart",
+    "complete-the-set \"Family Tree Photo Frame\" (home-decoration) does not go with the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Knoll Saarinen Executive Conference Chair → savings: -; set: Family Tree Photo Frame, House Showpiece Plant, Ice Cube Tray, Table Lamp",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Ice Cube Tray\" (kitchen-accessories) does not go with the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Dior J'adore + 1× Red Lipstick → savings: -; set: Red Nail Polish, Olay Ultra Moisture Shea Butter Body Wash, Vaseline Men Body and Face Lotion, Chanel Coco Noir Eau De",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Vaseline Men Body and Face Lotion\" is for men",
+    "complete-the-set \"Chanel Coco Noir Eau De\" is another fragrances like one already in the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Samsung Galaxy S10 + 1× iPhone 12 Silicone Case with MagSafe Plum → savings: -; set: Apple HomePod Mini Cosmic Grey, Apple AirPods Max Silver, iPhone 6, iPhone X",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Apple HomePod Mini Cosmic Grey\" is not compatible with the Samsung Galaxy S10",
+    "complete-the-set \"iPhone 6\" (smartphones) does not go with the cart",
+    "complete-the-set \"iPhone 6\" is another smartphones like one already in the cart",
+    "complete-the-set \"iPhone X\" (smartphones) does not go with the cart",
+    "complete-the-set \"iPhone X\" is another smartphones like one already in the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Puma Future Rider Trainers → savings: -; set: Sunglasses, Gigabyte Aorus Men Tshirt, Brown Leather Belt Watch, Blue & Black Check Shirt",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "cart",
+   "name": "2× Glass → savings: -; set: Microwave Oven, Red Onions, Kiwi, House Showpiece Plant",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"House Showpiece Plant\" (home-decoration) does not go with the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Red Nail Polish (coupon WELCOME10) → savings: -; set: Olay Ultra Moisture Shea Butter Body Wash, Dolce Shine Eau de, Attitude Super Leaves Hand Soap, Calvin Klein CK One",
+   "pass": false,
+   "failures": [
+    "free-shipping gap says Rs 2,501, real gap Rs 2,751 (after the Rs 250 coupon)",
+    "summary does not state the real gap"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Lunch Box + 1× Ice Cube Tray (coupon FLAT500) → savings: -; set: Microwave Oven, Spoon, Black Whisk, Pan",
+   "pass": false,
+   "failures": [
+    "no free-shipping gap although below the threshold",
+    "complete-the-set \"Spoon\" (kitchen-accessories) does not go with the cart",
+    "complete-the-set \"Spoon\" is another kitchen accessories like one already in the cart",
+    "complete-the-set \"Black Whisk\" (kitchen-accessories) does not go with the cart",
+    "complete-the-set \"Black Whisk\" is another kitchen accessories like one already in the cart"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Realme XT → savings: -; set: Apple HomePod Mini Cosmic Grey, Monopod",
+   "pass": false,
+   "failures": [
+    "complete-the-set \"Apple HomePod Mini Cosmic Grey\" (mobile-accessories) does not go with the cart",
+    "complete-the-set \"Apple HomePod Mini Cosmic Grey\" is not compatible with the Realme XT"
+   ]
+  },
+  {
+   "feature": "cart",
+   "name": "1× Longines Master Collection → savings: -; set: Man Short Sleeve Shirt, Party Glasses, Gigabyte Aorus Men Tshirt, Green and Black Glasses",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "demo user (electronics 67%, fashion 15%, beauty 14%) → The Curious Explorer (runner-up The Tech Enthusiast); top Mobile Accessories, Laptops, Women's Bags",
+   "pass": false,
+   "failures": [
+    "persona \"The Curious Explorer\" although 67% of the activity is electronics"
+   ]
+  },
+  {
+   "feature": "dna",
+   "name": "beauty lover → The Beauty Buff (runner-up The Smart Saver)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "tech fan → The Tech Enthusiast (runner-up The Quality Connoisseur)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "bargain hunter → The Curious Explorer (runner-up The Home Maker)",
+   "pass": false,
+   "failures": [
+    "persona \"The Curious Explorer\", expected The Smart Saver"
+   ]
+  },
+  {
+   "feature": "dna",
+   "name": "Apple loyalist → The Tech Enthusiast (runner-up The Brand Loyalist)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "luxury watch buyer → The Style Maven (runner-up The Trendsetter)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "home maker → The Home Maker (runner-up The Quality Connoisseur)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "dna",
+   "name": "brand-new user → The Fresh Explorer (runner-up -)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "phones: lowest vs highest budget bracket → 8 vs 2 results",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "phones from Samsung → Samsung Galaxy S7, Samsung Galaxy S10",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "laptops for gaming → Asus Zenbook Pro Dual Screen Laptop, Huawei Matebook X Pro, Apple MacBook Pro 14 Inch Space Grey",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "phones for photography → Vivo V9, iPhone 13 Pro, Oppo F19 Pro Plus",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "phones with long battery life → iPhone 5s, Realme C35, Oppo A57",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "women's shoes → Calvin Klein Heel Shoes, Red Shoes, Golden Shoes Woman",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "men's watches, lowest budget → Under Rs 8,500: Brown Leather Belt Watch Rs 25,199, Longines Master Collection Rs 419,999, Rolex Cellini Date Black Dial Rs 2,519,999",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "women's clothing in red → Marni Red & Black Suit (Red), Tartan Dress (Red), Girl Summer Dress (Pink)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "fragrances, lowest budget → Under Rs 3k: Calvin Klein CK One, Dolce Shine Eau de, Gucci Bloom Eau de (fallback)",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "kitchen → Microwave Oven, Chopping Board, Boxed Blender",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "bedroom → Bedside Table African Cherry, Annibale Colombo Bed, Wooden Bathroom Sink With Mirror",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "cricket gear → Cricket Wicket, Cricket Helmet, Cricket Bat",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "fruits → Apple, Kiwi, Juice",
+   "pass": false,
+   "failures": [
+    "\"Juice\" in the top 3 for fruits"
+   ]
+  },
+  {
+   "feature": "finder",
+   "name": "car vs motorcycle → 5 cars, 4 bikes",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "motorcycle for daily commute → Generic Motorcycle, Scooter Motorcycle, MotoGP CI.H1",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "finder",
+   "name": "makeup → Red Lipstick, Powder Canister, Eyeshadow Palette with Mirror",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"red dress under 10000\" → Showing dresses in red under Rs 10,000. Nothing under Rs 10,000 — the closest options start at Rs 13,999. [Women's Dresses, Under Rs 10,000, Red]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"samsung phone\" → Showing Samsung smartphones [Smartphones, Samsung]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"gift for dad under 20k\" → Showing options for your dad under Rs 20,000 [Under Rs 20,000, For dad]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"cheap laptop\" → Showing laptops [Laptops, Cheapest first]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"watches for women\" → Showing watches for women [Women's Watches, For women]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"running shoes for men\" → Showing shoes for men [Men's Shoes, For men]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"perfume\" → Showing fragrances [Fragrances]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"iphone 13 pro\" → Showing Apple smartphones [Smartphones, Apple, pro]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "search",
+   "name": "\"kitchen stuff below 5000\" → Showing kitchen accessories under Rs 5,000 [Kitchen Accessories, Under Rs 5,000]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Essence Mascara Lash Princess → Essence Mascara Lash Princess [Fragrances 35%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Red Nail Polish → Red Nail Polish [Makeup 61%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Dolce Shine Eau de → Dolce Shine Eau de [Fragrances 90%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Bedside Table African Cherry → Bedside Table African Cherry [Furniture 35%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Beef Steak → Beef Steak [Fresh & Pantry 43%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Cucumber → Cucumber [Fresh & Pantry 56%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Green Bell Pepper → Green Bell Pepper [Women's Jewellery 26%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Juice → Juice [Skin Care 35%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Mulberry → (nothing)",
+   "pass": false,
+   "failures": [
+    "not recognized (non-product: a screenshot)"
+   ]
+  },
+  {
+   "feature": "visual",
+   "name": "Red Onions → Decoration Swing [Home Decor 35%]",
+   "pass": false,
+   "failures": [
+    "top result \"Decoration Swing\" (home-decoration) is neither the product nor its category",
+    "detected \"Home Decor\" instead of Fresh & Pantry"
+   ]
+  },
+  {
+   "feature": "visual",
+   "name": "Tissue Paper Box → Decoration Swing [Home Decor 51%]",
+   "pass": false,
+   "failures": [
+    "top result \"Decoration Swing\" (home-decoration) is neither the product nor its category",
+    "detected \"Home Decor\" instead of Fresh & Pantry"
+   ]
+  },
+  {
+   "feature": "visual",
+   "name": "House Showpiece Plant → House Showpiece Plant [Home Decor 88%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Black Aluminium Cup → Black Aluminium Cup [Home Decor 29%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Chopping Board → Chopping Board [Furniture 29%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Fine Mesh Strainer → Fine Mesh Strainer [Kitchen Accessories 72%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Hand Blender → Hand Blender [Kitchen Accessories 13%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Lunch Box → Lunch Box [Mobile Accessories 22%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Plate → Plate [Kitchen Accessories 54%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Spice Rack → Spice Rack [Skin Care 22%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Yellow Peeler → Yellow Peeler [Women's Watches 23%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Lenovo Yoga 920 → Lenovo Yoga 920 [Laptops 95%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Man Plaid Shirt → Man Plaid Shirt [Men's Shirts 88%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Nike Baseball Cleats → Nike Baseball Cleats [Men's Shoes 73%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Brown Leather Belt Watch → Brown Leather Belt Watch [Men's Watches 52%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Rolex Datejust → Rolex Datejust Women [Women's Watches 92%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Apple AirPods Max Silver → Apple AirPods Max Silver [Mobile Accessories 62%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Apple MagSafe Battery Pack → Apple MagSafe Battery Pack [Tablets 31%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Monopod → Monopod [Mobile Accessories 57%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Generic Motorcycle → Generic Motorcycle [Motorcycles 81%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Sportbike Motorcycle → Generic Motorcycle [Motorcycles 83%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "iPhone 5s → iPhone 6 [Smartphones 72%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Oppo A57 → Oppo A57 [Smartphones 62%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Realme X → Vivo S1 [Smartphones 79%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Samsung Galaxy S10 → Samsung Galaxy S10 [Smartphones 75%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "American Football → American Football [Sports Equipment 97%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Basketball Rim → Basketball Rim [Sports Equipment 91%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Cricket Wicket → Cricket Wicket [Mobile Accessories 14%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Iron Golf → Iron Golf [Mobile Accessories 14%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Volleyball → (nothing)",
+   "pass": false,
+   "failures": [
+    "not recognized (non-product: a screenshot)"
+   ]
+  },
+  {
+   "feature": "visual",
+   "name": "Party Glasses → Party Glasses [Sunglasses 87%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Samsung Galaxy Tab White → Samsung Galaxy Tab White [Tablets 89%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Short Frock → Corset Leather With Skirt [Women's Dresses 83%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Dodge Hornet GT Plus → Dodge Hornet GT Plus [Cars 50%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Heshe Women's Leather Bag → Heshe Women's Leather Bag [Women's Bags 93%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Black Women's Gown → Black Women's Gown [Women's Dresses 71%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Marni Red & Black Suit → Corset Leather With Skirt [Women's Dresses 86%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Black & Brown Slipper → Pampi Shoes [Women's Shoes 85%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Red Shoes → Red Shoes [Women's Shoes 83%]",
+   "pass": true,
+   "failures": []
+  },
+  {
+   "feature": "visual",
+   "name": "Watch Gold for Women → IWC Ingenieur Automatic Steel [Women's Watches 52%]",
+   "pass": true,
+   "failures": []
+  }
+ ],
+ "visualStats": {
+  "n": 49,
+  "exact": 37,
+  "exact3": 41,
+  "sameCat": 45
+ }
+}

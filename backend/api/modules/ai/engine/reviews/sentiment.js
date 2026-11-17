@@ -1,8 +1,10 @@
 // lexicon sentiment with negation scope, intensifiers/diminishers and "but" contrast weighting
 const { LEXICON, PHRASES, NEGATORS, INTENSIFIERS, DIMINISHERS } = require('./lexicon');
 
+// clause punctuation becomes a "|" token so a negation never reaches across a comma
+// ("Not long-lasting, it fades within hours": "not" must not flip "fades")
 const tokenize = (text) =>
-  String(text || '').toLowerCase().replace(/n't\b/g, ' not').replace(/[^a-z0-9\s'-]/g, ' ').split(/\s+/).filter(Boolean)
+  String(text || '').toLowerCase().replace(/n't\b/g, ' not').replace(/[,;:]/g, ' | ').replace(/[^a-z0-9\s'|-]/g, ' ').split(/\s+/).filter(Boolean)
     .map((t) => t.replace(/'/g, ''));
 
 const splitSentences = (text) =>
@@ -26,11 +28,13 @@ const scoreSentence = (text) => {
         break;
       }
     }
+    if (tokens[i] === '|') continue;
     if (value === null) value = LEXICON.get(tokens[i]) ?? LEXICON.get(tokens[i].replace(/(?:ed|s)$/, '')) ?? null;
     if (value === null || value === 0) continue;
     let v = value;
     // modifiers within the 3 preceding tokens
-    for (let k = Math.max(0, i - 3); k < i; k += 1) {
+    const clauseStart = tokens.lastIndexOf('|', i - 1) + 1;
+    for (let k = Math.max(clauseStart, i - 3); k < i; k += 1) {
       const t = tokens[k];
       if (NEGATORS.has(t) && !PHRASES.has(tokens.slice(i, i + span).join(' '))) v = -v * 0.75;
       else if (INTENSIFIERS.has(t) && k === i - 1) v *= INTENSIFIERS.get(t);

@@ -146,6 +146,8 @@ const cartSnapshot = async (userId) => {
   return { items, couponCode: cart?.coupon_code || null };
 };
 
+const couponByCode = (code) => (code ? db('coupons').whereRaw('upper(code) = ?', [String(code).toUpperCase()]).first() : Promise.resolve(null));
+
 const activeCoupons = () =>
   db('coupons').where({ is_active: true })
     .andWhere((q) => q.whereNull('expires_at').orWhere('expires_at', '>', db.fn.now()))
@@ -208,7 +210,7 @@ module.exports = {
   catalogSignature, loadCatalogRows, loadTaxonomy, loadBrandNames, loadEmbeddings, upsertEmbeddings, countEmbeddings,
   loadImageEmbeddings, upsertImageEmbeddings,
   productsWithImages, ratingBreakdowns, reviewStamp, reviewsFor, productExists,
-  userSignals, profileExtras, basketRows, latestOrder, cartSnapshot, activeCoupons, recordSearch,
+  userSignals, profileExtras, basketRows, latestOrder, cartSnapshot, couponByCode, activeCoupons, recordSearch,
   createConversation, findConversation, updateConversation, listConversations, deleteConversation,
   conversationMessages, insertMessages, findMessageForUser, upsertFeedback, aiStats,
 };

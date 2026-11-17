@@ -2,18 +2,24 @@
 const L = require('../nlu/lexicon');
 const { stem } = require('../nlu/normalizer');
 const { getCatalog } = require('./catalog');
-const { scoreAll, order, mmr, reasonsFor, matchesColor } = require('../ranking/ranker');
+const { scoreAll, order, byTier, mmr, reasonsFor, matchesColor } = require('../ranking/ranker');
+const A = require('../ranking/attributes');
 const { money, list } = require('../format');
-
-const opposite = { men: 'women', women: 'men' };
 
 const categoryLabel = (catalog, slugs) =>
   list(slugs.map((s) => catalog.taxonomy.find((c) => c.slug === s)?.name || s), 'or');
 
+// "dress" also finds frocks and dresses filed under Tops: same department, product type tagged "dress"
+const expandedIn = (p, f) => {
+  if (!f.expandTypes?.length || !f.departments?.length || !f.departments.includes(p.department_slug)) return false;
+  const { types } = A.attrsOf(p);
+  return f.expandTypes.some((t) => types.has(t));
+};
+
 const applyFilters = (products, f) =>
   products.filter((p) => {
     if (f.inStock && p.stock <= 0) return false;
-    if (f.categories?.length && !f.categories.includes(p.category_slug)) return false;
+    if (f.categories?.length && !f.categories.includes(p.category_slug) && !expandedIn(p, f)) return false;
     if (!f.categories?.length && f.department && p.department_slug !== f.department) return false;
     const brand = (p.brand_name || '').toLowerCase();
     if (f.brands?.length && !f.brands.includes(brand)) return false;
@@ -21,7 +27,7 @@ const applyFilters = (products, f) =>
     if (f.minPrice != null && p.price < f.minPrice) return false;
     if (f.maxPrice != null && p.price > f.maxPrice) return false;
     if (f.minRating != null && p.rating < f.minRating) return false;
-    if (f.gender && p.gender === opposite[f.gender]) return false;
+    if (f.gender && !A.genderFits(p, f.gender)) return false;
     if (f.excludeColors?.some((c) => matchesColor(p, c))) return false;
     if (f.excludeIds?.size && f.excludeIds.has(p.id)) return false;
     return true;
@@ -39,6 +45,8 @@ const filtersFromSlots = (slots, excludeIds = []) => ({
   gender: slots.gender && slots.gender !== 'any' ? slots.gender : null,
   excludeColors: slots.excludeColors || [],
   excludeIds: new Set(excludeIds),
+  expandTypes: [...A.queryProfile(slots).expand],
+  departments: slots.department ? [slots.department] : [],
 });
 
 // weighted bm25 query: explicit keywords > feature/occasion/color expansion terms
@@ -67,7 +75,10 @@ const semanticQuery = (slots, catalog) => {
   if (slots.color) parts.push(slots.color);
   for (const f of slots.features || []) parts.push(L.FEATURES[f]?.label || f);
   parts.push(...(slots.keywords || []));
-  if (slots.categories?.length) parts.push(categoryLabel(catalog, slots.categories));
+  // the shopper's own product words ("cricket", "heels", "lamp") say more than the category name
+  const label = slots.categories?.length ? categoryLabel(catalog, slots.categories) : '';
+  for (const t of slots.terms || []) if (!parts.includes(t) && !label.toLowerCase().includes(t)) parts.push(t);
+  if (label) parts.push(label);
   if (slots.gender) parts.push(`for ${slots.gender}`);
   if (slots.occasion) parts.push(`for ${slots.occasion}`);
   return parts.join(' ').trim();
@@ -165,7 +176,7 @@ const retrieve = async (slots, options = {}) => {
   }
   const relaxations = relaxed.filter((r) => r.message);
 
-  const ctx = { catalog, slots, semantic: sem.scores, lexical, profile };
+  const ctx = { catalog, slots, semantic: sem.scores, lexical, profile, query: A.queryProfile(slots) };
   const scored = scoreAll(candidates, ctx);
   let ranked = order(scored, slots.sort || forcedSort);
   if (diversity && !slots.sort && !forcedSort && ranked.length > limit) {
@@ -174,20 +185,24 @@ const retrieve = async (slots, options = {}) => {
     ranked = [...head, ...ranked.filter((r) => !headIds.has(r.p.id))];
   }
   if (perCategoryCap) {
-    const counts = new Map();
-    const capped = [];
-    const overflow = [];
-    for (const r of ranked) {
-      const c = counts.get(r.p.category_slug) || 0;
-      (c < perCategoryCap ? capped : overflow).push(r);
-      counts.set(r.p.category_slug, c + 1);
-    }
-    ranked = [...capped, ...overflow];
+    // the cap only reorders inside a constraint tier, never lifts a weaker match over a better one
+    ranked = byTier(ranked).flatMap((group) => {
+      const counts = new Map();
+      const capped = [];
+      const overflow = [];
+      for (const r of group) {
+        const c = counts.get(r.p.category_slug) || 0;
+        (c < perCategoryCap ? capped : overflow).push(r);
+        counts.set(r.p.category_slug, c + 1);
+      }
+      return [...capped, ...overflow];
+    });
   }
   const page = ranked.slice(offset, offset + limit).map((s) => ({
     product: s.p,
     score: +Math.min(1, s.score).toFixed(3),
     parts: s.parts,
+    fit: s.fit,
     reasons: reasonsFor(s, ctx),
   }));
   return {

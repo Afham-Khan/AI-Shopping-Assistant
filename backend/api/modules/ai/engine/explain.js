@@ -175,7 +175,7 @@ const display = (v, { kind }) => {
   let level = oled ? 4 : tft ? 2 : 3;
   const parts = [];
   if (inch) {
-    if (['phone'].includes(kind)) parts.push(inch < 5.5 ? 'Compact screen, easy to use with one hand.' : inch <= 6.3 ? 'Comfortable size for one-handed use.' : 'Big screen, great for videos and games.');
+    if (['phone'].includes(kind)) parts.push(inch < 5.5 ? 'Compact screen, easy to use with one hand.' : inch <= 6.3 ? 'Comfortable size for one-handed use.' : 'Big screen: lots of room for videos and games.');
     else if (kind === 'laptop') parts.push(inch <= 13.5 ? 'Very portable size.' : inch < 15.5 ? 'A balanced size: portable but roomy enough to work on.' : 'Roomy for spreadsheets and movies, but less portable.');
     else if (kind === 'tablet') parts.push(inch >= 12 ? 'Large canvas for drawing, notes and split-screen.' : 'Handy size for reading, streaming and classes.');
   }
@@ -239,7 +239,8 @@ const battery = (v, { kind, p }) => {
       const total = first(/(\d+)\s*hours? with (?:the )?charging case/i, s);
       if (total) meaning = `About ${hours} hours per charge and ${total} hours in total with the charging case: a week of commutes.`;
     }
-    return out(`Up to ${hours} hours battery`, meaning, level, 'Battery life');
+    const wh = first(/(\d+(?:\.\d+)?)\s*wh\b/i, s);
+    return out(`${wh ? `${wh} Wh, up` : 'Up'} to ${hours} hours battery`, meaning, level, 'Battery life');
   }
   return null;
 };

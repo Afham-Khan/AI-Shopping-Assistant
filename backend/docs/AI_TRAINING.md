@@ -253,6 +253,117 @@ an error.
 `npm test` always runs offline (`test/setup.js` forces `LLM_PROVIDER=none`), and the probe does too unless
 you pass `--llm`.
 
+The LLM may also never change which product is the **top pick**: if its rewrite names a different product
+first than the first product card, the rewrite is thrown away and the offline reply is used.
+
+---
+
+## 9. Improving recommendations (no coding needed)
+
+This is for when Zel shows the **wrong products**, for example "best running shoes" showing high heels.
+You will: (1) write the bad case down as a test, (2) run one command, (3) read the report, and if it is a
+product-data problem, (4) fix the product's keywords.
+
+### Step 1: add the bad case to the golden set
+
+Open `backend/api/modules/ai/training/data/ranking-eval.json`. Every line under `"queries"` is one test.
+Copy a line that looks similar to your case, paste it at the end of the list (mind the comma between lines)
+and change it:
+
+```json
+{ "id": "shoes-running-5", "q": "shoes for my morning run", "group": "use-case: running",
+  "expectCategories": ["mens-shoes", "womens-shoes"], "mustMatchAny": ["sneaker", "trainer", "running"],
+  "mustNotMatch": ["heel", "slipper", "sandal"], "color": null, "gender": null,
+  "minPrice": null, "maxPrice": null, "brand": null, "minHits@3": 3 }
+```
+
+| Field | What to write |
+| --- | --- |
+| `id` | a new unique name |
+| `q` | exactly what you typed in the app (typos and Roman Urdu are fine) |
+| `expectCategories` | category slugs the top 3 must be in, or `null` for any. Slugs: `smartphones`, `laptops`, `tablets`, `mobile-accessories`, `mens-shirts`, `mens-shoes`, `mens-watches`, `tops`, `womens-dresses`, `womens-shoes`, `womens-bags`, `womens-jewellery`, `womens-watches`, `sunglasses`, `beauty`, `fragrances`, `skin-care`, `furniture`, `home-decoration`, `kitchen-accessories`, `groceries`, `sports-accessories`, `motorcycle`, `vehicle` |
+| `mustMatchAny` | words a GOOD product has in its title, keywords or specs (`"sneaker"` also matches "sneakers") |
+| `mustNotMatch` | words that make a product WRONG for this search (heels for running) |
+| `color` | `"red"`, `"black"`, ... if you asked for a colour, else `null` |
+| `gender` | `"men"` / `"women"` if you asked for one, else `null` |
+| `maxPrice` / `minPrice` | your budget in rupees, else `null` |
+| `brand` | e.g. `"Nike"` if you asked for a brand, else `null` |
+| `minHits@3` | how many of the first 3 cards must be good (usually 2 or 3) |
+| `followUps` | only for chats that ask a question first (gift finder: "What budget?"): e.g. `["no budget", "surprise me"]` |
+
+The schema at the top of the file explains every field again.
+
+### Step 2: run the evaluation
+
+```bash
+cd backend
+npm run ai:eval -- --only=shoes-running-5   # just your new case, quick
+npm run ai:eval                             # everything, writes test/RANKING_EVAL.md
+npm run ai:eval -- --failures               # print only the failing cases
+```
+
+It uses your local database and takes a few seconds. No app or server needs to be running.
+
+### Step 3: read the report
+
+`backend/test/RANKING_EVAL.md` has the numbers at the top (BEFORE = the old ranking, AFTER = now) and one
+row per query with the first 3 product titles and **PASS** or **FAIL** plus the reason:
+
+| Reason in the report | Meaning |
+| --- | --- |
+| `only 1/3 relevant in top 3` | not enough of the first 3 cards match `mustMatchAny` |
+| `#2 mustNotMatch: Red Shoes (heel)` | card 2 contains a forbidden word |
+| `#1 color: ... (Black)` | card 1 is the wrong colour although a right-coloured product exists |
+| `#3 gender / budget / brand / category` | card 3 breaks that requirement although a better product exists |
+| `reply's top pick "X" is not the first card` | the text recommends a different product than the first card |
+| `no products returned` | Zel showed nothing (asked a question, or misunderstood the message) |
+
+Numbers: **pass rate** (share of PASS), **precision@3** (how many of the first 3 cards are good) and
+**nDCG@5** (is the best product near the top; 1.0 is perfect). Higher is better for all three; violations
+should be 0.
+
+If the case fails, tell a developer which line fails. `npm test` now fails on any failing case, so if it can't
+be fixed today add `"knownFailure": true` to that line: it stays in the report but doesn't block everyone.
+If the catalogue simply has no right product (for example no women's running shoes), the evaluation already
+allows for that and won't count it against Zel.
+
+### Step 4: fix product data (keywords, colour, gender)
+
+Often a product is ranked wrong because its data doesn't say what it is. Product data lives in
+`backend/data/product-enrichment.json`, one block per product, keyed by the product number from
+`backend/data/dummyjson-products.json` (search that file for the title to find it; e.g. `90` = Puma Future
+Rider Trainers):
+
+```json
+"90": {
+  "specs": { "Style": "Retro running", "Heel": "Flat" },
+  "highlights": ["..."],
+  "color": "White",
+  "gender": "men",
+  "keywords": ["puma", "trainers", "running shoes", "gym shoes", "joota"]
+}
+```
+
+- `keywords`: add the words shoppers use ("running shoes", "gym shoes", "office wear", "gift for her").
+  Zel reads them to decide what a product **is** (sneaker, heel, slipper, dress, charger...) and what it is
+  **for** (running, gym, office, wedding, party, travel, summer...).
+- `color`: the main colour. For two colours put both in the title or a `"Colourway": "Red and black"` spec,
+  so "red & black" counts as red-ish.
+- `gender`: `"men"`, `"women"` or `"unisex"`.
+
+Then reload your **local** database and search index, restart the API and run the evaluation again:
+
+```bash
+npm run db:seed     # safe to repeat: updates products, never deletes anything
+npm run ai:index    # recompute the "meaning" vectors
+npm run ai:eval
+```
+
+Never run these against the live (Neon) database yourself; the lead does that when deploying.
+
+For developers: the use-case and product-type word lists are `USE_CASES`, `TYPE_WORDS`, `TYPE_RULES` and
+`USE_RULES` in `api/modules/ai/engine/ranking/attributes.js` (e.g. running = sneakers, never heels).
+
 ---
 
 ## Quick checklist
@@ -261,6 +372,38 @@ you pass `--llm`.
 # 1. edit api/modules/ai/training/data/intents.json (and/or nlu/lexicon.js)
 npm run ai:train                     # accuracy must stay >= 90%
 node scripts/probeAssistant.js       # check test/ASSISTANT_PROBE.md
+npm run ai:eval                      # recommendation relevance, check test/RANKING_EVAL.md
 npm test                             # everything green
 # 2. restart the API so it loads the new model
 ```
+
+## 10. Checking the other AI features (`npm run ai:audit`)
+
+Chat search has its own eval (section 9). Every other AI feature is checked by one audit script: compare, bundle builder, gift finder, complete the look, spec explainer, product Q&A, review summary, similar / bought together, cart insights, Shopping DNA, guided finder, the smart-search wrapper and Snap & Find.
+
+```bash
+npm run ai:audit                          # everything (~30 s; Snap & Find loads the image model)
+npm run ai:audit -- --no-visual           # skip Snap & Find
+npm run ai:audit -- --only gift,bundle    # just some features (does not rewrite the report)
+npm run ai:audit -- --verbose             # also print the cases that pass
+```
+
+It runs about 270 realistic cases against the local database and only reads from it (carts and shopping histories are faked in memory). Each case is checked the way a shopper would check it. A gift for dad must not be a women's item. "Best value" must not lose to a cheaper, better-rated product. 8 GB RAM must not be called "flagship". "Is it automatic?" on a manual bike must get "No". A cart with a Samsung phone must not be offered an iPhone case.
+
+**Reading the result.** The terminal prints a scorecard, for example `Gift finder 16/16 (100%)`, plus every failing case with its reasons:
+
+```
+FAIL dad likes travel, Rs 15,000 → Beats Flex…, Monopod, Party Glasses…
+     - novelty "Party Glasses" for a general gift
+```
+
+The first line shows the input and the top results. Each `-` line is one problem, written in plain words. The same results go to `test/AI_FEATURE_AUDIT.md`, which shows **BEFORE** (the saved baseline) and **AFTER** (this run) side by side, the failing cases, and a Notes block that you can edit by hand (it is kept when the report is regenerated). Snap & Find also reports recall: how often a cropped, mirrored product photo finds the same product or category.
+
+**When something fails:**
+- *Wrong product type, gender or age* (a bedside table as a desk, a girls' dress in an adult look): first check the product's data (category, `gender`, the "Ideal For" spec). The shared rules live in `api/modules/ai/engine/complements.js`.
+- *Wrong spec level or wording*: the rules are in `engine/explain.js` (one function per spec).
+- *Q&A says "yes" wrongly*: add the feature's words to `FEATURE_WORDS` / `CONTRARY` in `engine/qa.js`.
+- *Wrong pros/cons*: add the phrase to `engine/reviews/lexicon.js`.
+- *Similar / bought together*: these come from `engine/ranking/recommender.js`.
+
+Then run `npm run ai:audit` again, and `npm test`. To save a new BEFORE snapshot (only after a release, so the comparison stays meaningful), run `npm run ai:audit -- --baseline`.

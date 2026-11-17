@@ -85,8 +85,10 @@ const decideIntent = (a, e, ctx, refs, text) => {
   if (pending === 'which_product' && refs.ids.length) return 'add_to_cart';
   if (pending === 'bundle_budget' && e.budget) return 'bundle';
   if (pending === 'gift_interest') return 'gift_suggestion';
-  // a single product type without bundle words is a search ("laptop for gaming under 5 lakh")
-  if (intent === 'bundle' && e.categories.length === 1 && !/\b(?:setup|kit|bundle|set|routine|outfit|pack|combo|everything|starter|makeover|hamper|look|box)\b/.test(text)) return 'product_search';
+  // a single product type without bundle words is a search ("laptop for gaming under 5 lakh", "heels for a wedding",
+  // "protein for gym"): one category family (men's + women's shoes count as one) or a named product word
+  const families = new Set(e.categories.map((c) => c.replace(/^(?:mens|womens)-/, '')));
+  if (intent === 'bundle' && (families.size === 1 || (!families.size && e.keywords.length)) && !/\b(?:setup|kit|bundle|set|routine|outfit|pack|combo|everything|starter|makeover|hamper|look|box)\b/.test(text)) return 'product_search';
   const hasShown = ctx.lastProducts.length > 0 || ctx.focus;
   // "explain the specs of the first one" / "in simple words" -> plain-language spec explainer
   if (EXPLAIN_RE.test(text) && (hasShown || refs.ids.length || product)) return 'explain_specs';
@@ -663,15 +665,26 @@ const handleRelated = (kind) => async (t) => {
   }
   const base = catalog.byId.get(baseId);
   if (!base) return { content: 'Which product should I base that on? Search for something first.', suggestions: ['Phones', 'Laptops'] };
-  // fashion items get a styled outfit (colour harmony, gender, price band) instead of co-purchases
+  // fashion items get a styled outfit (colour harmony, gender, price band) instead of co-purchases; everything else
+  // gets complementary items (boughtTogether keeps only co-purchases that genuinely go with it: compatible, right
+  // audience, not a substitute, then fills from complementary categories)
   const look = kind === 'bought_together' && FASHION.has(base.category_slug) ? await completeLook(base.id, { limit: CHAT_LIMIT }) : null;
   const items = look ? look.items : (kind === 'similar' ? await similar(base.id, CHAT_LIMIT) : await boughtTogether(base.id, CHAT_LIMIT)) || [];
-  ctx.lastProducts = items.map((i) => i.product.id);
   ctx.focus = base.id;
+  if (!items.length) {
+    // nothing in the catalog really fits: say so instead of padding with unrelated products
+    return {
+      content: kind === 'similar'
+        ? `I couldn't find anything close enough to **${base.title}** right now.`
+        : `I don't have anything that genuinely goes with **${base.title}** in stock right now.`,
+      suggestions: kind === 'similar' ? ['Recommend something'] : ['Show similar items', 'Recommend something'],
+    };
+  }
+  ctx.lastProducts = items.map((i) => i.product.id);
   const top = items[0];
   const lead = kind === 'similar' ? `Here are items similar to **${base.title}**`
     : look ? `To complete the look with **${base.title}**: ${list(look.look.slice(0, 4).map((l) => l.role.toLowerCase()))}${look.palette?.tip ? `. ${look.palette.tip.replace(/\.$/, '')}` : ''}`
-      : `Shoppers who buy **${base.title}** often add these`;
+      : `These go well with **${base.title}**`;
   return {
     content: `${lead}.${top ? ` Top match: **${top.product.title}** at **${money(top.product.price)}** (${nl(top.reasons[0])}).` : ''}`,
     products: items,
